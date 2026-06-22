@@ -43,6 +43,23 @@ export class OrdersService {
     });
     if (!user) throw new ForbiddenException('Kullanıcı bulunamadı');
 
+    // Ürün doğrulama (M1): geçerli + aktif + kategori sipariş kategorisiyle uyumlu olmalı.
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: dto.items.map((i) => i.productId) } },
+      select: { id: true, category: true, active: true },
+    });
+    const byId = new Map(products.map((p) => [p.id, p]));
+    for (const item of dto.items) {
+      const p = byId.get(item.productId);
+      if (!p) throw new BadRequestException(`Ürün bulunamadı: ${item.productId}`);
+      if (!p.active) throw new BadRequestException(`Ürün pasif: ${item.productId}`);
+      if (p.category !== dto.category) {
+        throw new BadRequestException(
+          `Ürün kategorisi sipariş kategorisiyle uyuşmuyor (${p.category} ≠ ${dto.category})`,
+        );
+      }
+    }
+
     const quote = await this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],

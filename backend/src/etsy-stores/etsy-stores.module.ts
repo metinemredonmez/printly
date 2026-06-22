@@ -50,7 +50,9 @@ export class EtsyStoresService {
     if (!store || store.userId !== userId) {
       throw new NotFoundException('Mağaza bulunamadı');
     }
-    return this.prisma.etsyStore.delete({ where: { id } });
+    // Silinen kaydı ham döndürme — apiKey ciphertext + userId sızmasın (M4)
+    const deleted = await this.prisma.etsyStore.delete({ where: { id } });
+    return mask(deleted);
   }
 }
 

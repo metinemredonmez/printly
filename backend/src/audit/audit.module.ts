@@ -49,7 +49,11 @@ export class AuditService {
         entityId: filter.entityId,
       },
       orderBy: { createdAt: 'desc' },
-      take: Math.min(filter.take ?? 100, 500),
+      // Güvenli take: NaN/negatif/0 → varsayılan 100, üst sınır 500 (M3)
+      take:
+        Number.isFinite(filter.take) && (filter.take as number) > 0
+          ? Math.min(filter.take as number, 500)
+          : 100,
     });
   }
 }

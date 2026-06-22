@@ -8,11 +8,17 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
+import { IsDefined } from 'class-validator';
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+class SetSettingDto {
+  // value zorunlu (eksikse Prisma 500 + kaynak yolu sızıntısı yerine net 400 — M2)
+  @IsDefined() value: unknown;
+}
 
 // Varsayılan ayarlar (DB'de yoksa bunlar döner)
 export const DEFAULT_SETTINGS: Record<string, unknown> = {
@@ -82,10 +88,10 @@ export class SettingsController {
   @Put(':key')
   set(
     @Param('key') key: string,
-    @Body('value') value: unknown,
+    @Body() dto: SetSettingDto,
     @CurrentUser() user: AuthUser,
   ) {
-    return this.settings.set(key, value, user);
+    return this.settings.set(key, dto.value, user);
   }
 }
 

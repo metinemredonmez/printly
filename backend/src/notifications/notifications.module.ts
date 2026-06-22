@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   IsString,
@@ -60,10 +61,18 @@ export class NotificationsService {
   ) {}
 
   // ── Cihaz kaydı (push) ─────────────────────
-  registerDevice(userId: string, dto: RegisterDeviceDto) {
+  async registerDevice(userId: string, dto: RegisterDeviceDto) {
+    // Hijack koruması (H2): token başka bir hesaba kayıtlıysa devralma reddedilir;
+    // upsert update dalında da userId DEĞİŞTİRİLMEZ. (Push token cihaza özgü ve opak.)
+    const existing = await this.prisma.userDevice.findUnique({
+      where: { deviceToken: dto.deviceToken },
+    });
+    if (existing && existing.userId !== userId) {
+      throw new ForbiddenException('Bu cihaz başka bir hesaba kayıtlı');
+    }
     return this.prisma.userDevice.upsert({
       where: { deviceToken: dto.deviceToken },
-      update: { userId, platform: dto.platform, isActive: true, lastActiveAt: new Date() },
+      update: { platform: dto.platform, isActive: true, lastActiveAt: new Date() },
       create: { userId, deviceToken: dto.deviceToken, platform: dto.platform },
     });
   }

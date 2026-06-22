@@ -11,13 +11,13 @@ import { ProductCategory, ProductUnit } from '@prisma/client';
 
 export class CreateMaterialDto {
   @IsString() name: string;
-  @IsOptional() @IsInt() widthInch?: number;
+  @IsOptional() @IsInt() @Min(1) widthInch?: number;
   @IsOptional() settings?: Record<string, unknown>;
 }
 
 export class UpdateMaterialDto {
   @IsOptional() @IsString() name?: string;
-  @IsOptional() @IsInt() widthInch?: number;
+  @IsOptional() @IsInt() @Min(1) widthInch?: number;
   @IsOptional() settings?: Record<string, unknown>;
   @IsOptional() @IsBoolean() active?: boolean;
 }

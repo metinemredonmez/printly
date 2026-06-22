@@ -1,4 +1,11 @@
-import { Module, Injectable, Controller, Get, Query } from '@nestjs/common';
+import {
+  Module,
+  Injectable,
+  Controller,
+  Get,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { OrderStatus, PaymentStatus, Role, TransactionType, TransactionStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -93,10 +100,19 @@ export class ReportsService {
 
   // Dönem bazlı sipariş özeti
   async ordersRange(from?: string, to?: string) {
+    // Geçersiz tarih → Prisma 500 yerine net 400 (M6)
+    const parseDate = (s: string | undefined, label: string): Date | undefined => {
+      if (!s) return undefined;
+      const d = new Date(s);
+      if (isNaN(d.getTime())) {
+        throw new BadRequestException(`Geçersiz tarih (${label}): ${s}`);
+      }
+      return d;
+    };
     const where = {
       createdAt: {
-        gte: from ? new Date(from) : undefined,
-        lte: to ? new Date(to) : undefined,
+        gte: parseDate(from, 'from'),
+        lte: parseDate(to, 'to'),
       },
     };
     const [count, byCategory, byStatus, revenue] = await Promise.all([

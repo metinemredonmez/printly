@@ -116,6 +116,10 @@ export class AuthService {
   async setupTwoFactor(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
+    // 2FA yalnız doğrulanmış + aktif hesapta kurulabilir (L9)
+    if (!user.isEmailVerified || !user.active) {
+      throw new BadRequestException('2FA için e-posta doğrulanmış ve aktif hesap gerekir');
+    }
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(user.email, 'Ortak Doku', secret);
     await this.prisma.user.update({
@@ -188,8 +192,9 @@ export class AuthService {
 
   // Dev-only: şifre/OTP olmadan hızlı giriş (test kolaylığı). Prod'da kapalı.
   async mockLogin(email: string) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new ForbiddenException('Mock login yalnızca geliştirmede kullanılabilir');
+    // Allowlist: yalnız development/test (staging/boş NODE_ENV'de auth-bypass'ı engeller — I1)
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      throw new ForbiddenException('Mock login yalnızca geliştirme/test ortamında kullanılabilir');
     }
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase() },

@@ -6,7 +6,7 @@ import {
   Patch,
   ForbiddenException,
 } from '@nestjs/common';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Matches } from 'class-validator';
 import { Role } from '@prisma/client';
 import { OrganizationsService } from './organizations.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -15,7 +15,12 @@ import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorat
 class UpdateOrgDto {
   @IsOptional() @IsString() name?: string;
   @IsOptional() @IsString() taxInfo?: string;
-  @IsOptional() @IsString() slug?: string; // subdomain
+  // subdomain: yalnız a-z0-9- , 3-40 karakter (reserved kelimeler serviste reddedilir — M5)
+  @IsOptional()
+  @Matches(/^[a-z0-9-]{3,40}$/, {
+    message: 'slug yalnız küçük harf, rakam ve tire içerebilir (3-40 karakter)',
+  })
+  slug?: string;
   @IsOptional() theme?: Record<string, unknown>; // branding
 }
 
@@ -37,6 +42,8 @@ export class OrganizationsController {
     return this.orgs.findOne(user.organizationId);
   }
 
+  // Firma profilini yalnız Ekip Lideri veya Admin düzenleyebilir (USER yazamaz — M5)
+  @Roles(Role.TEAM_LEADER, Role.ADMIN)
   @Patch('me')
   updateMyOrg(@CurrentUser() user: AuthUser, @Body() dto: UpdateOrgDto) {
     if (!user.organizationId) throw new ForbiddenException('Firma bağlantınız yok');
