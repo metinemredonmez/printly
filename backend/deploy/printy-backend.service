@@ -15,7 +15,8 @@ Group=deploy
 WorkingDirectory=/home/deploy/printy/backend
 # NODE_ENV=production → ConfigModule .env.production'ı WorkingDirectory'den okur
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/node dist/main
+# Build çıktısı dist/src/main.js (tsc, src dışı prisma/seed de derlendiği için)
+ExecStart=/usr/bin/node dist/src/main
 Restart=on-failure
 RestartSec=5
 # Loglar journald'e gider: journalctl -u printy-backend -f
