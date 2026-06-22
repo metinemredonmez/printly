@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -9,39 +11,64 @@ import {
   CreateExtraOptionDto,
 } from './dto';
 
+const TTL = 300_000; // 5 dk
+const K = { materials: 'catalog:materials', products: 'catalog:products', extras: 'catalog:extras' };
+
 @Injectable()
 export class CatalogService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
+
+  private async cached<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    const hit = await this.cache.get<T>(key);
+    if (hit !== undefined && hit !== null) return hit;
+    const val = await fn();
+    await this.cache.set(key, val, TTL);
+    return val;
+  }
 
   // ── Materials ──────────────────────────────
   listMaterials(onlyActive = true) {
-    return this.prisma.material.findMany({
-      where: onlyActive ? { active: true } : undefined,
-      orderBy: { name: 'asc' },
-    });
+    if (!onlyActive) {
+      return this.prisma.material.findMany({ orderBy: { name: 'asc' } });
+    }
+    return this.cached(K.materials, () =>
+      this.prisma.material.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+    );
   }
 
-  createMaterial(dto: CreateMaterialDto) {
-    return this.prisma.material.create({
+  async createMaterial(dto: CreateMaterialDto) {
+    const m = await this.prisma.material.create({
       data: { ...dto, settings: dto.settings as Prisma.InputJsonValue },
     });
+    await this.cache.del(K.materials);
+    return m;
   }
 
   async updateMaterial(id: string, dto: UpdateMaterialDto) {
     await this.ensure('material', id);
-    return this.prisma.material.update({
+    const m = await this.prisma.material.update({
       where: { id },
       data: { ...dto, settings: dto.settings as Prisma.InputJsonValue },
     });
+    await this.cache.del(K.materials);
+    return m;
   }
 
   // ── Products ───────────────────────────────
   listProducts(onlyActive = true) {
-    return this.prisma.product.findMany({
-      where: onlyActive ? { active: true } : undefined,
-      include: { material: true },
-      orderBy: { name: 'asc' },
-    });
+    if (!onlyActive) {
+      return this.prisma.product.findMany({ include: { material: true }, orderBy: { name: 'asc' } });
+    }
+    return this.cached(K.products, () =>
+      this.prisma.product.findMany({
+        where: { active: true },
+        include: { material: true },
+        orderBy: { name: 'asc' },
+      }),
+    );
   }
 
   async getProduct(id: string) {
@@ -53,38 +80,48 @@ export class CatalogService {
     return p;
   }
 
-  createProduct(dto: CreateProductDto) {
-    return this.prisma.product.create({
+  async createProduct(dto: CreateProductDto) {
+    const p = await this.prisma.product.create({
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },
     });
+    await this.cache.del(K.products);
+    return p;
   }
 
   async updateProduct(id: string, dto: UpdateProductDto) {
     await this.getProduct(id);
-    return this.prisma.product.update({
+    const p = await this.prisma.product.update({
       where: { id },
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },
     });
+    await this.cache.del(K.products);
+    return p;
   }
 
   // ── Extra options ──────────────────────────
   listExtras(onlyActive = true) {
-    return this.prisma.extraOption.findMany({
-      where: onlyActive ? { active: true } : undefined,
-      orderBy: { name: 'asc' },
-    });
+    if (!onlyActive) {
+      return this.prisma.extraOption.findMany({ orderBy: { name: 'asc' } });
+    }
+    return this.cached(K.extras, () =>
+      this.prisma.extraOption.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
+    );
   }
 
-  createExtra(dto: CreateExtraOptionDto) {
-    return this.prisma.extraOption.create({ data: dto });
+  async createExtra(dto: CreateExtraOptionDto) {
+    const e = await this.prisma.extraOption.create({ data: dto });
+    await this.cache.del(K.extras);
+    return e;
   }
 
   async deleteExtra(id: string) {
     await this.ensure('extraOption', id);
-    return this.prisma.extraOption.update({
+    const e = await this.prisma.extraOption.update({
       where: { id },
       data: { active: false },
     });
+    await this.cache.del(K.extras);
+    return e;
   }
 
   private async ensure(model: 'material' | 'extraOption', id: string) {

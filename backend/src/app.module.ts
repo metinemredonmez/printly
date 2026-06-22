@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 import * as Joi from 'joi';
 
 import { PrismaModule } from './prisma/prisma.module';
@@ -44,6 +46,7 @@ import { HealthController } from './health.controller';
         R2_BUCKET: Joi.string().allow('').default('printy-files'),
         R2_ENDPOINT: Joi.string().allow('').default(''),
         R2_PRESIGN_EXPIRES: Joi.number().default(3600),
+        REDIS_URL: Joi.string().allow('').default(''),
         // SMTP (OTP e-posta). Boşsa kod log'a yazılır (dev).
         SMTP_HOST: Joi.string().allow('').default(''),
         SMTP_PORT: Joi.number().default(587),
@@ -55,6 +58,21 @@ import { HealthController } from './health.controller';
     }),
     // Global rate-limit: varsayılan 120 istek/dk; hassas auth endpoint'leri @Throttle ile daha sıkı.
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
+    // Global cache: REDIS_URL varsa Redis, yoksa in-memory (graceful).
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const url = config.get<string>('REDIS_URL');
+        if (!url) return { ttl: 60000 };
+        try {
+          const store = await redisStore({ url, ttl: 60000 });
+          return { store };
+        } catch {
+          return { ttl: 60000 }; // Redis erişilemezse in-memory'e düş
+        }
+      },
+    }),
     PrismaModule,
     MailModule,
     AuditModule,
