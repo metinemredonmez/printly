@@ -18,10 +18,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderStatus, Role } from '@prisma/client';
+import { OrderStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
-import { Roles } from '../common/decorators/roles.decorator';
+import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -147,13 +147,13 @@ export class BoardService {
 export class BoardController {
   constructor(private readonly board: BoardService) {}
 
-  @Roles(Role.ADMIN, Role.PRODUCTION)
+  @RequirePermission('board:manage')
   @Get()
   getBoard() {
     return this.board.getBoard();
   }
 
-  @Roles(Role.ADMIN, Role.PRODUCTION)
+  @RequirePermission('board:manage')
   @Patch('orders/:id/move')
   move(
     @CurrentUser() user: AuthUser,
@@ -163,7 +163,7 @@ export class BoardController {
     return this.board.move(user, id, dto.toStatus, dto.position);
   }
 
-  @Roles(Role.ADMIN, Role.PRODUCTION)
+  @RequirePermission('board:manage')
   @Patch('reorder')
   reorder(@Body() dto: ReorderDto) {
     return this.board.reorder(dto.status, dto.items);

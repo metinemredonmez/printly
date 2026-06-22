@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateStatusDto } from './dto';
-import { Roles } from '../common/decorators/roles.decorator';
+import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 @Controller('orders')
@@ -24,8 +23,8 @@ export class OrdersController {
     return this.orders.findOne(user, id);
   }
 
-  // Durum değiştirme: yalnızca ADMIN/PRODUCTION
-  @Roles(Role.ADMIN, Role.PRODUCTION)
+  // Durum değiştirme: 'order:updateStatus' izni (ADMIN '*' + PRODUCTION)
+  @RequirePermission('order:updateStatus')
   @Patch(':id/status')
   updateStatus(
     @CurrentUser() user: AuthUser,

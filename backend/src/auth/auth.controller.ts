@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { VerifyEmailDto, ResendOtpDto } from './dto/verify-email.dto';
 import { Public } from '../common/decorators/public.decorator';
+import { permissionsForRole } from '../common/permissions';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 @Controller('auth')
@@ -50,6 +51,11 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return user;
+  }
+
+  @Get('permissions')
+  permissions(@CurrentUser() user: AuthUser) {
+    return { role: user.role, permissions: permissionsForRole(user.role) };
   }
 
   // ── 2FA ──────────────────────────────────────
