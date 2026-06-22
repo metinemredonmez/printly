@@ -1,0 +1,221 @@
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  CreateMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
+  UploadPartCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { AssetStatus, AssetRole, Role, Asset } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { R2_CLIENT } from './r2.client';
+import { AuthUser } from '../common/decorators/current-user.decorator';
+import {
+  InitiateUploadDto,
+  CompleteUploadDto,
+  AbortUploadDto,
+  CompletePartDto,
+} from './dto';
+
+const PART_SIZE = 10 * 1024 * 1024; // 10 MB
+const MULTIPART_THRESHOLD = 15 * 1024 * 1024; // bunun üstü multipart
+const MAX_PARTS = 1000;
+const MAX_SIZE = 600 * 1024 * 1024; // 600 MB üst sınır
+
+// Role'e göre izin verilen dosya uzantıları (MIME tarayıcıda tutarsız olduğu için uzantı bazlı)
+const ALLOWED_EXT: Record<string, string[]> = {
+  PRODUCTION: ['pdf', 'ai', 'eps', 'png', 'tif', 'tiff'],
+  MOCKUP: ['jpg', 'jpeg', 'png'],
+  SHIPPING_LABEL: ['pdf', 'jpg', 'jpeg', 'png'],
+  OTHER: ['pdf', 'png', 'jpg', 'jpeg', 'tif', 'tiff'],
+};
+
+@Injectable()
+export class FilesService {
+  private bucket: string;
+  private expiresIn: number;
+
+  constructor(
+    @Inject(R2_CLIENT) private s3: S3Client,
+    private prisma: PrismaService,
+    config: ConfigService,
+  ) {
+    this.bucket = config.get<string>('R2_BUCKET') as string;
+    this.expiresIn = config.get<number>('R2_PRESIGN_EXPIRES') ?? 3600;
+  }
+
+  /**
+   * Yükleme başlatır. Küçük dosya → tek presigned PUT, büyük → multipart.
+   * Boyut + uzantı doğrulanır; orderId verilmişse sipariş sahipliği kontrol edilir.
+   */
+  async initiate(user: AuthUser, dto: InitiateUploadDto) {
+    const role = dto.role ?? AssetRole.OTHER;
+
+    // Boyut sınırı
+    if (dto.sizeBytes > MAX_SIZE) {
+      throw new BadRequestException(
+        `Dosya çok büyük (max ${Math.round(MAX_SIZE / 1024 / 1024)} MB)`,
+      );
+    }
+    // Uzantı whitelist
+    const ext = (dto.originalName.split('.').pop() || '').toLowerCase();
+    const allowed = ALLOWED_EXT[role] ?? ALLOWED_EXT.OTHER;
+    if (!allowed.includes(ext)) {
+      throw new BadRequestException(
+        `İzin verilmeyen dosya türü ".${ext}". ${role} için: ${allowed.join(', ')}`,
+      );
+    }
+    // orderId verildiyse sahiplik
+    if (dto.orderId) {
+      const order = await this.prisma.order.findUnique({
+        where: { id: dto.orderId },
+        select: { userId: true },
+      });
+      if (!order) throw new NotFoundException('Sipariş bulunamadı');
+      if (!this.canAccess(user, order.userId)) {
+        throw new ForbiddenException('Bu siparişe dosya ekleyemezsiniz');
+      }
+    }
+
+    const safeName = dto.originalName.replace(/[^\w.\-]+/g, '_').slice(-120);
+    const key = `org/${user.organizationId ?? 'platform'}/${randomUUID()}-${safeName}`;
+
+    const asset = await this.prisma.asset.create({
+      data: {
+        r2Key: key,
+        originalName: dto.originalName,
+        mime: dto.mime,
+        sizeBytes: BigInt(dto.sizeBytes),
+        status: AssetStatus.UPLOADING,
+        role,
+        orderId: dto.orderId,
+        userId: user.userId,
+      },
+    });
+
+    if (dto.sizeBytes <= MULTIPART_THRESHOLD) {
+      const url = await getSignedUrl(
+        this.s3,
+        new PutObjectCommand({ Bucket: this.bucket, Key: key, ContentType: dto.mime }),
+        { expiresIn: this.expiresIn },
+      );
+      return { mode: 'single' as const, assetId: asset.id, key, url };
+    }
+
+    const created = await this.s3.send(
+      new CreateMultipartUploadCommand({ Bucket: this.bucket, Key: key, ContentType: dto.mime }),
+    );
+    const uploadId = created.UploadId as string;
+
+    const partCount = Math.min(Math.ceil(dto.sizeBytes / PART_SIZE), MAX_PARTS);
+    const parts = await Promise.all(
+      Array.from({ length: partCount }, async (_, i) => {
+        const partNumber = i + 1;
+        const url = await getSignedUrl(
+          this.s3,
+          new UploadPartCommand({
+            Bucket: this.bucket,
+            Key: key,
+            UploadId: uploadId,
+            PartNumber: partNumber,
+          }),
+          { expiresIn: this.expiresIn },
+        );
+        return { partNumber, url };
+      }),
+    );
+
+    await this.prisma.asset.update({ where: { id: asset.id }, data: { uploadId } });
+
+    return {
+      mode: 'multipart' as const,
+      assetId: asset.id,
+      key,
+      uploadId,
+      partSize: PART_SIZE,
+      parts,
+    };
+  }
+
+  async markReady(user: AuthUser, assetId: string) {
+    await this.getOwnedAsset(user, assetId);
+    return this.prisma.asset.update({
+      where: { id: assetId },
+      data: { status: AssetStatus.READY },
+    });
+  }
+
+  async complete(user: AuthUser, dto: CompleteUploadDto) {
+    const asset = await this.getOwnedAsset(user, dto.assetId);
+    const parts = [...dto.parts].sort((a, b) => a.partNumber - b.partNumber);
+    await this.s3.send(
+      new CompleteMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: asset.r2Key,
+        UploadId: dto.uploadId,
+        MultipartUpload: {
+          Parts: parts.map((p: CompletePartDto) => ({
+            PartNumber: p.partNumber,
+            ETag: p.etag,
+          })),
+        },
+      }),
+    );
+    return this.prisma.asset.update({
+      where: { id: dto.assetId },
+      data: { status: AssetStatus.READY },
+    });
+  }
+
+  async abort(user: AuthUser, dto: AbortUploadDto) {
+    const asset = await this.getOwnedAsset(user, dto.assetId);
+    await this.s3.send(
+      new AbortMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: asset.r2Key,
+        UploadId: dto.uploadId,
+      }),
+    );
+    return this.prisma.asset.update({
+      where: { id: dto.assetId },
+      data: { status: AssetStatus.FAILED },
+    });
+  }
+
+  // İndirme: sahip VEYA ADMIN/PRODUCTION (üretim ekibi baskı için indirir).
+  async downloadUrl(user: AuthUser, assetId: string) {
+    const asset = await this.getOwnedAsset(user, assetId);
+    const url = await getSignedUrl(
+      this.s3,
+      new GetObjectCommand({ Bucket: this.bucket, Key: asset.r2Key }),
+      { expiresIn: this.expiresIn },
+    );
+    return { url, originalName: asset.originalName };
+  }
+
+  // ── yetki ────────────────────────────────────
+  private canAccess(user: AuthUser, ownerId: string | null): boolean {
+    if (user.role === Role.ADMIN || user.role === Role.PRODUCTION) return true;
+    return !!ownerId && ownerId === user.userId;
+  }
+
+  private async getOwnedAsset(user: AuthUser, id: string): Promise<Asset> {
+    const asset = await this.prisma.asset.findUnique({ where: { id } });
+    if (!asset) throw new NotFoundException('Dosya kaydı bulunamadı');
+    if (!this.canAccess(user, asset.userId)) {
+      throw new ForbiddenException('Bu dosyaya erişiminiz yok');
+    }
+    return asset;
+  }
+}

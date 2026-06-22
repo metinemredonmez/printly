@@ -1,0 +1,17 @@
+# Bağımlılıklar / build
+node_modules/
+dist/
+build/
+
+# Env (gerçek değerler push edilmez; sadece .env.example)
+.env
+.env.*
+!.env.example
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Loglar
+*.log

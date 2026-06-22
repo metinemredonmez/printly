@@ -1,0 +1,67 @@
+# Printy / Ortak Doku — SADECE ALTYAPI servisleri Docker'da çalışır.
+# Backend (NestJS) ve Frontend (Next.js) LOKALDE çalışır, Docker'da DEĞİL.
+#
+# Makinende zaten 5432 (Postgres) ve 6379 (Redis) kullanımda olduğu için
+# Printy çakışmayan portlar kullanır:  Postgres → 5433, Redis → 6380
+#
+# Çalıştır:  docker compose up -d
+#
+# ÖNEMLİ: Sabit proje adı "printy" → klasör adından ("backend") türeyen
+# proje-adı çakışması olmaz, başka projelerine asla dokunmaz.
+name: printy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: printy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: printy
+      POSTGRES_PASSWORD: printy
+      POSTGRES_DB: printy
+    ports:
+      - "5433:5432" # host 5433 → container 5432 (çakışmayı önler)
+    volumes:
+      - printy_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U printy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: printy-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379" # host 6380 → container 6379 (çakışmayı önler)
+    volumes:
+      - printy_redisdata:/data
+
+  # ── Kafka (OPSİYONEL — Faz 1'de GEREKMİYOR) ─────────────────
+  # Faz 1 arka plan işleri Redis + BullMQ ile yürür. Kafka'yı ancak
+  # gerçek event-streaming (Etsy/QuickBooks akışları, çoklu servis) gelince
+  # aç. Açmak için aşağıyı yorumdan çıkar:
+  #
+  # kafka:
+  #   image: bitnami/kafka:3.7
+  #   container_name: printy-kafka
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9094:9094"
+  #   environment:
+  #     KAFKA_CFG_NODE_ID: 1
+  #     KAFKA_CFG_PROCESS_ROLES: controller,broker
+  #     KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@127.0.0.1:9093
+  #     KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+  #     KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+  #     KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+  #     KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     ALLOW_PLAINTEXT_LISTENER: "yes"
+  #   volumes:
+  #     - printy_kafkadata:/bitnami/kafka
+
+volumes:
+  printy_pgdata:
+  printy_redisdata:
+  # printy_kafkadata:

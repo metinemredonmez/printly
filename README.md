@@ -1,0 +1,33 @@
+# Printy / Ortak Doku
+
+B2B Print-on-Demand sipariş + üretim takip platformu. Bayiler Etsy üzerinden ABD'ye
+**Wallpaper (m²) / Wall Decal / Wood (CNC)** satıyor.
+
+**Stack:** NestJS + PostgreSQL + Prisma + Cloudflare R2 + Redis · Frontend (Next.js, sonra) · AI servisi (ayrı, Python/FastAPI, sonra).
+
+## Yapı
+- [`backend/`](backend) — NestJS API (auth+OTP, katalog, fiyat motoru, sipariş+durum makinesi, R2 dosya yükleme, kredi/üyelik, Etsy mağaza, fatura). Kurulum: [backend/README.md](backend/README.md).
+- `docs/` — `mockup.html` (tasarım referansı).
+
+## Dökümanlar
+| Döküman | İçerik |
+|---|---|
+| [ANALIZ.md](ANALIZ.md) | Uçtan uca mimari |
+| [BACKEND-DETAY-ANALIZ.md](BACKEND-DETAY-ANALIZ.md) | Mimari + güvenlik denetimi |
+| [BACKEND-OZELLIK-KAPSAMI.md](BACKEND-OZELLIK-KAPSAMI.md) | HTML→backend özellik eşlemesi (78 özellik) |
+| [ENTEGRASYON-API.md](ENTEGRASYON-API.md) | Dış API haritası (Etsy/QuickBooks/kargo/AI...) |
+| [BACKEND-GENISLETME-PLANI.md](BACKEND-GENISLETME-PLANI.md) | 2FA, multi-tenant, ödeme, cache, bildirim, harita, kanban |
+| [AI-SERVIS.md](AI-SERVIS.md) | AI servisi (chatbox, virtual try-on, guardrails) |
+| [ADMIN-MAIL.md](ADMIN-MAIL.md) | Admin içeriden mail (SMTP+IMAP) |
+| [KANBAN-BOARD.md](KANBAN-BOARD.md) | Sipariş/üretim kanban |
+| [PUSH-ONESIGNAL.md](PUSH-ONESIGNAL.md) | OneSignal toplu push |
+| [MUSTERI-KURULUM-LISTESI.md](MUSTERI-KURULUM-LISTESI.md) | Müşteri hesap/kurulum listesi |
+
+## Çalıştırma (backend)
+```bash
+cd backend && nvm use 20
+cp .env.example .env.development   # değerleri doldur
+docker compose up -d               # Postgres :5433 + Redis :6380
+npm install && npm run prisma:migrate && npm run db:seed
+npm run start:dev                  # http://localhost:3001/api  (Swagger: /api/docs)
+```

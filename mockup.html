@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ortak Doku - Sipariş ve Operasyon Portalı</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (İkonlar için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Dinamik Tema Değişkenleri ve Reset Kodları -->
+    <style>
+        :root {
+            --color-primary: #1F5EFF;         /* Elektrik Mavisi */
+            --color-primary-hover: #1546C7;
+            --color-dark-navy: #0B1F3A;       /* Koyu Lacivert Menü */
+            --color-accent: #6B8E23;          /* Zeytin Yeşili */
+            --font-family: 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: #F8F9FA;
+        }
+        
+        /* Smooth Transition */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Drag and Drop Custom Styles */
+        .border-dashed-custom {
+            border-style: dashed;
+            border-width: 3px;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] text-[#2C3E50] min-h-screen flex flex-col antialiased">
+
+    <!-- Bildirimler için sağ üst köşede kayan konteyner -->
+    <div id="notification-container" class="fixed top-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full"></div>
+    
+    <!-- Sanal E-Posta Bildirim Konteyneri -->
+    <div id="email-simulator-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none max-w-md w-full"></div>
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 transition-all-300 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Sol Logo Alanı -->
+            <a href="#" onclick="showSection('dashboard')" class="flex items-center space-x-3 group">
+                <div id="dynamic-logo-container" class="h-12 w-auto flex items-center">
+                    <!-- Dinamik Logo Buraya Gelecek -->
+                </div>
+            </a>
+
+            <!-- Orta Menü Bağlantıları (Landing Page) -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+                <a href="#ecosystem" onclick="showSection('dashboard')" class="hover:text-primary transition-colors">Ekosistem</a>
+                <a href="#operations" onclick="showSection('dashboard')" class="hover:text-primary transition-colors">Operasyonlar</a>
+                <a href="#production" onclick="showSection('dashboard')" class="hover:text-primary transition-colors">Üretim</a>
+                <a href="#technology" onclick="showSection('dashboard')" class="hover:text-primary transition-colors">Teknoloji</a>
+            </nav>
+
+            <!-- Sağ Aksiyon Alanı -->
+            <div class="flex items-center space-x-4">
+                <!-- Profil Bilgisi (Giriş Yapılınca Görünür) -->
+                <div id="user-profile-badge" class="hidden items-center space-x-3">
+                    <div class="text-right">
+                        <div id="badge-name" class="text-sm font-bold text-slate-800">Kullanıcı Tanımsız</div>
+                        <div id="badge-role" class="text-xs text-slate-500">Profilinizi Doldurun</div>
+                    </div>
+                    <div id="badge-avatar" class="h-10 w-10 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm shadow-md">
+                        YK
+                    </div>
+                </div>
+
+                <!-- Giriş Yap ve Çıkış Yap Butonları -->
+                <button id="btn-login-gate" onclick="openLoginModal()" class="px-5 h-11 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-all shadow-md shadow-blue-100 flex items-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Giriş Yap</span>
+                </button>
+                <button id="btn-logout" onclick="logout()" class="hidden px-4 h-11 text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Çıkış Yap</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ANA PORTAL GÖVDESİ -->
+    <div class="flex-1 flex relative">
+        
+        <!-- SOL OPERASYON PANELİ (Sadece Giriş Yapıldığında Görünür) -->
+        <aside id="sidebar-panel" class="hidden w-64 bg-dark-navy text-white flex-col transition-all-300 shrink-0 shadow-2xl z-20">
+            <!-- Navigasyon Elemanları -->
+            <div class="p-6 flex-1 space-y-2">
+                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 mb-4">Operasyon Merkezi</p>
+                
+                <button onclick="showSection('products')" id="menu-btn-products" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+                    <i class="fa-solid fa-cubes w-5"></i>
+                    <span>Ürünler</span>
+                </button>
+
+                <button onclick="showSection('stores')" id="menu-btn-stores" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+                    <i class="fa-solid fa-store w-5"></i>
+                    <span>Mağazalarım</span>
+                </button>
+
+                <!-- AYRILMIŞ PROFİL VE FATURA SEKMELERİ -->
+                <button onclick="showSection('profile')" id="menu-btn-profile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>Profil Bilgileri</span>
+                </button>
+
+                <button onclick="showSection('billing')" id="menu-btn-billing" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+                    <i class="fa-solid fa-file-invoice-dollar w-5"></i>
+                    <span>Fatura Bilgileri</span>
+                </button>
+
+                <div class="pt-6 border-t border-white/5">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 mb-3">Sistem Bilgisi</p>
+                    <a href="ortak_doku_is_akisi.md" target="_blank" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
+                        <i class="fa-solid fa-circle-info w-5"></i>
+                        <span>İş Akış Kılavuzu</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin Paneli Giriş Tetikleyici (Sadece admin@ortakdoku.com rolünde görünür) -->
+            <div id="admin-panel-trigger" class="hidden p-4 border-t border-white/10 bg-black/10">
+                <button onclick="showSection('admin')" class="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>👑 Yönetici Paneli</span>
+                </button>
+            </div>
+
+            <!-- Alt Marka Alanı -->
+            <div class="p-6 border-t border-white/5 text-center text-[11px] text-slate-500">
+                &copy; 2026 Ortak Doku
+            </div>
+        </aside>
+
+        <!-- ANA İÇERİK ALANI -->
+        <main class="flex-1 overflow-y-auto px-4 py-8 md:p-8 lg:p-12">
+            
+            <!-- SECTION 1: LANDING PAGE & SAAS ANA SAYFA -->
+            <section id="view-dashboard" class="space-y-24 max-w-7xl mx-auto">
+                
+                <!-- HERO SECTION -->
+                <div class="relative overflow-hidden py-12 md:py-20 lg:py-24">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-7 space-y-8 text-left">
+                            <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-primary">
+                                <i class="fa-solid fa-rocket mr-1.5"></i> Yeni Nesil E-Ticaret Standartları
+                            </span>
+                            <h1 id="hero-title" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B1F3A] leading-tight tracking-tight">
+                                Birlikte Üreten, Birlikte Büyüyen Bir Ekosistem
+                            </h1>
+                            <p id="hero-desc-1" class="text-lg text-slate-600 font-medium leading-relaxed">
+                                Sürdürülebilir büyüme hedefleyen girişimciler için tasarlanmış; rakipsiz ürün fırsatlarını, güçlü üretim altyapısını, operasyonel sistemleri ve ölçeklenebilir iş süreçlerini tek ekosistemde bir araya getiriyoruz.
+                            </p>
+                            <p id="hero-desc-2" class="text-md text-slate-500 leading-relaxed">
+                                Ortak Doku, e-ticarete yeni başlayanlardan markasını büyütmek isteyen girişimcilere kadar herkesin daha hızlı, daha verimli ve daha güvenli ilerleyebilmesi için üretim, teknoloji, iş birlikleri ve operasyonel destek sunan bütünleşik bir yapıdır.
+                            </p>
+                            <div class="flex flex-wrap gap-4 pt-4">
+                                <button onclick="openApplyModal()" class="px-8 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center space-x-2">
+                                    <span>Şimdi Başvur</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sağ Taraf: Soyut Vektörel Altyapı İllüstrasyonu -->
+                        <div class="lg:col-span-5 relative flex items-center justify-center">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-50 to-emerald-50 rounded-full filter blur-3xl opacity-60"></div>
+                            <svg class="relative w-full max-w-md h-auto" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="200" cy="200" r="160" stroke="#1F5EFF" stroke-width="2" stroke-dasharray="8 8" class="animate-[spin_120s_linear_infinite]" />
+                                <circle cx="200" cy="200" r="100" stroke="#6B8E23" stroke-width="2" stroke-dasharray="4 4" class="animate-[spin_60s_linear_infinite_reverse]" />
+                                
+                                <circle cx="200" cy="40" r="12" fill="#0B1F3A" />
+                                <circle cx="200" cy="360" r="12" fill="#0B1F3A" />
+                                <circle cx="40" cy="200" r="12" fill="#1F5EFF" />
+                                <circle cx="360" cy="200" r="12" fill="#6B8E23" />
+                                
+                                <circle cx="100" cy="100" r="8" fill="#1F5EFF" />
+                                <circle cx="300" cy="300" r="8" fill="#1F5EFF" />
+                                <circle cx="300" cy="100" r="8" fill="#6B8E23" />
+                                <circle cx="100" cy="300" r="8" fill="#0B1F3A" />
+
+                                <line x1="200" y1="40" x2="40" y2="200" stroke="#0B1F3A" stroke-width="2" opacity="0.3" />
+                                <line x1="200" y1="40" x2="360" y2="200" stroke="#0B1F3A" stroke-width="2" opacity="0.3" />
+                                <line x1="40" y1="200" x2="200" y2="360" stroke="#1F5EFF" stroke-width="2" opacity="0.3" />
+                                <line x1="360" y1="200" x2="200" y2="360" stroke="#6B8E23" stroke-width="2" opacity="0.3" />
+                                
+                                <circle cx="200" cy="200" r="40" fill="#0B1F3A" />
+                                <circle cx="200" cy="200" r="30" fill="#1F5EFF" />
+                                <circle cx="200" cy="200" r="15" fill="#6B8E23" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIX CAPABILITIES SECTION (TEK EKOSİSTEM. ÇOKLU YETENEK.) -->
+                <div class="space-y-12">
+                    <div class="text-center space-y-4">
+                        <h2 class="text-3xl font-extrabold text-[#0B1F3A]">Tek Ekosistem. Çoklu Yetenek.</h2>
+                        <p class="text-slate-500 max-w-2xl mx-auto">Maksimum operasyonel verimlilik için senkronize edilmiş altı temel modül.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-industry"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">Üretim Ağı</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Ahşap, sticker (decal) ve duvar kağıdı üretimi için özel entegre tesislere anında yönlendirme.</p>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">Sipariş Yönetimi</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">İlk sipariş girişinden küresel kargo teslimatına kadar tüm aşamaları izleyen entegre arayüz.</p>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-gears"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">Operasyonel Sistemler</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Üretim detaylarını manuel ölçekleme hatalarına karşı koruyan standartlaştırılmış parametreler.</p>
+                        </div>
+                        <!-- Card 4 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-truck-ramp-box"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">Fulfillment (Sipariş Karşılama) Altyapısı</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Küresel lojistik hatları ve kargo çıkışında otomatik oluşturulan kargo takip kodları.</p>
+                        </div>
+                        <!-- Card 5 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">Teknoloji Platformu</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Tüm sipariş ve üretim verilerini güvenli ve her an erişilebilir tutan güçlü veritabanı altyapısı.</p>
+                        </div>
+                        <!-- Card 6 -->
+                        <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                            <div class="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-[#0B1F3A]">İş Ortaklıkları</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Hammadde sağlayıcılarını, zanaatkarları ve satıcı ekiplerini birleştiren özenle yönetilen iş ortaklığı ağı.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISION STATEMENT & CTA -->
+                <div id="technology" class="bg-dark-navy text-white p-12 md:p-16 rounded-3xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-8 space-y-4">
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-white">Daha Güçlü Bir Ticaret Ekosistemi İnşa Ediyoruz</h2>
+                        <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                            Ortak Doku, işletmelerin daha verimli çalışabilmesi ve güvenle büyüyebilmesi için altyapı, operasyonlar ve iş birliklerini bir araya getirmektedir.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-4 lg:text-right">
+                        <button onclick="openApplyModal()" class="px-8 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg transition-all">
+                            Şimdi Başvur
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- SECTION 1B: DİNAMİK ÜRÜNLER SAYFASI (GİRİŞ YAPINCA GÖRÜNÜR) -->
+            <section id="view-products" class="hidden max-w-6xl mx-auto space-y-12">
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-extrabold text-[#0B1F3A]">Ürünler ve Sipariş Portalı</h2>
+                    <p class="text-slate-500 text-sm">Üretim kategorinizi seçerek sipariş adımlarını hemen başlatabilirsiniz.</p>
+                </div>
+
+                <!-- Kategori Seçim Kartları -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Wallpaper -->
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-6 flex flex-col justify-between group">
+                        <div class="space-y-4">
+                            <div class="h-28 bg-blue-50/50 rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-scroll text-5xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wallpaper (Duvar Kağıdı)</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Premium dikey rulo baskı, m² bazlı fiyatlandırma ve kurulum aksesuar opsiyonları.</p>
+                        </div>
+                        <button onclick="startOrderWithCategory('Wallpaper')" class="w-full py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-colors text-xs flex items-center justify-center space-x-2">
+                            <span>Sipariş Oluştur</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Wall Decal -->
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-6 flex flex-col justify-between group">
+                        <div class="space-y-4">
+                            <div class="h-28 bg-emerald-50/50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-leaf text-5xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wall Decal (Duvar Çıkartması)</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Özel kesim sticker, harf ve duvar süslemeleri için doğrudan kesim siparişi.</p>
+                        </div>
+                        <button onclick="startOrderWithCategory('Wall Decal')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors text-xs flex items-center justify-center space-x-2">
+                            <span>Sipariş Oluştur</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Wood -->
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-all space-y-6 flex flex-col justify-between group">
+                        <div class="space-y-4">
+                            <div class="h-28 bg-amber-50/50 rounded-2xl flex items-center justify-center text-amber-700 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-tree text-5xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wood (Ahşap Oyma)</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Lazer kesim ahşap plakalar, kurumsal tabelalar ve dekoratif oyma tasarımları.</p>
+                        </div>
+                        <button onclick="startOrderWithCategory('Wood')" class="w-full py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl transition-colors text-xs flex items-center justify-center space-x-2">
+                            <span>Sipariş Oluştur</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SADECE "KULLANICI" ROLÜ İÇİN GÖRÜNECEK ÖZEL ALANLAR (TOPLU BAKİYE & EKİP ÜYESİ OLMA) -->
+                <div id="kullanici-promotions-area" class="hidden space-y-8 pt-8 border-t border-slate-200">
+                    <h3 class="text-2xl font-extrabold text-[#0B1F3A] flex items-center space-x-2">
+                        <i class="fa-solid fa-tags text-primary"></i>
+                        <span>Özel Fırsatlar & Üyelik Modelleri</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Toplu Bakiye Yükleme (250$) -->
+                        <div class="bg-gradient-to-br from-amber-50 to-orange-50/40 p-8 rounded-3xl border-2 border-amber-200 space-y-6 flex flex-col justify-between hover:shadow-lg transition-all">
+                            <div class="space-y-3">
+                                <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold uppercase rounded-md tracking-wider">Toplu Bakiye Avantajı</span>
+                                <h4 class="text-xl font-extrabold text-[#0B1F3A] flex items-center">
+                                    <span>⚡ 250$ Yükle, %40 İndirim Al!</span>
+                                </h4>
+                                <p class="text-slate-600 text-xs leading-relaxed">
+                                    250 dolar bakiye yükleyen fiyatlardan <strong>%40 indirim</strong> almaya hak kazanır. Bakiye bitince indirim sona erer. Bakiye yüklense de Ekip Üyesinin diğer imkanlarından faydalanamaz.
+                                </p>
+                            </div>
+                            <button id="btn-load-250-action" onclick="loadBulk250()" class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition-colors shadow-md shadow-amber-500/10">
+                                250$ Bakiye Yükle (%40 İndirimi Başlat)
+                            </button>
+                        </div>
+
+                        <!-- Ekip Üyesi Olma -->
+                        <div class="bg-blue-50/20 p-8 rounded-3xl border-2 border-primary space-y-6 flex flex-col justify-between hover:shadow-lg transition-all relative">
+                            <div class="absolute -top-3 right-8 bg-primary text-white text-[9px] font-bold uppercase py-1 px-3 rounded-full">Topluluk Gücü</div>
+                            <div class="space-y-3">
+                                <span class="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded-md tracking-wider">Sınırsız Gelişim</span>
+                                <h4 class="text-xl font-extrabold text-[#0B1F3A]">👑 Ekip Üyesi Statüsüne Geç</h4>
+                                <p class="text-slate-600 text-xs leading-relaxed">
+                                    Aylık 30$ aidat ödeyerek topluluk yapısına dahil olun; satış koçluğu, takım liderlerinden operasyonel destek ve ürünlere doğrudan en düşük indirim seviyelerinden erişim kazanın.
+                                </p>
+                            </div>
+                            <button id="btn-upgrade-team-action" onclick="upgradeToTeamMember()" class="w-full py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl text-xs transition-colors shadow-md shadow-blue-500/10">
+                                Ekip Üyesi Ol (Aylık 30$)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: ADIM ADIM YENİ SİPARİŞ PORTALI -->
+            <section id="view-new-order" class="hidden max-w-5xl mx-auto space-y-8">
+                
+                <!-- ÜST DURUM VE İLERLEME ÇUBUĞU -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-[#0B1F3A] flex items-center space-x-2">
+                            <span class="p-2 rounded-lg bg-blue-50 text-primary text-xs font-bold uppercase">YENİ SİPARİŞ</span>
+                            <span>Sipariş Akış Kartı</span>
+                        </h2>
+                        <span id="progress-text" class="text-xs font-bold text-slate-400">Adım 1 / 6</span>
+                    </div>
+                    <!-- İlerleme Barı -->
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-primary h-full rounded-full transition-all duration-500" style="width: 16.66%;"></div>
+                    </div>
+                    <!-- Görsel Adım Çizgisi -->
+                    <div class="grid grid-cols-6 gap-2 text-[10px] text-center font-bold text-slate-400">
+                        <div id="step-label-1" class="text-primary">1. Kategori</div>
+                        <div id="step-label-2">2. Ürün</div>
+                        <div id="step-label-3">3. Sipariş Detayı</div>
+                        <div id="step-label-4">4. Ödeme</div>
+                        <div id="step-label-5">5. Dosyalar</div>
+                        <div id="step-label-6">6. Teslimat</div>
+                    </div>
+                </div>
+
+                <!-- ADIM 1: KATEGORİ SEÇİMİ -->
+                <div id="order-step-1" class="order-step-container grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Kategori: Wallpaper -->
+                    <button onclick="selectCategory('Wallpaper')" class="bg-white p-8 rounded-3xl border-2 border-slate-100 hover:border-primary text-left transition-all hover:shadow-xl space-y-6 group flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="h-24 bg-blue-50/50 rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-scroll text-4xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wallpaper</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Duvar kağıdı, rulo, paketleme ve montaj seti siparişlerinizi oluşturun.</p>
+                        </div>
+                        <div class="flex items-center justify-between w-full pt-4">
+                            <span class="text-xs font-bold text-primary">Seç ve İlerle</span>
+                            <i class="fa-solid fa-arrow-right text-primary group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </button>
+                    <!-- Kategori: Wall Decal -->
+                    <button onclick="selectCategory('Wall Decal')" class="bg-white p-8 rounded-3xl border-2 border-slate-100 hover:border-primary text-left transition-all hover:shadow-xl space-y-6 group flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="h-24 bg-emerald-50/50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-leaf text-4xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wall Decal</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Özel kesim sticker ve duvar yapışkanları siparişlerinizi oluşturun.</p>
+                        </div>
+                        <div class="flex items-center justify-between w-full pt-4">
+                            <span class="text-xs font-bold text-emerald-600">Seç ve İlerle</span>
+                            <i class="fa-solid fa-arrow-right text-emerald-600 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </button>
+                    <!-- Kategori: Wood -->
+                    <button onclick="selectCategory('Wood')" class="bg-white p-8 rounded-3xl border-2 border-slate-100 hover:border-primary text-left transition-all hover:shadow-xl space-y-6 group flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="h-24 bg-amber-50/50 rounded-2xl flex items-center justify-center text-amber-700 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-tree text-4xl"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-[#0B1F3A]">Wood</h3>
+                            <p class="text-slate-500 text-sm leading-relaxed">Ahşap paneller, dekoratif levhalar ve oymalı ahşap işlerinizi sipariş edin.</p>
+                        </div>
+                        <div class="flex items-center justify-between w-full pt-4">
+                            <span class="text-xs font-bold text-amber-700">Seç ve İlerle</span>
+                            <i class="fa-solid fa-arrow-right text-amber-700 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- ADIM 2: ÜRÜN TÜRÜ SEÇİMİ (WALLPAPER İÇİN) -->
+                <div id="order-step-2" class="order-step-container hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Peel & Stick Smooth -->
+                        <label class="bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary transition-all cursor-pointer block relative">
+                            <input type="radio" name="product_type" value="Peel & Stick Smooth" class="absolute right-4 top-4 h-5 w-5 accent-primary" checked>
+                            <h4 class="font-bold text-[#0B1F3A] text-lg mb-2">Peel & Stick Smooth</h4>
+                            <p class="text-slate-500 text-xs leading-relaxed mb-4">Kendinden yapışkanlı, düz yüzey, pürüzsüz doku. Kolay uygulama.</p>
+                            <div class="text-sm font-bold text-primary product-price-label">$23.00 / m²</div>
+                        </label>
+                        <!-- Peel & Stick Canvas -->
+                        <label class="bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary transition-all cursor-pointer block relative">
+                            <input type="radio" name="product_type" value="Peel & Stick Canvas / Textile" class="absolute right-4 top-4 h-5 w-5 accent-primary">
+                            <h4 class="font-bold text-[#0B1F3A] text-lg mb-2">Peel & Stick Canvas</h4>
+                            <p class="text-slate-500 text-xs leading-relaxed mb-4">Kumaş dokulu, kendinden yapışkanlı, premium duvar kağıdı modeli.</p>
+                            <div class="text-sm font-bold text-primary product-price-label">$23.00 / m²</div>
+                        </label>
+                        <!-- Traditional -->
+                        <label class="bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary transition-all cursor-pointer block relative">
+                            <input type="radio" name="product_type" value="Traditional" class="absolute right-4 top-4 h-5 w-5 accent-primary">
+                            <h4 class="font-bold text-[#0B1F3A] text-lg mb-2">Traditional</h4>
+                            <p class="text-slate-500 text-xs leading-relaxed mb-4">Klasik tutkallı duvar kağıdı modeli, yapıştırıcı ile beraber uygulanır.</p>
+                            <div class="text-sm font-bold text-primary product-price-label">$23.00 / m²</div>
+                        </label>
+                    </div>
+
+                    <!-- EK ÜRÜNLER ALANI (SABİT FİYATLANDIRILMIŞTIR) -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-4">
+                        <h4 class="font-bold text-[#0B1F3A] flex items-center space-x-2">
+                            <i class="fa-solid fa-boxes-stacked text-primary"></i>
+                            <span>Ek Opsiyonlar / Aksesuarlar (Her iki üyelikte de aynı fiyattır)</span>
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="flex items-start p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" name="extra_products" value="Shipping Box" class="mt-1 h-4 w-4 accent-primary mr-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-xs">Shipping Box (Koli)</div>
+                                    <div class="text-[10px] text-slate-500">Güçlendirilmiş özel kargo kutusu ($2.50)</div>
+                                </div>
+                            </label>
+                            <label class="flex items-start p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" name="extra_products" value="Installation Kit" class="mt-1 h-4 w-4 accent-primary mr-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-xs">Installation Kit (Montaj Kiti)</div>
+                                    <div class="text-[10px] text-slate-500">Uygulama spatulası, maket bıçağı ($3.00)</div>
+                                </div>
+                            </label>
+                            <!-- Sample (Numune) -->
+                            <label class="flex items-start p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="chk-sample" name="extra_products" value="Sample" onchange="toggleSampleMode(this)" class="mt-1 h-4 w-4 accent-primary mr-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-xs text-amber-700 flex items-center">
+                                        <span>Sample (Numune)</span>
+                                        <span class="ml-1.5 px-1 bg-amber-100 text-amber-800 text-[8px] rounded">Sınırlı Ölçü</span>
+                                    </div>
+                                    <div class="text-[10px] text-slate-500">Otomatik 20" x 15" numune paneli ($2.50)</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Alt Buton Şeridi -->
+                    <div class="flex justify-between items-center">
+                        <button onclick="goToPrevStep()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="goToNextStep()" class="px-8 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all">
+                            Devam Et
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ADIM 3: SİPARİŞ DETAYLARI VE ÖLÇÜLER -->
+                <div id="order-step-3" class="order-step-container hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                        
+                        <!-- Ölçüler Bilgilendirme Kutusu (Sample için kilitlenebilir) -->
+                        <div id="sample-dimensions-banner" class="hidden bg-blue-50 border-l-4 border-primary p-4 rounded-xl">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fa-solid fa-circle-info text-primary"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-xs text-blue-700 font-semibold">
+                                        Numune (Sample) siparişi seçildi. Ölçüleriniz otomatik olarak standart 20" x 15" seviyesine sabitlenmiştir.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Genişlik / Yükseklik Form Alanları -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Genişlik (Width - inch) *</label>
+                                <input type="number" id="order_width" oninput="calculateAreaAndPrice()" placeholder="Genişlik girin" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Yükseklik (Height - inch) *</label>
+                                <input type="number" id="order_height" oninput="calculateAreaAndPrice()" placeholder="Yükseklik girin" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Metrekare ve FeetKare Hesaplama Widget'ı -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/50">
+                            <div class="p-4 bg-white rounded-lg text-center border border-slate-100 shadow-sm">
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Hesaplanan Toplam Alan</div>
+                                <div id="calculated-sqft" class="text-xl font-extrabold text-[#0B1F3A] mt-1">0.00 ft²</div>
+                            </div>
+                            <div class="p-4 bg-white rounded-lg text-center border border-slate-100 shadow-sm">
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Metrik Değeri (m²)</div>
+                                <div id="calculated-sqm" class="text-xl font-extrabold text-primary mt-1">0.00 m²</div>
+                            </div>
+                        </div>
+
+                        <!-- Etsy Sipariş No & Tarih -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Etsy Sipariş No *</label>
+                                <input type="text" id="order_etsy_no" placeholder="Örn: 301452841" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sipariş Tarihi *</label>
+                                <input type="date" id="order_date" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Mağaza Seçim Alanı -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Siparişi Veren Mağaza *</label>
+                            <select id="order_store_select" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                                <option value="">Bir Mağaza Seçin</option>
+                            </select>
+                            <div id="no-store-alert" class="hidden mt-2 text-xs text-rose-600 font-medium flex items-center space-x-1">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>Tanımlı mağazanız yok. Sipariş vermeden önce lütfen ayarlar sekmesinden mağaza tanımlayın.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <button onclick="goToPrevStep()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="goToNextStep()" class="px-8 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all">
+                            Devam Et
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ADIM 4: ÖDEME BİLGİLERİ -->
+                <div id="order-step-4" class="order-step-container hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                            <h3 class="font-bold text-[#0B1F3A] text-lg">Ödeme Yöntemi Tercih Edin</h3>
+                            
+                            <!-- Bakiye Ödeme Kartı -->
+                            <div onclick="selectPaymentMethod('balance')" id="pay-card-balance" class="p-6 border-2 border-primary rounded-2xl cursor-pointer transition-all bg-blue-50/20 relative">
+                                <div class="flex items-center space-x-4">
+                                    <div class="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                                        <i class="fa-solid fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-[#0B1F3A] text-sm">Bakiyeden Öde</h4>
+                                        <p class="text-xs text-slate-500 mt-1">Ön yüklemeli bakiyenizden otomatik tahsil edilir.</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-xs text-slate-400 font-bold">Kullanılabilir Bakiye:</span>
+                                    <span id="active-user-balance" class="text-sm font-bold text-emerald-600">$0.00 USD</span>
+                                </div>
+                            </div>
+
+                            <!-- Kredi Kartı Ödeme Kartı -->
+                            <div onclick="selectPaymentMethod('card')" id="pay-card-cc" class="p-6 border-2 border-slate-200 hover:border-primary rounded-2xl cursor-pointer transition-all relative">
+                                <div class="flex items-center space-x-4">
+                                    <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-[#0B1F3A] text-sm">Kredi Kartı ile Öde</h4>
+                                        <p class="text-xs text-slate-500 mt-1">Güvenli 3D Secure kredi kartı entegrasyonu.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Özet Fatura Detayı -->
+                        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-100 space-y-4 shadow-sm h-fit">
+                            <h3 class="font-bold text-[#0B1F3A] text-sm uppercase tracking-wider">Fatura Özeti</h3>
+                            <div class="divide-y divide-slate-100 text-xs">
+                                <div class="py-3 flex justify-between">
+                                    <span class="text-slate-500">Ürün / m² Bedeli:</span>
+                                    <span id="bill-base-price" class="font-semibold text-slate-800">$0.00</span>
+                                </div>
+                                <div class="py-3 flex justify-between">
+                                    <span class="text-slate-500">Ekstra Seçenekler:</span>
+                                    <span id="bill-extras-price" class="font-semibold text-slate-800">$0.00</span>
+                                </div>
+                                <!-- %40 bakiye indirim rozeti eklentisi -->
+                                <div id="bill-discount-row" class="py-3 flex justify-between text-emerald-600 hidden">
+                                    <span>⚡ %40 Bakiye İndirimi:</span>
+                                    <span id="bill-discount-amount">-$0.00</span>
+                                </div>
+                                <div class="py-3 flex justify-between text-base font-bold text-[#0B1F3A]">
+                                    <span>Toplam Sipariş Tutarı:</span>
+                                    <span id="bill-total-price">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <button onclick="goToPrevStep()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="goToNextStep()" class="px-8 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all">
+                            Ödemeyi Onayla ve İlerle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ADIM 5: TASARIM DOSYALARI -->
+                <div id="order-step-5" class="order-step-container hidden space-y-6">
+                    <div class="bg-white p-8 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                        
+                        <!-- Üretim Dosyası (Yüksek Çözünürlüklü) -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Üretim Dosyası (PDF / AI / EPS / PNG) *</label>
+                            <div class="border-3 border-dashed border-slate-200 hover:border-primary rounded-2xl p-8 text-center transition-all cursor-pointer relative bg-slate-50/50" onclick="triggerFileInput('file_production')">
+                                <input type="file" id="file_production" class="hidden" accept=".pdf,.ai,.eps,.png" onchange="handleFileSelected(this, 'production-status')">
+                                <div class="space-y-3">
+                                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm mx-auto">
+                                        <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-600">Sürükle veya Dosya Seç</div>
+                                    <div class="text-[10px] text-slate-400">PDF, AI, EPS veya yüksek çözünürlüklü PNG (Max 500MB)</div>
+                                    <div id="production-status" class="text-xs text-emerald-600 font-semibold hidden">
+                                        <i class="fa-solid fa-circle-check"></i> Dosya başarıyla seçildi
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ölçülü Kontrol Görseli -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Ölçülü Kontrol Görseli (JPG / JPEG / PNG) *</label>
+                            <div class="border-3 border-dashed border-slate-200 hover:border-primary rounded-2xl p-8 text-center transition-all cursor-pointer relative bg-slate-50/50" onclick="triggerFileInput('file_mockup')">
+                                <input type="file" id="file_mockup" class="hidden" accept=".jpg,.jpeg,.png" onchange="handleFileSelected(this, 'mockup-status')">
+                                <div class="space-y-3">
+                                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm mx-auto">
+                                        <i class="fa-solid fa-image text-lg"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-600">Sürükle veya Dosya Seç</div>
+                                    <div class="text-[10px] text-slate-400">JPG, JPEG veya PNG formatında şablon/kontrol görseli</div>
+                                    <div id="mockup-status" class="text-xs text-emerald-600 font-semibold hidden">
+                                        <i class="fa-solid fa-circle-check"></i> Kontrol görseli seçildi
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <button onclick="goToPrevStep()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="goToNextStep()" class="px-8 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all">
+                            Dosyaları Yükle ve Devam Et
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ADIM 6: TESLİMAT BİLGİLERİ -->
+                <div id="order-step-6" class="order-step-container hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                        
+                        <!-- İsim & Soyisim -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Müşteri Adı *</label>
+                                <input type="text" id="order_client_name" placeholder="Müşteri adını girin" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Müşteri Soyadı *</label>
+                                <input type="text" id="order_client_surname" placeholder="Müşteri soyadını girin" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Adres (Uzun Metin) -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Müşteri Adresi *</label>
+                            <textarea id="order_client_address" rows="3" placeholder="Sokak, daire, bina no vb." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm"></textarea>
+                        </div>
+
+                        <!-- Kargo Etiketi Yükleme Alanı -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Kargo Etiketi (Shipping Label - PDF / JPG / PNG) *</label>
+                            <div class="border-3 border-dashed border-slate-200 hover:border-primary rounded-2xl p-6 text-center transition-all cursor-pointer relative bg-slate-50/50" onclick="triggerFileInput('file_shipping_label')">
+                                <input type="file" id="file_shipping_label" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelected(this, 'shipping-label-status')">
+                                <div class="space-y-2">
+                                    <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-primary shadow-sm mx-auto">
+                                        <i class="fa-solid fa-file-invoice text-lg"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-600">Sürükle veya Kargo Etiketi Seç</div>
+                                    <div class="text-[10px] text-slate-400">PDF, JPG veya PNG formatında Etsy kargo etiketi</div>
+                                    <div id="shipping-label-status" class="text-xs text-emerald-600 font-semibold hidden">
+                                        <i class="fa-solid fa-circle-check"></i> Kargo etiketi başarıyla yüklendi
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ülke Seçimi (Dropdown) ve Posta Kodu -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ülke *</label>
+                                <select id="order_client_country" onchange="triggerZipLookup()" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                                    <option value="">Ülke Seçiniz</option>
+                                    <option value="US">Amerika Birleşik Devletleri (US)</option>
+                                    <option value="CA">Kanada (CA)</option>
+                                    <option value="GB">Birleşik Krallık (GB)</option>
+                                    <option value="DE">Almanya (DE)</option>
+                                    <option value="FR">Fransa (FR)</option>
+                                    <option value="IT">İtalya (IT)</option>
+                                    <option value="ES">İspanya (ES)</option>
+                                    <option value="NL">Hollanda (NL)</option>
+                                    <option value="TR">Türkiye (TR)</option>
+                                    <option value="AU">Avustralya (AU)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Posta Kodu *</label>
+                                <div class="relative">
+                                    <input type="text" id="order_client_zip" onblur="triggerZipLookup()" placeholder="Örn: 90210" class="w-full pl-4 pr-10 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                                    <div id="zip-lookup-indicator" class="hidden absolute right-3 top-3.5 text-slate-400">
+                                        <i class="fa-solid fa-spinner animate-spin"></i>
+                                    </div>
+                                    <div id="zip-success-indicator" class="hidden absolute right-3 top-3.5 text-emerald-500">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </div>
+                                <span id="zip-status-text" class="text-[10px] font-semibold text-slate-400 mt-1 block">Ülke ve posta kodu girince adres otomatik tamamlanır.</span>
+                            </div>
+                        </div>
+
+                        <!-- Şehir, Eyalet, Telefon -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Şehir *</label>
+                                <input type="text" id="order_client_city" placeholder="Şehir" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Eyalet / Bölge *</label>
+                                <input type="text" id="order_client_state" placeholder="Eyalet" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Telefon No (Opsiyonel)</label>
+                                <input type="text" id="order_client_phone" placeholder="Telefon" class="w-full px-4 h-12 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Ek Sipariş Notu -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Müşteri Notu</label>
+                            <textarea id="order_client_note" rows="2" placeholder="Üretime iletmek istediğiniz özel bir not varsa yazın..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary transition-all text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Alt Butonlar -->
+                    <div class="flex justify-between items-center">
+                        <button onclick="goToPrevStep()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="submitOrderForm()" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Siparişi Kaydet ve Gönder</span>
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- SECTION 3: MAĞAZALARIM BÖLÜMÜ -->
+            <section id="view-stores" class="hidden max-w-4xl mx-auto space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-extrabold text-[#0B1F3A]">Etsy Mağazalarım</h2>
+                    <button onclick="openAddStoreModal()" class="px-5 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-colors text-xs flex items-center space-x-1.5 shadow-md">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Yeni Mağaza Tanımla</span>
+                    </button>
+                </div>
+
+                <!-- Mağaza Kartları Alanı -->
+                <div id="store-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Boş Durum Şablonu -->
+                    <div id="stores-empty-state" class="col-span-full bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-400">
+                        <i class="fa-solid fa-store text-4xl mb-4 text-slate-300"></i>
+                        <p class="font-bold text-slate-600 text-sm">Kayıtlı Mağazanız Bulunmuyor</p>
+                        <p class="text-xs text-slate-400 mt-1">Sipariş verebilmek için lütfen ilk Etsy mağazanızı ekleyin.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: PROFİL BİLGİLERİ (BÖLÜNMÜŞ - YALNIZCA KİŞİSEL BİLGİLER & ŞİFRE) -->
+            <section id="view-profile" class="hidden max-w-2xl mx-auto space-y-8">
+                <h2 class="text-2xl font-extrabold text-[#0B1F3A]">Profil Bilgileri</h2>
+                
+                <!-- Akıllı Doğrulama Uyarı Paneli -->
+                <div id="profile-warning-banner" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl flex items-start space-x-3 hidden animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-lg"></i>
+                    <div class="text-xs text-amber-800 leading-relaxed font-semibold">
+                        Profil bilgileriniz henüz tanımlanmamış! Diğer bölümleri kullanmak, sipariş oluşturmak, bakiye yüklemek veya topluluğa katılmak için lütfen aşağıdaki Ad Soyad, E-posta ve Telefon bilgilerini eksiksiz doldurup kaydedin.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                    <h3 class="font-bold text-[#0B1F3A] text-md pb-3 border-b border-slate-100 flex items-center space-x-2">
+                        <i class="fa-solid fa-user-gear text-primary"></i>
+                        <span>Kişisel Bilgiler</span>
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Ad Soyad *</label>
+                            <input type="text" id="prof_name" placeholder="Adınızı ve soyadınızı girin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary text-sm transition-all">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">E-posta *</label>
+                                <span id="email-verification-badge" class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800">Onay Bekliyor</span>
+                            </div>
+                            <input type="email" id="prof_email" readonly placeholder="E-posta adresiniz" class="w-full px-4 h-11 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Telefon No *</label>
+                            <input type="text" id="prof_phone" placeholder="Telefon numaranızı girin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary text-sm transition-all">
+                        </div>
+
+                        <!-- EKİP ÜYELERİ İÇİN ZORUNLU EKİP LİDERİ SEÇİM ALANI -->
+                        <div id="leader-selection-container" class="hidden">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Bağlı Olduğunuz Ekip Lideri *</label>
+                            <select id="prof_connected_leader" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-primary text-sm transition-all">
+                                <option value="">Bir Ekip Lideri Seçiniz</option>
+                            </select>
+                            <span class="text-[10px] text-slate-400 mt-1 block">Kurallar gereği her ekip üyesi bir lider gözetiminde çalışmalıdır.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ŞIFRE DEĞİŞTİRME / GÜVENLİK ALANI -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                    <h3 class="font-bold text-[#0B1F3A] text-md pb-3 border-b border-slate-100 flex items-center space-x-2">
+                        <i class="fa-solid fa-shield-halved text-primary"></i>
+                        <span>Şifre Belirleme & Güvenlik</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mevcut Şifre</label>
+                            <input type="password" id="prof_current_password" placeholder="Şifrenizi değiştirmek için mevcut şifrenizi girin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white text-sm transition-all">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Yeni Şifre</label>
+                                <input type="password" id="prof_new_password" placeholder="Yeni şifrenizi girin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white text-sm transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Yeni Şifre Tekrar</label>
+                                <input type="password" id="prof_new_password_confirm" placeholder="Yeni şifrenizi tekrar girin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white text-sm transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bilgileri Kaydet Butonu -->
+                <div class="text-right">
+                    <button onclick="saveUserProfileOnly()" class="px-8 py-3.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-md">
+                        Bilgileri Kaydet ve Güncelle
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION 4B: FATURA BİLGİLERİ (BÖLÜNMÜŞ - YALNIZCA FATURA VERİLERİ) -->
+            <section id="view-billing" class="hidden max-w-2xl mx-auto space-y-8">
+                <h2 class="text-2xl font-extrabold text-[#0B1F3A]">Fatura Bilgileri</h2>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                    <h3 class="font-bold text-[#0B1F3A] text-md pb-3 border-b border-slate-100 flex items-center space-x-2">
+                        <i class="fa-solid fa-file-invoice-dollar text-primary"></i>
+                        <span>Fatura Detayları</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Fatura Ülkesi Seçimi -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Fatura Ülkesi</label>
+                            <select id="billing_country" onchange="toggleBillingFields()" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-primary">
+                                <option value="TR" selected>Türkiye (TR)</option>
+                                <option value="US">Amerika Birleşik Devletleri (US)</option>
+                            </select>
+                        </div>
+                        <!-- Fatura Türü (Bireysel / Kurumsal) -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Fatura Tipi</label>
+                            <select id="billing_type" onchange="toggleBillingFields()" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-primary">
+                                <option value="individual" selected>Bireysel</option>
+                                <option value="corporate">Kurumsal</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dinamik Alan Konteynerleri -->
+                    <div class="space-y-4">
+                        <!-- TÜRKİYE ALANLARI -->
+                        <div id="billing-tr-fields" class="space-y-4">
+                            <div id="tr-ind-fields" class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">T.C. Kimlik No *</label>
+                                    <input type="text" id="billing_tr_tc" maxlength="11" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                </div>
+                            </div>
+                            <div id="tr-corp-fields" class="hidden space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Şirket Unvanı *</label>
+                                    <input type="text" id="billing_tr_title" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Vergi Dairesi *</label>
+                                        <input type="text" id="billing_tr_tax_office" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Vergi Numarası *</label>
+                                        <input type="text" id="billing_tr_tax_no" maxlength="10" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ABD ALANLARI -->
+                        <div id="billing-us-fields" class="hidden space-y-4">
+                            <div id="us-ind-fields" class="space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">SSN veya ITIN Numarası *</label>
+                                    <input type="text" id="billing_us_ssn" placeholder="XXX-XX-XXXX" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                </div>
+                            </div>
+                            <div id="us-corp-fields" class="hidden space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Resmi Şirket Adı (Legal Company Name) *</label>
+                                    <input type="text" id="billing_us_title" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">EIN (Tax ID) *</label>
+                                        <input type="text" id="billing_us_ein" placeholder="XX-XXXXXXX" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kayıtlı Olduğu Eyalet (State) *</label>
+                                        <input type="text" id="billing_us_state" placeholder="Örn: Delaware" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ortak Fatura Adresi -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Resmi Fatura Adresi *</label>
+                            <textarea id="billing_address" rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-primary transition-all"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fatura Bilgilerini Kaydet Butonu -->
+                <div class="text-right">
+                    <button onclick="saveUserBillingOnly()" class="px-8 py-3.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-md">
+                        Fatura Bilgilerini Kaydet
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION 5: YÖNETİCİ (ADMIN) PANELİ -->
+            <section id="view-admin" class="hidden max-w-4xl mx-auto space-y-8">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                    <h2 class="text-2xl font-extrabold text-[#0B1F3A] flex items-center space-x-2">
+                        <span class="text-amber-500">👑</span>
+                        <span>Ortak Doku - Yönetici Ayarları</span>
+                    </h2>
+                    <button onclick="resetThemeToDefault()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors">
+                        Varsayılana Sıfırla
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <!-- Tema ve Renkler -->
+                    <div class="md:col-span-6 bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider border-b border-slate-100 pb-2">Renk Paleti Kontrolü</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2">Ana Marka Rengi (Mavi)</label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="color" id="theme_color_primary" class="h-10 w-16 border border-slate-200 rounded cursor-pointer">
+                                    <span class="text-xs text-slate-400 font-semibold">Tüm butonları ve birincil vurguları kontrol eder.</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2">Sol Menü Rengi (Dark Navy)</label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="color" id="theme_color_navy" class="h-10 w-16 border border-slate-200 rounded cursor-pointer">
+                                    <span class="text-xs text-slate-400 font-semibold">Sidebar arka plan rengini yönetir.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logo & Metinler -->
+                    <div class="md:col-span-6 bg-white p-6 rounded-2xl border border-slate-100 space-y-6 shadow-sm">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider border-b border-slate-100 pb-2">İçerik & Logo Revizyonu</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Kurumsal SVG Logo Kodu</label>
+                                <textarea id="theme_logo_svg" rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono outline-none focus:bg-white"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Hero Başlığı</label>
+                                <input type="text" id="theme_hero_title" class="w-full px-4 h-10 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:bg-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <button onclick="saveThemeSettings()" class="px-8 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all shadow-md shadow-amber-500/10">
+                        Sistem Görünümünü Güncelle
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL 1: PREMIUM BAŞVURU SEÇİM PANELİ (ŞİMDİ BAŞVUR) -->
+    <div id="apply-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-6xl w-full p-8 md:p-10 shadow-2xl relative overflow-y-auto max-h-[90vh] space-y-8 animate-in fade-in zoom-in-95">
+            <!-- Kapatma Butonu -->
+            <button onclick="closeApplyModal()" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+            </button>
+
+            <!-- Başlık ve Açıklama -->
+            <div class="text-center space-y-3 max-w-2xl mx-auto">
+                <span class="px-3.5 py-1.5 bg-blue-50 text-primary text-xs font-bold uppercase rounded-full tracking-wider">Aramıza Katılın</span>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-[#0B1F3A]">Üyelik Modeli Tercih Edin</h3>
+                <p class="text-slate-500 text-sm">Hedeflerinize ve iş yapış şeklinize en uygun modeli seçerek Ortak Doku dünyasına ilk adımınızı atın.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- MODEL 1: KULLANICI -->
+                <div class="bg-slate-50/50 p-6 rounded-3xl border border-slate-200/60 space-y-4 flex flex-col justify-between hover:shadow-xl transition-all">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 bg-slate-200 text-slate-700 text-[9px] font-bold uppercase rounded-md">Bireysel Satıcı</span>
+                            <span class="text-lg font-black text-[#0B1F3A]">Ücretsiz</span>
+                        </div>
+                        <h4 class="text-lg font-extrabold text-[#0B1F3A]">Kullanıcı Modeli</h4>
+                        <p class="text-slate-500 text-[11px] leading-relaxed">
+                            Ortak Doku topluluğuna üye olmadan, sadece ihtiyaç duyduğunda sistemden profesyonel ürün veya hizmet satın alan satıcı yapısıdır.
+                        </p>
+                        <div class="pt-3 border-t border-slate-200/50">
+                            <ul class="space-y-2 text-slate-600 text-[11px]">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Topluluk aidatı veya ek yükümlülük ödemez.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Ürünleri normal standart fiyattan (2x) satın alır.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Ön bakiye yükleyerek esnek %40 indirim fırsatları yakalayabilir.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button onclick="confirmRoleChoice('Kullanıcı')" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-colors text-xs mt-4">
+                        Kullanıcı Olarak Başvur
+                    </button>
+                </div>
+
+                <!-- MODEL 2: EKİP ÜYESİ -->
+                <div class="bg-blue-50/20 p-6 rounded-3xl border-2 border-primary space-y-4 flex flex-col justify-between hover:shadow-xl transition-all relative">
+                    <div class="absolute -top-3 right-6 bg-primary text-white text-[8px] font-bold uppercase py-0.5 px-2 rounded-full">Tavsiye Edilen</div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[9px] font-bold uppercase rounded-md">Topluluk Ortağı</span>
+                            <span class="text-lg font-black text-[#0B1F3A] flex items-baseline">
+                                $30 <span class="text-[10px] text-slate-400 font-semibold">/ ay</span>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-extrabold text-[#0B1F3A]">Ekip Üyesi Modeli</h4>
+                        <p class="text-slate-500 text-[11px] leading-relaxed">
+                            Topluluğa aidat ödeyerek katılan, organizasyonun gücünden ve tüm indirim modellerinden en üst limitte yararlanan profesyoneller.
+                        </p>
+                        <div class="pt-3 border-t border-blue-100">
+                            <ul class="space-y-2 text-slate-600 text-[11px]">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Ürünlere <strong>en düşük indirim seviyelerinden (1x)</strong> doğrudan erişir.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Bir <strong>Ekip Liderine</strong> bağlı olarak doğrudan satış koçluğu desteği görür.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Özel eğitim ve organizasyonlara indirimli katılır.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button onclick="confirmRoleChoice('Ekip Üyesi')" class="w-full py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-colors text-xs mt-4 shadow-md shadow-blue-100">
+                        Ekip Üyesi Olarak Başvur ($30/Ay)
+                    </button>
+                </div>
+
+                <!-- MODEL 3: EKİP LİDERİ -->
+                <div class="bg-amber-50/30 p-6 rounded-3xl border border-amber-300 space-y-4 flex flex-col justify-between hover:shadow-xl transition-all relative">
+                    <div class="absolute -top-3 right-6 bg-amber-500 text-white text-[8px] font-bold uppercase py-0.5 px-2 rounded-full">Koordinatör</div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[9px] font-bold uppercase rounded-md">Yönetici Kadro</span>
+                            <span class="text-lg font-black text-amber-700">Ücretsiz (Aidat Yok)</span>
+                        </div>
+                        <h4 class="text-lg font-extrabold text-[#0B1F3A]">Ekip Lideri Modeli</h4>
+                        <p class="text-slate-500 text-[11px] leading-relaxed">
+                            Topluluğu büyütmekle görevli, bağlı üyelerine mentörlük ve operasyonel destek sağlayan organizasyon liderleri.
+                        </p>
+                        <div class="pt-3 border-t border-amber-200">
+                            <ul class="space-y-2 text-slate-600 text-[11px]">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Ekip üyeleriyle tamamen <strong>aynı (1x) indirimli fiyatlardan</strong> yararlanır.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span><strong>Aylık $30 aidat ödemez!</strong> Aidattan tamamen muaftır.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mr-2 mt-0.5"></i>
+                                    <span>Bağlı ekip üyelerini yönetir, onların gelişimini takip eder.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button onclick="confirmRoleChoice('Ekip Lideri')" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-colors text-xs mt-4 shadow-md">
+                        Ekip Lideri Olarak Başvur (Aidatsız)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: GİRİŞ YAP / KAYIT OL GATE MODALI (YENİ İKİ SEKME YAPISI + OTP ADIMI) -->
+    <div id="login-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative animate-in fade-in zoom-in-95 space-y-6">
+            <!-- Kapatma Butonu -->
+            <button onclick="closeLoginModal()" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-circle-xmark text-xl"></i>
+            </button>
+
+            <!-- Giriş / Kayıt Sekmeleri -->
+            <div class="flex border-b border-slate-100 pb-3" id="auth-tabs">
+                <button onclick="switchAuthMode('login')" id="tab-btn-login" class="flex-1 pb-2 text-sm font-bold border-b-2 border-primary text-primary text-center">Giriş Yap</button>
+                <button onclick="switchAuthMode('register')" id="tab-btn-register" class="flex-1 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 text-center hover:text-slate-600">Hesap Oluştur (Kayıt)</button>
+            </div>
+
+            <!-- GİRİŞ FORMU -->
+            <div id="form-auth-login" class="space-y-4">
+                <p class="text-xs text-slate-500 leading-normal">
+                    Etsy sipariş havuzuna erişmek, bakiye işlemlerinizi ve mağaza siparişlerinizi yönetmek için lütfen hesabınızla giriş yapın.
+                </p>
+                <div class="space-y-3">
+                    <input type="email" id="login-email" placeholder="E-Posta (Yönetici: admin@ortakdoku.com)" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                    <input type="password" id="login-password" placeholder="Şifre" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                </div>
+                <button onclick="performLogin()" class="w-full h-11 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Sistem Girişi Yap</span>
+                </button>
+            </div>
+
+            <!-- KAYIT FORMU (İki Aşamalı: Form Verisi -> OTP Doğrulama) -->
+            <div id="form-auth-register" class="hidden space-y-4">
+                
+                <!-- Adım 1: E-Posta ve Şifre Belirleme -->
+                <div id="register-step-1" class="space-y-4">
+                    <p class="text-xs text-slate-500 leading-normal">
+                        Yeni bir Ortak Doku satıcı hesabı oluşturun. E-posta adresinize gönderilecek doğrulama kodu ile hesap onaylanır.
+                    </p>
+                    <div class="space-y-3">
+                        <input type="email" id="reg-email" placeholder="E-Posta Adresiniz" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                        <input type="password" id="reg-password" placeholder="Güçlü Bir Şifre Belirleyin" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                        <input type="password" id="reg-password-confirm" placeholder="Şifre Tekrar" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                    </div>
+                    <button onclick="startEmailVerification()" class="w-full h-11 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Doğrulama Kodu Gönder</span>
+                    </button>
+                </div>
+
+                <!-- Adım 2: OTP Kodu Doğrulama -->
+                <div id="register-step-2" class="hidden space-y-4">
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center">
+                        <p class="text-xs text-amber-800 font-semibold flex items-center justify-center">
+                            <i class="fa-solid fa-envelope-open-text mr-2"></i>
+                            <span>Lütfen e-posta simülatörünü kontrol edin!</span>
+                        </p>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-normal text-center">
+                        Girdiğiniz mail adresine gönderilen 6 haneli doğrulama kodunu yazarak kaydı tamamlayın.
+                    </p>
+                    <div class="flex justify-center space-x-2">
+                        <input type="text" id="reg-otp" placeholder="6 Haneli Kod" maxlength="6" class="w-48 text-center tracking-widest px-4 h-12 bg-slate-50 border-2 border-slate-200 rounded-xl text-lg font-bold outline-none focus:border-primary">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="backToRegisterStep1()" class="flex-1 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors">
+                            Geri Dön
+                        </button>
+                        <button onclick="completeRegistration()" class="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-user-check"></i>
+                            <span>Doğrula & Kayıt Ol</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: MAĞAZA EKLEME MODALI -->
+    <div id="store-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative animate-in fade-in zoom-in-95 space-y-4">
+            <h3 class="text-lg font-bold text-[#0B1F3A]">Yeni Etsy Mağazası Tanımla</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mağaza Adı *</label>
+                    <input type="text" id="new_store_name" placeholder="Örn: Wallutex Design" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mağaza API Anahtarı (Opsiyonel)</label>
+                    <input type="text" id="new_store_api" placeholder="Etsy Keystore Token" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                </div>
+            </div>
+            <div class="text-right space-x-2 pt-4 border-t border-slate-100">
+                <button onclick="closeAddStoreModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition-colors">Vazgeç</button>
+                <button onclick="saveNewStore()" class="px-5 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-lg shadow-md transition-colors">Mağazayı Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: GOOGLE SHEETS & GOOGLE DRIVE ENTEGRASYON SİMÜLASYONU -->
+    <div id="sheets-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-8 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-[#0B1F3A] text-lg">Ortak Doku - Google Sheets Otomasyonu</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Sipariş veritabanı anlık veri döküm simülasyonu</p>
+                    </div>
+                </div>
+                <button onclick="closeSheetsModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-circle-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Bilgilendirme Kartı -->
+            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-xl flex items-start space-x-3">
+                <i class="fa-solid fa-circle-info text-emerald-600 mt-0.5"></i>
+                <div class="text-xs text-emerald-800 leading-relaxed">
+                    Siparişiniz başarıyla kuyruğa alındı! Arka plan otomasyon motorumuz (Google Apps Script), girdiğiniz verileri Ortak Doku üretim tablosuna (E-Tablo) yeni satır olarak yazdı ve yüklediğiniz üretim dosyalarını otomatik olarak Google Drive klasörünüzde arşivledi.
+                </div>
+            </div>
+
+            <!-- E-Tablo Tasarımı -->
+            <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-[#F9FBF9]">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="bg-emerald-800 text-white font-bold uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3 border-r border-emerald-700">Timestamp</th>
+                            <th class="p-3 border-r border-emerald-700">Etsy Sipariş No</th>
+                            <th class="p-3 border-r border-emerald-700">Mağaza</th>
+                            <th class="p-3 border-r border-emerald-700">Kategori</th>
+                            <th class="p-3 border-r border-emerald-700">Ölçüler</th>
+                            <th class="p-3 border-r border-emerald-700">Üretim Dosyası (Drive)</th>
+                            <th class="p-3 border-r border-emerald-700">Kargo Etiketi (Drive)</th>
+                            <th class="p-3 border-r border-emerald-700">Teslimat Adresi</th>
+                            <th class="p-3">Fatura Türü / Bilgisi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 font-mono text-[11px] text-slate-700">
+                        <tr class="bg-emerald-50/30">
+                            <td id="sheet-timestamp" class="p-3 border-r border-slate-200 text-slate-500">2026-06-05 20:19:31</td>
+                            <td id="sheet-etsy-no" class="p-3 border-r border-slate-200 font-bold text-slate-800">OD-301452</td>
+                            <td id="sheet-store" class="p-3 border-r border-slate-200">Wallutex</td>
+                            <td id="sheet-category" class="p-3 border-r border-slate-200 text-blue-600">Wallpaper</td>
+                            <td id="sheet-dimensions" class="p-3 border-r border-slate-200 font-semibold">120" x 96"</td>
+                            <td id="sheet-drive-link" class="p-3 border-r border-slate-200 text-primary underline">drive.google.com/open?id=1A2B3C...</td>
+                            <td id="sheet-label-link" class="p-3 border-r border-slate-200 text-primary underline">drive.google.com/open?id=1L8M9N...</td>
+                            <td id="sheet-address" class="p-3 border-r border-slate-200 truncate max-w-xs">John Doe, 123 Maple St, NY, US</td>
+                            <td id="sheet-billing" class="p-3 text-slate-500 font-sans">TR Bireysel: TC-12345678910</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Dışa Aktarma Butonları -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                <button onclick="downloadCSVData()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 transition-colors">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>Veriyi CSV Olarak Dışa Aktar</span>
+                </button>
+                <button onclick="closeSheetsModal()" class="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl text-xs transition-colors">
+                    Onaylandı, Siparişi Bitir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: GÜVENLİ ÖDEME VE GEÇİT SİMÜLATÖRÜ (CHECKOUT) -->
+    <div id="checkout-payment-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 grid grid-cols-1 md:grid-cols-12 gap-8">
+            <!-- Kapatma Butonu -->
+            <button onclick="closeCheckoutModal()" class="absolute right-6 top-6 text-slate-400 hover:text-slate-600 z-10">
+                <i class="fa-solid fa-circle-xmark text-xl"></i>
+            </button>
+
+            <!-- Sol Panel: Paket / Ödeme Özeti -->
+            <div class="md:col-span-5 bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <span class="px-2.5 py-1 bg-primary/10 text-primary text-[9px] font-bold uppercase rounded tracking-wider">Ödeme Özeti</span>
+                    <h3 id="checkout-summary-title" class="text-base font-extrabold text-[#0B1F3A]">Ürün Yükleme</h3>
+                    <p id="checkout-summary-desc" class="text-[11px] text-slate-500 leading-relaxed">Ödeme onayından sonra haklarınız anında hesabınıza tanımlanacaktır.</p>
+                </div>
+                <div class="pt-6 border-t border-slate-200/60 mt-4">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Toplam Ödenecek Tutar</div>
+                    <div id="checkout-summary-amount" class="text-2xl font-black text-emerald-600 mt-1">$0.00 USD</div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel: Kredi Kartı Formu -->
+            <form onsubmit="processCheckoutPayment(event)" class="md:col-span-7 space-y-4">
+                <h4 class="font-bold text-[#0B1F3A] text-sm flex items-center space-x-1.5">
+                    <i class="fa-solid fa-credit-card text-primary"></i>
+                    <span>Kredi Kartı Bilgileri</span>
+                </h4>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kart Üzerindeki İsim</label>
+                        <input type="text" id="checkout_card_name" required placeholder="Örn: Ahmet Yılmaz" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kart Numarası</label>
+                        <input type="text" id="checkout_card_number" required maxlength="19" placeholder="0000 0000 0000 0000" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary font-mono">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sona Erme Tarihi</label>
+                            <input type="text" id="checkout_card_expiry" required placeholder="AA/YY" maxlength="5" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary font-mono text-center">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">CVC / CVV</label>
+                            <input type="password" id="checkout_card_cvc" required maxlength="3" placeholder="***" class="w-full px-4 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:bg-white focus:border-primary font-mono text-center">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center space-x-2">
+                    <div class="text-[10px] text-slate-400 font-semibold leading-snug">
+                        <i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i>
+                        <span>256-Bit SSL güvenlik altyapısı ile korunmaktadır.</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-checkout-submit" class="w-full h-11 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Güvenli Ödeme Yap</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT KONTROL MOTORU (MANTIKSAL VE VERİSEL AKIŞLAR) -->
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('ortak_doku_user')) || null;
+        let currentBilling = JSON.parse(localStorage.getItem('ortak_doku_billing')) || null;
+        let storesList = JSON.parse(localStorage.getItem('ortak_doku_stores')) || [];
+
+        // Global OTP ve Doğrulama Durumları
+        let currentGeneratedOTP = "123456";
+        let pendingRegisterEmail = "";
+        let pendingRegisterPassword = "";
+        
+        // Dinamik Ödeme Modül Değişkenleri
+        let activeCheckoutType = ""; // "bakiye" veya "team"
+
+        let registeredUsers = JSON.parse(localStorage.getItem('ortak_doku_registered_users')) || [
+            {
+                email: 'admin@ortakdoku.com',
+                password: 'admin',
+                name: 'Yönetici (Admin)',
+                phone: '05555555555',
+                balance: 1000,
+                role: '👑 Yönetici',
+                isEmailVerified: true
+            },
+            {
+                email: 'lider.hakan@ortakdoku.com',
+                password: 'lider123',
+                name: 'Hakan Demir',
+                phone: '05554443322',
+                balance: 0,
+                role: 'Ekip Lideri',
+                isEmailVerified: true
+            },
+            {
+                email: 'lider.elif@ortakdoku.com',
+                password: 'lider123',
+                name: 'Elif Şahin',
+                phone: '05553332211',
+                balance: 0,
+                role: 'Ekip Lideri',
+                isEmailVerified: true
+            }
+        ];
+
+        // Dinamik Tema Yapısı
+        let themeSettings = JSON.parse(localStorage.getItem('ortak_doku_theme')) || {
+            primaryColor: '#1F5EFF',
+            navyColor: '#0B1F3A',
+            heroTitle: 'Birlikte Üreten, Birlikte Büyüyen Bir Ekosistem',
+            logoSvg: `<svg class="h-10 w-auto" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="translate(10, 10) scale(0.9)">
+                            <rect x="180" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                            <rect x="220" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                            <rect x="260" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                            <path d="M120 50 C 160 50, 160 130, 120 130" stroke="#0B1F3A" stroke-width="24" stroke-linecap="round" fill="none" />
+                            <path d="M110 90 L 190 90" stroke="#0B1F3A" stroke-width="24" stroke-linecap="round" />
+                            <path d="M180 90 C 210 60, 230 60, 260 90" stroke="#6B8E23" stroke-width="12" stroke-linecap="round" fill="none" />
+                            <path d="M180 90 C 210 120, 230 120, 260 90" stroke="#0B1F3A" stroke-width="12" stroke-linecap="round" fill="none" />
+                        </g>
+                        <text x="320" y="110" font-family="'Inter', sans-serif" font-size="44" font-weight="800" fill="#0B1F3A" letter-spacing="1">ORTAK DOKU</text>
+                        <text x="325" y="150" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#6B8E23" letter-spacing="4">BİRLİKTE ÜRETİR, BİRLİKTE BÜYÜRÜZ</text>
+                    </svg>`
+        };
+
+        function applyThemeConfig() {
+            const primary = themeSettings.primaryColor || '#1F5EFF';
+            const navy = themeSettings.navyColor || '#0B1F3A';
+            
+            document.documentElement.style.setProperty('--color-primary', primary);
+            document.documentElement.style.setProperty('--color-primary-hover', adjustColorBrightness(primary, -15));
+            document.documentElement.style.setProperty('--color-dark-navy', navy);
+            
+            let styleEl = document.getElementById('dynamic-theme-styles');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-theme-styles';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.innerHTML = `
+                .bg-primary { background-color: ${primary} !important; }
+                .text-primary { color: ${primary} !important; }
+                .border-primary { border-color: ${primary} !important; }
+                .focus\\:border-primary:focus { border-color: ${primary} !important; }
+                .focus\\:ring-primary:focus { --tw-ring-color: ${primary} !important; }
+                .bg-dark-navy { background-color: ${navy} !important; }
+                .accent-primary { accent-color: ${primary} !important; }
+            `;
+
+            const logoContainers = document.querySelectorAll('#dynamic-logo-container, .dynamic-logo');
+            logoContainers.forEach(container => {
+                if (container) {
+                    container.innerHTML = themeSettings.logoSvg;
+                }
+            });
+
+            const heroTitleEl = document.getElementById('hero-title');
+            if (heroTitleEl && themeSettings.heroTitle) {
+                heroTitleEl.innerText = themeSettings.heroTitle;
+            }
+        }
+        
+        function adjustColorBrightness(hex, percent) {
+            let R = parseInt(hex.substring(1,3),16);
+            let G = parseInt(hex.substring(3,5),16);
+            let B = parseInt(hex.substring(5,7),16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = (R<255)?R:255;  
+            G = (G<255)?G:255;  
+            B = (B<255)?B:255;  
+
+            R = (R<0)?0:R;
+            G = (G<0)?0:G;
+            B = (B<0)?0:B;
+
+            const rHex = R.toString(16).padStart(2, '0');
+            const gHex = G.toString(16).padStart(2, '0');
+            const bHex = B.toString(16).padStart(2, '0');
+
+            return `#${rHex}${gHex}${bHex}`;
+        }
+
+        window.onload = function() {
+            applyThemeConfig();
+            initSessionState();
+            renderStoreCards();
+            populateProfileFields();
+            toggleBillingFields();
+            updateStoreDropdown();
+            updateLeadersDropdown();
+            
+            // Kart Numarası Boşluk Formatlayıcı Dinamikleri
+            const cardNumInput = document.getElementById('checkout_card_number');
+            if (cardNumInput) {
+                cardNumInput.addEventListener('input', function (e) {
+                    let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                    let matches = val.match(/\d{4,16}/g);
+                    let match = matches && matches[0] || '';
+                    let parts = [];
+                    for (let i = 0, len = match.length; i < len; i += 4) {
+                        parts.push(match.substring(i, i + 4));
+                    }
+                    e.target.value = parts.length > 0 ? parts.join(' ') : val;
+                });
+            }
+
+            // Kart SkT AA/YY Formatlayıcı
+            const cardExpiryInput = document.getElementById('checkout_card_expiry');
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', function (e) {
+                    let val = e.target.value.replace(/[^0-9]/gi, '');
+                    if (val.length >= 2) {
+                        e.target.value = val.substring(0, 2) + '/' + val.substring(2, 4);
+                    } else {
+                        e.target.value = val;
+                    }
+                });
+            }
+
+            if (currentUser) {
+                showSection('products');
+            } else {
+                showSection('dashboard');
+            }
+        };
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `flex items-center space-x-3 p-4 rounded-2xl shadow-xl border text-xs transition-all duration-300 transform translate-y-2 opacity-0 max-w-sm w-full bg-white pointer-events-auto`;
+            
+            let bg = 'border-slate-100 text-slate-800';
+            let icon = '<i class="fa-solid fa-circle-info text-blue-500 text-lg"></i>';
+            if (type === 'success') {
+                bg = 'bg-emerald-50 border-emerald-100 text-emerald-800';
+                icon = '<i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>';
+            } else if (type === 'error') {
+                bg = 'bg-rose-50 border-rose-100 text-rose-800';
+                icon = '<i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i>';
+            } else if (type === 'warning') {
+                bg = 'bg-amber-50 border-amber-100 text-amber-800';
+                icon = '<i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg"></i>';
+            }
+            
+            toast.className += ` ${bg}`;
+            toast.innerHTML = `
+                ${icon}
+                <div class="flex-1 font-semibold leading-relaxed">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 6000);
+        }
+
+        function initSessionState() {
+            const sidebar = document.getElementById('sidebar-panel');
+            const loginBtn = document.getElementById('btn-login-gate');
+            const logoutBtn = document.getElementById('btn-logout');
+            const profileBadge = document.getElementById('user-profile-badge');
+            const adminTrigger = document.getElementById('admin-panel-trigger');
+
+            if (currentUser) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                profileBadge.classList.remove('hidden');
+                profileBadge.classList.add('flex');
+
+                const isComplete = isProfileComplete();
+
+                document.getElementById('badge-name').innerText = isComplete ? currentUser.name : 'Profil Eksik ⚠️';
+                document.getElementById('badge-role').innerText = currentUser.role || 'Kullanıcı';
+                document.getElementById('badge-avatar').innerText = isComplete ? (currentUser.name).charAt(0).toUpperCase() : '?';
+
+                if (currentUser.email === 'admin@ortakdoku.com') {
+                    adminTrigger.classList.remove('hidden');
+                } else {
+                    adminTrigger.classList.add('hidden');
+                }
+
+                renderProductsPage();
+                updateDisplayedPrices();
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                profileBadge.classList.add('hidden');
+                adminTrigger.classList.add('hidden');
+            }
+        }
+
+        function updateDisplayedPrices() {
+            let isUser = (currentUser && currentUser.role === 'Kullanıcı');
+            let multiplier = isUser ? 2 : 1; // Ekip Liderleri ve Ekip Üyeleri 1x fiyat alır
+
+            document.querySelectorAll('.product-price-label').forEach(el => {
+                el.innerText = `$${(23.00 * multiplier).toFixed(2)} / m²`;
+            });
+        }
+
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+            switchAuthMode('login');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function switchAuthMode(mode) {
+            const loginBtn = document.getElementById('tab-btn-login');
+            const registerBtn = document.getElementById('tab-btn-register');
+            const loginForm = document.getElementById('form-auth-login');
+            const registerForm = document.getElementById('form-auth-register');
+
+            if (mode === 'login') {
+                loginBtn.className = "flex-1 pb-2 text-sm font-bold border-b-2 border-primary text-primary text-center";
+                registerBtn.className = "flex-1 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 text-center hover:text-slate-600";
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                registerBtn.className = "flex-1 pb-2 text-sm font-bold border-b-2 border-primary text-primary text-center";
+                loginBtn.className = "flex-1 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 text-center hover:text-slate-600";
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                backToRegisterStep1();
+            }
+        }
+
+        function openApplyModal() {
+            document.getElementById('apply-modal').classList.remove('hidden');
+        }
+
+        function closeApplyModal() {
+            document.getElementById('apply-modal').classList.add('hidden');
+        }
+
+        function confirmRoleChoice(roleName) {
+            closeApplyModal();
+            
+            if (!currentUser) {
+                showNotification('Sistem üyeliğinizi başlatmak için lütfen önce bir hesap oluşturun veya giriş yapın.', 'info');
+                openLoginModal();
+                switchAuthMode('register');
+                return;
+            }
+
+            if (roleName === 'Ekip Üyesi') {
+                currentUser.pendingRole = 'Ekip Üyesi';
+                currentUser.role = 'Kullanıcı'; // Ödeme yapılana kadar geçici rol
+                showNotification('Ekip üyeliği modelini seçtiniz. Profil bilgilerinizi kaydedip bir Lider seçtikten sonra $30 aidat ödeme adımına yönlendirileceksiniz.', 'info');
+            } else if (roleName === 'Ekip Lideri') {
+                currentUser.role = 'Ekip Lideri';
+                currentUser.pendingRole = null;
+                showNotification('Ekip Lideri modelini seçtiniz. Profil bilgilerinizi tamamladıktan sonra aidat ödemeden imkanlarınız hemen tanımlanacaktır.', 'success');
+            } else {
+                currentUser.role = 'Kullanıcı';
+                currentUser.pendingRole = null;
+            }
+
+            localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+
+            const idx = registeredUsers.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                registeredUsers[idx].role = currentUser.role;
+                registeredUsers[idx].pendingRole = currentUser.pendingRole;
+                localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+            }
+
+            initSessionState();
+            populateProfileFields();
+            showSection('profile');
+        }
+
+        function renderProductsPage() {
+            const promoArea = document.getElementById('kullanici-promotions-area');
+            if (!currentUser) return;
+
+            // Sadece 'Kullanıcı' rolü toplu bakiye ve üye olma ekranını görür
+            if (currentUser.role === 'Kullanıcı') {
+                promoArea.classList.remove('hidden');
+            } else {
+                promoArea.classList.add('hidden');
+            }
+        }
+
+        function loadBulk250() {
+            if (!currentUser) return;
+
+            if (!isProfileComplete()) {
+                showNotification('⚠️ Bakiye yükleyebilmek için lütfen önce Profil Bilgilerinizi doldurun!', 'warning');
+                showSection('profile');
+                return;
+            }
+
+            openCheckoutModal('bakiye');
+        }
+
+        function upgradeToTeamMember() {
+            if (!currentUser) return;
+
+            if (!isProfileComplete()) {
+                showNotification('⚠️ Ekip üyesi statüsüne geçebilmek için lütfen önce Profil Bilgilerinizi doldurun!', 'warning');
+                showSection('profile');
+                return;
+            }
+
+            openCheckoutModal('team');
+        }
+
+        function openCheckoutModal(type) {
+            activeCheckoutType = type;
+            const modal = document.getElementById('checkout-payment-modal');
+            const title = document.getElementById('checkout-summary-title');
+            const desc = document.getElementById('checkout-summary-desc');
+            const amount = document.getElementById('checkout-summary-amount');
+
+            document.getElementById('checkout_card_name').value = currentUser.name || '';
+            document.getElementById('checkout_card_number').value = '';
+            document.getElementById('checkout_card_expiry').value = '';
+            document.getElementById('checkout_card_cvc').value = '';
+
+            if (type === 'bakiye') {
+                title.innerText = "Toplu Bakiye Yükleme";
+                desc.innerText = "250$ Alışveriş Bakiyesi yükleyerek siparişlerinizde bakiye bitene kadar geçerli %40 indirim hakkı kazanın.";
+                amount.innerText = "$250.00 USD";
+            } else if (type === 'team') {
+                title.innerText = "Ekip Üyeliği Aidatı";
+                desc.innerText = "Ortak Doku topluluğuna katılarak en düşük indirim seviyelerinden ve sınırsız eğitim / koçluk desteğinden yararlanın.";
+                amount.innerText = "$30.00 USD";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-payment-modal').classList.add('hidden');
+        }
+
+        function processCheckoutPayment(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('btn-checkout-submit');
+            const originalHTML = btn.innerHTML;
+            
+            btn.setAttribute('disabled', 'true');
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Ödeme Doğrulanıyor...</span>`;
+
+            setTimeout(() => {
+                btn.removeAttribute('disabled');
+                btn.innerHTML = originalHTML;
+                closeCheckoutModal();
+
+                if (activeCheckoutType === 'bakiye') {
+                    executeLoadBulk250Success();
+                } else if (activeCheckoutType === 'team') {
+                    executeUpgradeToTeamMemberSuccess();
+                }
+            }, 1800);
+        }
+
+        function executeLoadBulk250Success() {
+            currentUser.balance = (parseFloat(currentUser.balance) || 0) + 250;
+            currentUser.hasDiscount40 = true; 
+            localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+
+            const idx = registeredUsers.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                registeredUsers[idx].balance = currentUser.balance;
+                registeredUsers[idx].hasDiscount40 = true;
+                localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+            }
+            
+            showNotification('Ödemeniz onaylandı! Başarıyla 250$ bakiye yüklendi ve %40 indirim hakkınız hesabınıza tanımlandı.', 'success');
+            initSessionState();
+            populateProfileFields();
+            calculateAreaAndPrice();
+            renderProductsPage();
+        }
+
+        function executeUpgradeToTeamMemberSuccess() {
+            currentUser.role = 'Ekip Üyesi';
+            currentUser.pendingRole = null; 
+            currentUser.hasDiscount40 = false; 
+            localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+
+            const idx = registeredUsers.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                registeredUsers[idx].role = 'Ekip Üyesi';
+                registeredUsers[idx].pendingRole = null;
+                registeredUsers[idx].hasDiscount40 = false;
+                localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+            }
+
+            showNotification('Ödemeniz onaylandı! Tebrikler, başarıyla Ekip Üyesi oldunuz. Aylık 30$ aidat aboneliğiniz başlatıldı.', 'success');
+            initSessionState();
+            populateProfileFields();
+            calculateAreaAndPrice();
+            renderProductsPage(); 
+            showSection('products');
+        }
+
+        function startOrderWithCategory(cat) {
+            showSection('new-order');
+            selectCategory(cat);
+        }
+
+        function showSection(sectionId) {
+            if (sectionId !== 'dashboard' && !currentUser) {
+                openLoginModal();
+                return;
+            }
+
+            if (currentUser && !isProfileComplete() && sectionId !== 'profile' && sectionId !== 'dashboard') {
+                showNotification('⚠️ Devam etmek için lütfen önce Profil Bilgilerinizi (Ad, E-posta ve Telefon) eksiksiz doldurup kaydedin!', 'warning');
+                showSection('profile');
+                return;
+            }
+
+            if (currentUser && currentUser.pendingRole === 'Ekip Üyesi' && sectionId !== 'profile' && sectionId !== 'dashboard') {
+                showNotification('⚠️ Ekip Üyeliği ayrıcalıklarından yararlanmak için lütfen önce 30$ aidat ödemesini tamamlayın!', 'warning');
+                openCheckoutModal('team');
+                return;
+            }
+
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-products').classList.add('hidden');
+            document.getElementById('view-new-order').classList.add('hidden');
+            document.getElementById('view-stores').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-billing').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+
+            document.getElementById(`view-${sectionId}`).classList.remove('hidden');
+
+            const warningBanner = document.getElementById('profile-warning-banner');
+            if (warningBanner) {
+                if (!isProfileComplete()) {
+                    warningBanner.classList.remove('hidden');
+                } else {
+                    warningBanner.classList.add('hidden');
+                }
+            }
+
+            const buttons = ['products', 'stores', 'profile', 'billing'];
+            buttons.forEach(btn => {
+                const element = document.getElementById(`menu-btn-${btn}`);
+                if (element) {
+                    if (btn === sectionId) {
+                        element.classList.add('bg-white/10', 'text-white');
+                    } else {
+                        element.classList.remove('bg-white/10', 'text-white');
+                    }
+                }
+            });
+
+            if (sectionId === 'new-order') {
+                resetOrderFormFlow();
+            }
+        }
+
+        function saveUserProfileOnly() {
+            const name = document.getElementById('prof_name').value.trim();
+            const phone = document.getElementById('prof_phone').value.trim();
+
+            if (!name || !phone) {
+                showNotification('⚠️ Lütfen Ad Soyad ve Telefon numarası alanlarını eksiksiz doldurun!', 'error');
+                return;
+            }
+
+            // Ekip üyesi rolündeyse lider seçimi zorunludur
+            const connectedLeader = document.getElementById('prof_connected_leader').value;
+            const activeRole = currentUser ? (currentUser.pendingRole || currentUser.role) : 'Kullanıcı';
+
+            if (activeRole === 'Ekip Üyesi' && !connectedLeader) {
+                showNotification('⚠️ Ekip Üyesi olarak devam edebilmek için bağlı olduğunuz Ekip Liderini seçmelisiniz!', 'error');
+                return;
+            }
+
+            const currentPassInput = document.getElementById('prof_current_password').value;
+            const newPassInput = document.getElementById('prof_new_password').value;
+            const newPassConfirmInput = document.getElementById('prof_new_password_confirm').value;
+
+            let passwordToSave = currentUser.password;
+
+            if (currentPassInput || newPassInput || newPassConfirmInput) {
+                if (currentPassInput !== currentUser.password) {
+                    showNotification('Mevcut şifreniz yanlış! Güvenlik nedeniyle şifreniz değiştirilemedi.', 'error');
+                    return;
+                }
+                if (!newPassInput || newPassInput.length < 4) {
+                    showNotification('Yeni şifre en az 4 karakterden oluşmalıdır!', 'error');
+                    return;
+                }
+                if (newPassInput !== newPassConfirmInput) {
+                    showNotification('Yeni şifreleriniz uyuşmuyor!', 'error');
+                    return;
+                }
+                passwordToSave = newPassInput;
+                showNotification('Şifreniz başarıyla değiştirildi!', 'success');
+                document.getElementById('prof_current_password').value = "";
+                document.getElementById('prof_new_password').value = "";
+                document.getElementById('prof_new_password_confirm').value = "";
+            }
+
+            const userObj = {
+                email: currentUser.email,
+                password: passwordToSave,
+                name: name,
+                phone: phone,
+                balance: currentUser ? currentUser.balance : 0,
+                role: currentUser ? currentUser.role : 'Kullanıcı',
+                isEmailVerified: currentUser ? currentUser.isEmailVerified : true,
+                hasDiscount40: currentUser ? currentUser.hasDiscount40 : false,
+                pendingRole: currentUser ? currentUser.pendingRole : null,
+                connectedLeader: connectedLeader || null
+            };
+            
+            localStorage.setItem('ortak_doku_user', JSON.stringify(userObj));
+            currentUser = userObj;
+
+            const idx = registeredUsers.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+            if (idx !== -1) {
+                registeredUsers[idx] = userObj;
+                localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+            }
+
+            initSessionState();
+            populateProfileFields();
+            
+            if (currentUser.pendingRole === 'Ekip Üyesi') {
+                showNotification('🎉 Profil kaydedildi! Ekip üyeliğinizi tamamlamak için şimdi $30 aidat ödemesini tamamlayın.', 'success');
+                openCheckoutModal('team');
+            } else {
+                showNotification('🎉 Profil bilgileriniz başarıyla kaydedildi!', 'success');
+                showSection('products');
+            }
+        }
+
+        function saveUserBillingOnly() {
+            const address = document.getElementById('billing_address').value.trim();
+
+            if (!address) {
+                showNotification('⚠️ Resmi Fatura Adresi zorunludur!', 'error');
+                return;
+            }
+
+            const billObj = {
+                country: document.getElementById('billing_country').value,
+                type: document.getElementById('billing_type').value,
+                address: address,
+
+                tc: document.getElementById('billing_tr_tc').value.trim(),
+                title: document.getElementById('billing_country').value === 'TR' ? document.getElementById('billing_tr_title').value.trim() : document.getElementById('billing_us_title').value.trim(),
+                tax_office: document.getElementById('billing_tr_tax_office').value.trim(),
+                tax_no: document.getElementById('billing_tr_tax_no').value.trim(),
+
+                ssn: document.getElementById('billing_us_ssn').value.trim(),
+                ein: document.getElementById('billing_us_ein').value.trim(),
+                state: document.getElementById('billing_us_state').value.trim()
+            };
+            localStorage.setItem('ortak_doku_billing', JSON.stringify(billObj));
+            currentBilling = billObj;
+
+            showNotification('✅ Fatura bilgileriniz başarıyla yerel tarayıcı hafızasına kaydedildi!', 'success');
+        }
+
+        function populateProfileFields() {
+            if (currentUser) {
+                document.getElementById('prof_name').value = currentUser.name || '';
+                document.getElementById('prof_email').value = currentUser.email || '';
+                document.getElementById('prof_phone').value = currentUser.phone || '';
+                document.getElementById('email-verification-badge').className = currentUser.isEmailVerified ? "px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800" : "px-2 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800";
+                document.getElementById('email-verification-badge').innerText = currentUser.isEmailVerified ? "E-posta Onaylandı ✅" : "Onay Bekliyor";
+                
+                // Ekip Lideri seçimi sadece ekip üyelerine görünür kılınır
+                const activeRole = currentUser.pendingRole || currentUser.role;
+                const leaderContainer = document.getElementById('leader-selection-container');
+                if (activeRole === 'Ekip Üyesi') {
+                    leaderContainer.classList.remove('hidden');
+                    updateLeadersDropdown();
+                    document.getElementById('prof_connected_leader').value = currentUser.connectedLeader || '';
+                } else {
+                    leaderContainer.classList.add('hidden');
+                }
+            }
+            if (currentBilling) {
+                document.getElementById('billing_country').value = currentBilling.country || 'TR';
+                document.getElementById('billing_type').value = currentBilling.type || 'individual';
+                document.getElementById('billing_address').value = currentBilling.address || '';
+
+                if (currentBilling.country === 'TR') {
+                    document.getElementById('billing_tr_tc').value = currentBilling.tc || '';
+                    document.getElementById('billing_tr_title').value = currentBilling.title || '';
+                    document.getElementById('billing_tr_tax_office').value = currentBilling.tax_office || '';
+                    document.getElementById('billing_tr_tax_no').value = currentBilling.tax_no || '';
+                } else {
+                    document.getElementById('billing_us_ssn').value = currentBilling.ssn || '';
+                    document.getElementById('billing_us_title').value = currentBilling.title || '';
+                    document.getElementById('billing_us_ein').value = currentBilling.ein || '';
+                    document.getElementById('billing_us_state').value = currentBilling.state || '';
+                }
+            }
+        }
+
+        function updateLeadersDropdown() {
+            const select = document.getElementById('prof_connected_leader');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Bir Ekip Lideri Seçiniz</option>';
+            
+            // Veritabanındaki tüm liderleri listele
+            const leaders = registeredUsers.filter(u => u.role === 'Ekip Lideri');
+            leaders.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.name;
+                opt.innerText = `${l.name} (${l.email})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function isProfileComplete() {
+            if (!currentUser) return false;
+            if (!currentUser.name || !currentUser.email || !currentUser.phone) return false;
+            
+            // Ekip üyesi ise lider seçimi yapılmış mı denetlenir
+            const activeRole = currentUser.pendingRole || currentUser.role;
+            if (activeRole === 'Ekip Üyesi' && !currentUser.connectedLeader) return false;
+
+            return true;
+        }
+
+        function toggleBillingFields() {
+            const country = document.getElementById('billing_country').value;
+            const type = document.getElementById('billing_type').value;
+
+            const trFields = document.getElementById('billing-tr-fields');
+            const bgFields = document.getElementById('billing-us-fields'); // US fields element reference
+
+            const trInd = document.getElementById('tr-ind-fields');
+            const trCorp = document.getElementById('tr-corp-fields');
+
+            const usInd = document.getElementById('us-ind-fields');
+            const usCorp = document.getElementById('us-corp-fields');
+
+            if (country === 'TR') {
+                trFields.classList.remove('hidden');
+                bgFields.classList.add('hidden');
+                if (type === 'individual') {
+                    trInd.classList.remove('hidden');
+                    trCorp.classList.add('hidden');
+                } else {
+                    trInd.classList.add('hidden');
+                    trCorp.classList.remove('hidden');
+                }
+            } else {
+                trFields.classList.add('hidden');
+                bgFields.classList.remove('hidden');
+                if (type === 'individual') {
+                    usInd.classList.remove('hidden');
+                    usCorp.classList.add('hidden');
+                } else {
+                    usInd.classList.add('hidden');
+                    usCorp.classList.remove('hidden');
+                }
+            }
+        }
+
+        function performLogin() {
+            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+            const passInput = document.getElementById('login-password').value;
+
+            if (!emailInput || !passInput) {
+                showNotification('Lütfen e-posta ve şifrenizi girin!', 'error');
+                return;
+            }
+
+            const matchedUser = registeredUsers.find(u => u.email.toLowerCase() === emailInput && u.password === passInput);
+
+            if (matchedUser) {
+                currentUser = matchedUser;
+                localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+                closeLoginModal();
+                showNotification(`Başarıyla giriş yapıldı. Hoş geldiniz, ${currentUser.name || 'Satıcı'}!`, 'success');
+                initSessionState();
+                populateProfileFields();
+                showSection('products');
+            } else {
+                showNotification('E-posta adresi veya şifre hatalı!', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('ortak_doku_user');
+            initSessionState();
+            showNotification('Oturum başarıyla sonlandırıldı.', 'info');
+            showSection('dashboard');
+        }
+
+        function startEmailVerification() {
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-password').value;
+            const passConf = document.getElementById('reg-password-confirm').value;
+
+            if (!email || !pass || !passConf) {
+                showNotification('Lütfen tüm kayıt alanlarını doldurun!', 'error');
+                return;
+            }
+            if (pass !== passConf) {
+                showNotification('Belirlediğiniz şifreler uyuşmuyor!', 'error');
+                return;
+            }
+
+            const exists = registeredUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
+            if (exists) {
+                showNotification('Bu e-posta adresi zaten kullanımda!', 'error');
+                return;
+            }
+
+            pendingRegisterEmail = email;
+            pendingRegisterPassword = pass;
+
+            document.getElementById('register-step-1').classList.add('hidden');
+            document.getElementById('register-step-2').classList.remove('hidden');
+
+            currentGeneratedOTP = "123456"; 
+            showSimulatedEmailPopup(email, currentGeneratedOTP);
+        }
+
+        function showSimulatedEmailPopup(toEmail, code) {
+            const container = document.getElementById('email-simulator-container');
+            if (!container) return;
+
+            const popup = document.createElement('div');
+            popup.className = `bg-slate-900 text-white p-5 rounded-2xl shadow-2xl border border-slate-700 pointer-events-auto transition-all duration-300 transform translate-y-4 opacity-0 text-xs flex flex-col space-y-3`;
+            popup.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                    <span class="font-bold text-amber-400 flex items-center">
+                        <i class="fa-solid fa-square-envelope mr-1.5 text-base animate-pulse"></i>
+                        <span>Sanal E-Posta Gelen Kutusu</span>
+                    </span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="space-y-1">
+                    <div class="text-slate-400">Kimden: <span class="text-white font-medium">noreply@ortakdoku.com</span></div>
+                    <div class="text-slate-400">Kime: <span class="text-white font-medium">${toEmail}</span></div>
+                    <div class="text-slate-400">Konu: <span class="text-amber-300 font-bold">Ortak Doku - Hesap Doğrulama Kodu</span></div>
+                </div>
+                <div class="bg-slate-800 p-3 rounded-lg text-center space-y-2 border border-slate-700">
+                    <p class="text-[11px] text-slate-300">Hesap kayıt işlemini tamamlamak için aşağıdaki 6 haneli doğrulama kodunu kullanın:</p>
+                    <div class="text-lg font-mono font-black text-emerald-400 tracking-widest">${code}</div>
+                </div>
+            `;
+            container.appendChild(popup);
+
+            setTimeout(() => {
+                popup.classList.remove('translate-y-4', 'opacity-0');
+            }, 50);
+        }
+
+        function backToRegisterStep1() {
+            document.getElementById('register-step-1').classList.remove('hidden');
+            document.getElementById('register-step-2').classList.add('hidden');
+        }
+
+        function completeRegistration() {
+            const userOTP = document.getElementById('reg-otp').value.trim();
+
+            if (userOTP !== currentGeneratedOTP) {
+                showNotification('Girdiğiniz doğrulama kodu hatalı! Lütfen kodu kontrol edin.', 'error');
+                return;
+            }
+
+            const newUser = {
+                email: pendingRegisterEmail,
+                password: pendingRegisterPassword,
+                name: pendingRegisterEmail.split('@')[0], 
+                phone: '',
+                balance: 0,
+                role: 'Kullanıcı',
+                isEmailVerified: true
+            };
+
+            registeredUsers.push(newUser);
+            localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+
+            currentUser = newUser;
+            localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+
+            closeLoginModal();
+            showNotification('Hesabınız başarıyla oluşturuldu ve onaylandı!', 'success');
+            initSessionState();
+            populateProfileFields();
+            showSection('profile'); 
+        }
+
+        function renderStoreCards() {
+            const grid = document.getElementById('store-cards-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (storesList.length === 0) {
+                grid.innerHTML = `
+                    <div id="stores-empty-state" class="col-span-full bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center text-slate-400">
+                        <i class="fa-solid fa-store text-4xl mb-4 text-slate-300"></i>
+                        <p class="font-bold text-slate-600 text-sm">Kayıtlı Mağazanız Bulunmuyor</p>
+                        <p class="text-xs text-slate-400 mt-1">Sipariş verebilmek için lütfen ilk Etsy mağazanızı ekleyin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            storesList.forEach((store, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between";
+                card.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="h-12 w-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-lg shadow-sm">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#0B1F3A] text-sm">${store.name}</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Etsy Entegrasyon Modeli</p>
+                        </div>
+                    </div>
+                    <button onclick="removeStore(${index})" class="h-8 w-8 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openAddStoreModal() {
+            document.getElementById('new_store_name').value = '';
+            document.getElementById('new_store_api').value = '';
+            document.getElementById('store-modal').classList.remove('hidden');
+        }
+
+        function closeAddStoreModal() {
+            document.getElementById('store-modal').classList.add('hidden');
+        }
+
+        function saveNewStore() {
+            const name = document.getElementById('new_store_name').value.trim();
+            const api = document.getElementById('new_store_api').value.trim();
+
+            if (!name) {
+                showNotification('Lütfen Mağaza Adı girin!', 'error');
+                return;
+            }
+
+            storesList.push({ name, api });
+            localStorage.setItem('ortak_doku_stores', JSON.stringify(storesList));
+
+            closeAddStoreModal();
+            renderStoreCards();
+            updateStoreDropdown();
+            showNotification('Etsy Mağazası başarıyla kaydedildi!', 'success');
+        }
+
+        function removeStore(idx) {
+            storesList.splice(idx, 1);
+            localStorage.setItem('ortak_doku_stores', JSON.stringify(storesList));
+            renderStoreCards();
+            updateStoreDropdown();
+            showNotification('Mağaza silindi.', 'info');
+        }
+
+        function updateStoreDropdown() {
+            const select = document.getElementById('order_store_select');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Bir Mağaza Seçin</option>';
+            storesList.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store.name;
+                opt.innerText = store.name;
+                select.appendChild(opt);
+            });
+        }
+
+        let currentStep = 1;
+        let selectedCategoryVal = ""; 
+        let cachedDimensions = { width: "", height: "" };
+
+        function resetOrderFormFlow() {
+            currentStep = 1;
+            selectedCategoryVal = "";
+            cachedDimensions = { width: "", height: "" };
+            
+            document.getElementById('chk-sample').checked = false;
+            document.getElementById('order_width').removeAttribute('readonly');
+            document.getElementById('order_height').removeAttribute('readonly');
+            document.getElementById('sample-dimensions-banner').classList.add('hidden');
+
+            document.getElementById('order_width').value = "";
+            document.getElementById('order_height').value = "";
+            document.getElementById('order_etsy_no').value = "";
+            document.getElementById('order_date').value = new Date().toISOString().substring(0, 10);
+            
+            document.getElementById('order_client_name').value = "";
+            document.getElementById('order_client_surname').value = "";
+            document.getElementById('order_client_address').value = "";
+            document.getElementById('order_client_city').value = "";
+            document.getElementById('order_client_state').value = "";
+            document.getElementById('order_client_zip').value = "";
+            document.getElementById('order_client_country').value = "";
+            document.getElementById('order_client_phone').value = "";
+            document.getElementById('order_client_note').value = "";
+
+            document.getElementById('file_production').value = "";
+            document.getElementById('file_mockup').value = "";
+            document.getElementById('file_shipping_label').value = "";
+            document.getElementById('production-status').classList.add('hidden');
+            document.getElementById('mockup-status').classList.add('hidden');
+            document.getElementById('shipping-label-status').classList.add('hidden');
+
+            updateStepVisibility();
+        }
+
+        function selectCategory(cat) {
+            selectedCategoryVal = cat;
+            
+            if (cat === 'Wall Decal' || cat === 'Wood') {
+                currentStep = 3; 
+            } else {
+                currentStep = 2; 
+            }
+            updateStepVisibility();
+        }
+
+        function goToNextStep() {
+            if (currentStep === 2) {
+                currentStep = 3;
+            } else if (currentStep === 3) {
+                const width = document.getElementById('order_width').value;
+                const height = document.getElementById('order_height').value;
+                const etsyNo = document.getElementById('order_etsy_no').value.trim();
+                const store = document.getElementById('order_store_select').value;
+
+                if (!width || !height || !etsyNo || !store) {
+                    showNotification('Lütfen zorunlu alanları (* işaretli) doldurun!', 'error');
+                    return;
+                }
+                currentStep = 4;
+            } else if (currentStep === 4) {
+                currentStep = 5;
+            } else if (currentStep === 5) {
+                const prodFile = document.getElementById('file_production').files.length;
+                const mockupFile = document.getElementById('file_mockup').files.length;
+
+                if (!prodFile || !mockupFile) {
+                    showNotification('Lütfen her iki zorunlu tasarım dosyasını da yükleyin!', 'error');
+                    return;
+                }
+                currentStep = 6;
+            }
+            updateStepVisibility();
+        }
+
+        function goToPrevStep() {
+            if (currentStep === 3) {
+                if (selectedCategoryVal === 'Wall Decal' || selectedCategoryVal === 'Wood') {
+                    currentStep = 1;
+                } else {
+                    currentStep = 2;
+                }
+            } else {
+                currentStep--;
+            }
+            updateStepVisibility();
+        }
+
+        function updateStepVisibility() {
+            for (let i = 1; i <= 6; i++) {
+                const stepEl = document.getElementById(`order-step-${i}`);
+                if (stepEl) {
+                    if (i === currentStep) {
+                        stepEl.classList.remove('hidden');
+                    } else {
+                        stepEl.classList.add('hidden');
+                    }
+                }
+
+                const labelEl = document.getElementById(`step-label-${i}`);
+                if (labelEl) {
+                    if (i === currentStep) {
+                        labelEl.className = "text-primary font-bold text-center";
+                    } else if (i < currentStep) {
+                        labelEl.className = "text-emerald-500 font-bold text-center";
+                    } else {
+                        labelEl.className = "text-slate-400 font-bold text-center";
+                    }
+                }
+            }
+
+            const pct = (currentStep / 6) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `Adım ${currentStep} / 6`;
+
+            if (currentStep === 4) {
+                calculateAreaAndPrice();
+                const userBal = parseFloat(currentUser.balance) || 0;
+                document.getElementById('active-user-balance').innerText = `$${userBal.toFixed(2)} USD`;
+            }
+        }
+
+        function toggleSampleMode(checkbox) {
+            const widthInp = document.getElementById('order_width');
+            const heightInp = document.getElementById('order_height');
+            const banner = document.getElementById('sample-dimensions-banner');
+
+            if (checkbox.checked) {
+                cachedDimensions.width = widthInp.value;
+                cachedDimensions.height = heightInp.value;
+
+                widthInp.value = 20;
+                heightInp.value = 15;
+                widthInp.setAttribute('readonly', 'true');
+                heightInp.setAttribute('readonly', 'true');
+                banner.classList.remove('hidden');
+            } else {
+                widthInp.value = cachedDimensions.width;
+                heightInp.value = cachedDimensions.height;
+                widthInp.removeAttribute('readonly');
+                heightInp.removeAttribute('readonly');
+                banner.classList.add('hidden');
+            }
+            calculateAreaAndPrice();
+        }
+
+        let totalCalculatedBillUSD = 0;
+
+        function calculateAreaAndPrice() {
+            const width = parseFloat(document.getElementById('order_width').value) || 0;
+            const height = parseFloat(document.getElementById('order_height').value) || 0;
+
+            const sqft = (width * height) / 144;
+            const sqm = sqft * 0.092903;
+
+            document.getElementById('calculated-sqft').innerText = `${sqft.toFixed(2)} ft²`;
+            document.getElementById('calculated-sqm').innerText = `${sqm.toFixed(2)} m²`;
+
+            let isUserRole = (currentUser && currentUser.role === 'Kullanıcı');
+            let multiplier = isUserRole ? 2 : 1; 
+
+            let unitPrice = 23.00 * multiplier; 
+            let basePrice = sqm * unitPrice;
+
+            if (selectedCategoryVal === 'Wall Decal') {
+                basePrice = 15.00 * multiplier; 
+            } else if (selectedCategoryVal === 'Wood') {
+                basePrice = 35.00 * multiplier; 
+            }
+
+            let extrasPrice = 0;
+            const extrasChecked = document.querySelectorAll('input[name="extra_products"]:checked');
+            extrasChecked.forEach(chk => {
+                if (chk.value === 'Shipping Box') extrasPrice += 2.50;
+                if (chk.value === 'Installation Kit') extrasPrice += 3.00;
+                if (chk.value === 'Sample') extrasPrice += 2.50;
+            });
+
+            let finalPrice = basePrice + extrasPrice;
+            let discountAmount = 0;
+
+            const discountRow = document.getElementById('bill-discount-row');
+            if (currentUser && currentUser.hasDiscount40) {
+                discountAmount = finalPrice * 0.40;
+                finalPrice = finalPrice - discountAmount;
+                discountRow.classList.remove('hidden');
+                document.getElementById('bill-discount-amount').innerText = `-$${discountAmount.toFixed(2)}`;
+            } else {
+                discountRow.classList.add('hidden');
+            }
+
+            totalCalculatedBillUSD = finalPrice;
+
+            document.getElementById('bill-base-price').innerText = `$${basePrice.toFixed(2)}`;
+            document.getElementById('bill-extras-price').innerText = `$${extrasPrice.toFixed(2)}`;
+            document.getElementById('bill-total-price').innerText = `$${finalPrice.toFixed(2)}`;
+        }
+
+        function triggerFileInput(id) {
+            document.getElementById(id).click();
+        }
+
+        function handleFileSelected(input, statusId) {
+            const statusEl = document.getElementById(statusId);
+            if (input.files.length > 0) {
+                statusEl.classList.remove('hidden');
+                statusEl.innerText = `✔️ Dosya Seçildi: ${input.files[0].name}`;
+            } else {
+                statusEl.classList.add('hidden');
+            }
+        }
+
+        function triggerZipLookup() {
+            const country = document.getElementById('order_client_country').value;
+            const zip = document.getElementById('order_client_zip').value.trim();
+
+            const spinner = document.getElementById('zip-lookup-indicator');
+            const success = document.getElementById('zip-success-indicator');
+            const status = document.getElementById('zip-status-text');
+
+            if (!country || !zip) return;
+
+            spinner.classList.remove('hidden');
+            success.classList.add('hidden');
+
+            fetch(`https://api.zippopotam.us/${country}/${zip}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Geçersiz zip kodu');
+                    return res.json();
+                })
+                .then(data => {
+                    spinner.classList.add('hidden');
+                    success.classList.remove('hidden');
+                    status.className = "text-[10px] font-bold text-emerald-600 mt-1 block";
+                    status.innerText = "✔️ Lokasyon başarıyla doğrulandı!";
+
+                    const place = data.places[0];
+                    document.getElementById('order_client_city').value = place['place name'];
+                    document.getElementById('order_client_state').value = place['state'];
+                })
+                .catch(err => {
+                    spinner.classList.add('hidden');
+                    success.classList.add('hidden');
+                    status.className = "text-[10px] font-semibold text-amber-500 mt-1 block";
+                    status.innerText = "⚠️ Posta kodu bulunamadı. Lütfen manuel giriniz.";
+                });
+        }
+
+        let activeSheetsPayload = {};
+
+        function submitOrderForm() {
+            const clientName = document.getElementById('order_client_name').value.trim();
+            const clientSurname = document.getElementById('order_client_surname').value.trim();
+            const clientAddr = document.getElementById('order_client_address').value.trim();
+            const clientCity = document.getElementById('order_client_city').value.trim();
+            const clientState = document.getElementById('order_client_state').value.trim();
+            const clientZip = document.getElementById('order_client_zip').value.trim();
+            const clientCountry = document.getElementById('order_client_country').value;
+            const shippingFile = document.getElementById('file_shipping_label').files.length;
+
+            if (!clientName || !clientSurname || !clientAddr || !clientCity || !clientState || !clientZip || !clientCountry) {
+                showNotification('Lütfen tüm zorunlu teslimat alanlarını doldurun!', 'error');
+                return;
+            }
+
+            if (!shippingFile) {
+                showNotification('Lütfen müşterinize ait kargo etiketini (Shipping Label) yükleyin!', 'error');
+                return;
+            }
+
+            const activeMethod = document.querySelector('#pay-card-balance').classList.contains('border-primary') ? 'Bakiye' : 'Kredi Kartı';
+            
+            if (activeMethod === 'Bakiye') {
+                const bal = parseFloat(currentUser.balance) || 0;
+                if (bal < totalCalculatedBillUSD) {
+                    showNotification('Yetersiz bakiye! Lütfen Kredi Kartı metodunu seçin ya da ön yükleme yapın.', 'error');
+                    return;
+                }
+                currentUser.balance = bal - totalCalculatedBillUSD;
+                localStorage.setItem('ortak_doku_user', JSON.stringify(currentUser));
+                
+                const idx = registeredUsers.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+                if (idx !== -1) {
+                    registeredUsers[idx].balance = currentUser.balance;
+                    localStorage.setItem('ortak_doku_registered_users', JSON.stringify(registeredUsers));
+                }
+            }
+
+            activeSheetsPayload = {
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                etsyNo: document.getElementById('order_etsy_no').value.trim(),
+                store: document.getElementById('order_store_select').value,
+                category: selectedCategoryVal,
+                dims: `${document.getElementById('order_width').value}" x ${document.getElementById('order_height').value}"`,
+                driveLink: `drive.google.com/open?id=1_${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+                labelLink: `drive.google.com/open?id=1_LBL_${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+                address: `${clientName} ${clientSurname}, ${clientAddr}, ${clientCity}, ${clientState}, ${clientZip}, ${clientCountry}`,
+                billing: currentBilling ? `${currentBilling.country} ${currentBilling.type === 'individual' ? 'Bireysel' : 'Kurumsal'}: ${currentBilling.title || currentBilling.tc || 'Şahıs'}` : 'Tanımsız Fatura'
+            };
+
+            document.getElementById('sheet-timestamp').innerText = activeSheetsPayload.timestamp;
+            document.getElementById('sheet-etsy-no').innerText = activeSheetsPayload.etsyNo;
+            document.getElementById('sheet-store').innerText = activeSheetsPayload.store;
+            document.getElementById('sheet-category').innerText = activeSheetsPayload.category;
+            document.getElementById('sheet-dimensions').innerText = activeSheetsPayload.dims;
+            document.getElementById('sheet-drive-link').innerText = activeSheetsPayload.driveLink;
+            document.getElementById('sheet-label-link').innerText = activeSheetsPayload.labelLink;
+            document.getElementById('sheet-address').innerText = activeSheetsPayload.address;
+            document.getElementById('sheet-billing').innerText = activeSheetsPayload.billing;
+
+            showNotification('Sipariş başarıyla oluşturuldu! Veriler Google E-Tabloya dökülüyor...', 'success');
+            openSheetsModal();
+        }
+
+        function openSheetsModal() {
+            document.getElementById('sheets-modal').classList.remove('hidden');
+        }
+
+        function closeSheetsModal() {
+            document.getElementById('sheets-modal').classList.add('hidden');
+            showSection('products');
+        }
+
+        function downloadCSVData() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Timestamp,Etsy Siparis No,Magaza,Kategori,Olculer,Drive Linki,Kargo Etiketi Linki,Teslimat Adresi,Fatura Detayi\n";
+            csvContent += `"${activeSheetsPayload.timestamp}","${activeSheetsPayload.etsyNo}","${activeSheetsPayload.store}","${activeSheetsPayload.category}","${activeSheetsPayload.dims}","${activeSheetsPayload.driveLink}","${activeSheetsPayload.labelLink}","${activeSheetsPayload.address}","${activeSheetsPayload.billing}"\n`;
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `ortak_doku_siparis_${activeSheetsPayload.etsyNo}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function selectPaymentMethod(m) {
+            const balCard = document.getElementById('pay-card-balance');
+            const ccCard = document.getElementById('pay-card-cc');
+
+            if (m === 'balance') {
+                balCard.className = "p-6 border-2 border-primary rounded-2xl cursor-pointer transition-all bg-blue-50/20 relative";
+                ccCard.className = "p-6 border-2 border-slate-200 hover:border-primary rounded-2xl cursor-pointer transition-all relative";
+            } else {
+                ccCard.className = "p-6 border-2 border-primary rounded-2xl cursor-pointer transition-all bg-blue-50/20 relative";
+                balCard.className = "p-6 border-2 border-slate-200 hover:border-primary rounded-2xl cursor-pointer transition-all relative";
+            }
+        }
+
+        function saveThemeSettings() {
+            const primary = document.getElementById('theme_color_primary').value;
+            const navy = document.getElementById('theme_color_navy').value;
+            const title = document.getElementById('theme_hero_title').value;
+            const svg = document.getElementById('theme_logo_svg').value;
+
+            themeSettings = {
+                primaryColor: primary,
+                navyColor: navy,
+                heroTitle: title,
+                logoSvg: svg
+            };
+
+            localStorage.setItem('ortak_doku_theme', JSON.stringify(themeSettings));
+            applyThemeConfig();
+            showNotification('Sistem tema parametreleri başarıyla güncellendi!', 'success');
+        }
+
+        function resetThemeToDefault() {
+            localStorage.removeItem('ortak_doku_theme');
+            themeSettings = {
+                primaryColor: '#1F5EFF',
+                navyColor: '#0B1F3A',
+                heroTitle: 'Birlikte Üreten, Birlikte Büyüyen Bir Ekosistem',
+                logoSvg: `<svg class="h-10 w-auto" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(10, 10) scale(0.9)">
+                                <rect x="180" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                                <rect x="220" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                                <rect x="260" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
+                                <path d="M120 50 C 160 50, 160 130, 120 130" stroke="#0B1F3A" stroke-width="24" stroke-linecap="round" fill="none" />
+                                <path d="M110 90 L 190 90" stroke="#0B1F3A" stroke-width="24" stroke-linecap="round" />
+                                <path d="M180 90 C 210 60, 230 60, 260 90" stroke="#6B8E23" stroke-width="12" stroke-linecap="round" fill="none" />
+                                <path d="M180 90 C 210 120, 230 120, 260 90" stroke="#0B1F3A" stroke-width="12" stroke-linecap="round" fill="none" />
+                            </g>
+                            <text x="320" y="110" font-family="'Inter', sans-serif" font-size="44" font-weight="800" fill="#0B1F3A" letter-spacing="1">ORTAK DOKU</text>
+                            <text x="325" y="150" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#6B8E23" letter-spacing="4">BİRLİKTE ÜRETİR, BİRLİKTE BÜYÜRÜZ</text>
+                        </svg>`
+            };
+            applyThemeConfig();
+            
+            document.getElementById('theme_color_primary').value = themeSettings.primaryColor;
+            document.getElementById('theme_color_navy').value = themeSettings.navyColor;
+            document.getElementById('theme_hero_title').value = themeSettings.heroTitle;
+            document.getElementById('theme_logo_svg').value = themeSettings.logoSvg;
+
+            showNotification('Temalar orijinal fabrika ayarlarına sıfırlandı.', 'info');
+        }
+    </script>
+</body>
+</html>

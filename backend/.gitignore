@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+build/
+
+# env
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+# Not: sadece .env.example repoda; gerçek/dev env dosyaları push edilmez
+
+# logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# prisma
+prisma/*.db
