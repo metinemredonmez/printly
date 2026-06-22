@@ -88,12 +88,25 @@ import { HealthController } from './health.controller';
         }
       },
     }),
-    // BullMQ arka plan kuyruğu (toplu mail/push vb.) — Redis bağlantısı
+    // BullMQ arka plan kuyruğu (toplu mail/push vb.) — Redis bağlantısı.
+    // Yönetilen Redis (Upstash/Redis Cloud) rediss:// (TLS) + parola ister;
+    // bağlantı parolayı/TLS'i URL'den çözer. Dev'de redis://localhost:6380.
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const url = new URL(config.get<string>('REDIS_URL') || 'redis://localhost:6380');
-        return { connection: { host: url.hostname, port: Number(url.port) || 6379 } };
+        const isTls = url.protocol === 'rediss:';
+        return {
+          connection: {
+            host: url.hostname,
+            port: Number(url.port) || 6379,
+            username: url.username || undefined,
+            password: url.password || undefined,
+            tls: isTls ? {} : undefined,
+            // BullMQ gereği (ioredis bloklamayan komutlar) — yönetilen Redis'te şart
+            maxRetriesPerRequest: null,
+          },
+        };
       },
     }),
     PrismaModule,

@@ -1,0 +1,32 @@
+# Ortak Doku (printy) NestJS backend — systemd unit
+# Kurulum:
+#   sudo cp backend/deploy/printy-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now printy-backend
+[Unit]
+Description=Ortak Doku (printy) NestJS backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/printy/backend
+# NODE_ENV=production → ConfigModule .env.production'ı WorkingDirectory'den okur
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node dist/main
+Restart=on-failure
+RestartSec=5
+# Loglar journald'e gider: journalctl -u printy-backend -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=printy-backend
+# Sertleştirme
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/deploy/printy/backend
+
+[Install]
+WantedBy=multi-user.target

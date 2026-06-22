@@ -1,0 +1,32 @@
+name: Deploy backend (prod)
+
+# main'e push'ta (backend değişikliği) sunucuya SSH ile otomatik deploy.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch: {}
+
+# Aynı anda tek deploy; üst üste binmesin
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Sadece bu repo'nun kendi push'unda çalış (fork PR'ları secret göremez/çalıştıramaz)
+    if: github.repository == 'metinemredonmez/printly'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sunucuda deploy çalıştır
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            bash /home/deploy/printy/backend/deploy/deploy.sh

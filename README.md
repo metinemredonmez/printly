@@ -24,6 +24,7 @@ B2B Print-on-Demand sipariş + üretim takip platformu. Bayiler Etsy üzerinden 
 | [KUYRUK-YONETIMI.md](KUYRUK-YONETIMI.md) | BullMQ kuyruk yönetimi (Bull Board dashboard, retry/backoff, scheduled, alarm) |
 | [MOBIL-QR.md](MOBIL-QR.md) | QR/barkod okutma — backend + mobil (üretim istasyon takibi) |
 | [MOBIL-AR-3D-VIRTUAL.md](MOBIL-AR-3D-VIRTUAL.md) | Mobil virtual try-on / AR / 3D duvar uygulaması + AI |
+| [SUNUCU-PROD-KURULUM.md](SUNUCU-PROD-KURULUM.md) | Prod sunucu runbook (Hetzner + systemd + nginx/certbot + GitHub Actions + yönetilen DB/Redis) |
 | [MUSTERI-KURULUM-LISTESI.md](MUSTERI-KURULUM-LISTESI.md) | Müşteri hesap/kurulum listesi |
 
 ## Çalıştırma (backend)
