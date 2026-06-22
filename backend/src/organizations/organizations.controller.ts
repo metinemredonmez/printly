@@ -15,6 +15,8 @@ import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorat
 class UpdateOrgDto {
   @IsOptional() @IsString() name?: string;
   @IsOptional() @IsString() taxInfo?: string;
+  @IsOptional() @IsString() slug?: string; // subdomain
+  @IsOptional() theme?: Record<string, unknown>; // branding
 }
 
 @Controller('organizations')

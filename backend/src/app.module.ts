@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -31,6 +31,7 @@ import { ReportsModule } from './reports/reports.module';
 import { LabelsModule } from './labels/labels.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { AdminUsersModule } from './admin-users/admin-users.module';
+import { TenantModule, TenantMiddleware } from './tenant/tenant.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -118,6 +119,7 @@ import { HealthController } from './health.controller';
     LabelsModule,
     InvoicesModule,
     AdminUsersModule,
+    TenantModule,
   ],
   controllers: [HealthController],
   providers: [
@@ -125,4 +127,8 @@ import { HealthController } from './health.controller';
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantMiddleware).forRoutes('*');
+  }
+}

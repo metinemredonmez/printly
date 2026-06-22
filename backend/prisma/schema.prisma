@@ -114,6 +114,8 @@ enum OtpPurpose {
 model Organization {
   id                   String   @id @default(cuid())
   name                 String
+  slug                 String?  @unique // subdomain (bayi1.ortakdoku.com → "bayi1")
+  theme                Json?    // tenant branding (renk/logo/hero)
   taxInfo              String?
   quickbooksCustomerId String?
   active               Boolean  @default(true)

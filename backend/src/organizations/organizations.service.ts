@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -20,7 +21,13 @@ export class OrganizationsService {
     return org;
   }
 
-  update(id: string, data: { name?: string; taxInfo?: string }) {
-    return this.prisma.organization.update({ where: { id }, data });
+  update(
+    id: string,
+    data: { name?: string; taxInfo?: string; slug?: string; theme?: Record<string, unknown> },
+  ) {
+    return this.prisma.organization.update({
+      where: { id },
+      data: { ...data, theme: data.theme as Prisma.InputJsonValue },
+    });
   }
 }
