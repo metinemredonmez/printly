@@ -51,4 +51,20 @@ export class AuthController {
   me(@CurrentUser() user: AuthUser) {
     return user;
   }
+
+  // ── 2FA ──────────────────────────────────────
+  @Post('2fa/setup')
+  setup2fa(@CurrentUser() user: AuthUser) {
+    return this.auth.setupTwoFactor(user.userId);
+  }
+
+  @Post('2fa/enable')
+  enable2fa(@CurrentUser() user: AuthUser, @Body('code') code: string) {
+    return this.auth.enableTwoFactor(user.userId, code);
+  }
+
+  @Post('2fa/disable')
+  disable2fa(@CurrentUser() user: AuthUser, @Body('code') code: string) {
+    return this.auth.disableTwoFactor(user.userId, code);
+  }
 }

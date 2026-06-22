@@ -7,10 +7,13 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { randomInt } from 'crypto';
+import { randomInt, randomBytes } from 'crypto';
+import { authenticator } from 'otplib';
+import * as QRCode from 'qrcode';
 import { Role, OtpPurpose, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { encrypt, decrypt } from '../common/crypto.util';
 import { multiplierForRole } from '../common/pricing.util';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -101,7 +104,86 @@ export class AuthService {
     if (!user.isEmailVerified) {
       throw new UnauthorizedException('Önce e-postanızı doğrulayın');
     }
+    if (user.twoFactorEnabled) {
+      if (!dto.code) throw new UnauthorizedException('2FA kodu gerekli');
+      const valid = await this.verifyTwoFactor(user, dto.code);
+      if (!valid) throw new UnauthorizedException('2FA kodu hatalı');
+    }
     return this.issueToken(user);
+  }
+
+  // ── 2FA (TOTP / authenticator QR) ───────────────
+  async setupTwoFactor(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
+    const secret = authenticator.generateSecret();
+    const otpauthUrl = authenticator.keyuri(user.email, 'Ortak Doku', secret);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorSecret: encrypt(secret), twoFactorEnabled: false },
+    });
+    const qrDataUrl = await QRCode.toDataURL(otpauthUrl);
+    return { otpauthUrl, qrDataUrl, secret }; // secret: manuel giriş için
+  }
+
+  async enableTwoFactor(userId: string, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.twoFactorSecret) {
+      throw new BadRequestException('Önce /auth/2fa/setup çağırın');
+    }
+    const secret = decrypt(user.twoFactorSecret);
+    if (!authenticator.verify({ token: code, secret })) {
+      throw new BadRequestException('Kod hatalı');
+    }
+    // 8 yedek kod üret, hash'leyerek sakla, düz halini bir kez döndür
+    const recovery = Array.from({ length: 8 }, () =>
+      randomBytes(5).toString('hex'),
+    );
+    const hashed = await Promise.all(recovery.map((c) => bcrypt.hash(c, 10)));
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorEnabled: true, twoFactorRecoveryCodes: hashed },
+    });
+    return { enabled: true, recoveryCodes: recovery };
+  }
+
+  async disableTwoFactor(userId: string, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.twoFactorEnabled) throw new BadRequestException('2FA zaten kapalı');
+    const valid = await this.verifyTwoFactor(user, code);
+    if (!valid) throw new BadRequestException('Kod hatalı');
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        twoFactorRecoveryCodes: [],
+      },
+    });
+    return { enabled: false };
+  }
+
+  // TOTP veya tek-kullanımlık yedek kod doğrula
+  private async verifyTwoFactor(user: User, code: string): Promise<boolean> {
+    if (user.twoFactorSecret) {
+      const secret = decrypt(user.twoFactorSecret);
+      if (authenticator.verify({ token: code, secret })) return true;
+    }
+    for (const hash of user.twoFactorRecoveryCodes) {
+      if (await bcrypt.compare(code, hash)) {
+        // kullanılan yedek kodu çıkar
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            twoFactorRecoveryCodes: user.twoFactorRecoveryCodes.filter(
+              (h) => h !== hash,
+            ),
+          },
+        });
+        return true;
+      }
+    }
+    return false;
   }
 
   // Dev-only: şifre/OTP olmadan hızlı giriş (test kolaylığı). Prod'da kapalı.

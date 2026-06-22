@@ -138,6 +138,10 @@ model User {
   balance         Decimal  @default(0) @db.Decimal(12, 2) // USD bakiye
   hasDiscount40   Boolean  @default(false) // $250 yükleme sonrası
   isEmailVerified Boolean  @default(false)
+  // 2FA (TOTP / authenticator QR)
+  twoFactorEnabled       Boolean  @default(false)
+  twoFactorSecret        String?  // AES-GCM şifreli base32 secret
+  twoFactorRecoveryCodes String[] // bcrypt-hashed yedek kodlar
   active          Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

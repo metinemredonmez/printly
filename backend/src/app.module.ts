@@ -47,6 +47,8 @@ import { HealthController } from './health.controller';
         R2_ENDPOINT: Joi.string().allow('').default(''),
         R2_PRESIGN_EXPIRES: Joi.number().default(3600),
         REDIS_URL: Joi.string().allow('').default(''),
+        // At-rest şifreleme (2FA secret vb.) — 32 byte = 64 hex
+        ENCRYPTION_KEY: Joi.string().allow('').default(''),
         // SMTP (OTP e-posta). Boşsa kod log'a yazılır (dev).
         SMTP_HOST: Joi.string().allow('').default(''),
         SMTP_PORT: Joi.number().default(587),
