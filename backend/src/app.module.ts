@@ -23,6 +23,7 @@ import { BillingModule } from './billing/billing.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { PaymentsModule } from './payments/payments.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -96,6 +97,7 @@ import { HealthController } from './health.controller';
     TransactionsModule,
     BoardModule,
     NotificationsModule,
+    PaymentsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

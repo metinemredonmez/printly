@@ -355,6 +355,8 @@ model Order {
   etsyOrderNo String?
   orderDate   DateTime?
   quickbooksInvoiceId String?
+  paymentProvider String? // QUICKBOOKS | STRIPE (kart ödemesi)
+  paymentRef      String? // sağlayıcı referansı (invoice/checkout id)
 
   // Teslimat
   clientName    String?
