@@ -26,6 +26,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { ReportsModule } from './reports/reports.module';
+import { LabelsModule } from './labels/labels.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -102,6 +103,7 @@ import { HealthController } from './health.controller';
     PaymentsModule,
     ImportExportModule,
     ReportsModule,
+    LabelsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
