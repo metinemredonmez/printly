@@ -5,6 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
+import { BullModule } from '@nestjs/bullmq';
 import * as Joi from 'joi';
 
 import { PrismaModule } from './prisma/prisma.module';
@@ -84,6 +85,14 @@ import { HealthController } from './health.controller';
         } catch {
           return { ttl: 60000 }; // Redis erişilemezse in-memory'e düş
         }
+      },
+    }),
+    // BullMQ arka plan kuyruğu (toplu mail/push vb.) — Redis bağlantısı
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const url = new URL(config.get<string>('REDIS_URL') || 'redis://localhost:6380');
+        return { connection: { host: url.hostname, port: Number(url.port) || 6379 } };
       },
     }),
     PrismaModule,

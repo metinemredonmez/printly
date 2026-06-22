@@ -16,6 +16,8 @@ import {
   IsIn,
   IsObject,
 } from 'class-validator';
+import { BullModule, InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Queue, Job } from 'bullmq';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
@@ -54,6 +56,7 @@ export class NotificationsService {
     private mail: MailService,
     private audit: AuditService,
     private onesignal: OneSignalProvider,
+    @InjectQueue('notifications') private queue: Queue,
   ) {}
 
   // ── Cihaz kaydı (push) ─────────────────────
@@ -134,32 +137,39 @@ export class NotificationsService {
     return updated;
   }
 
-  // ── Toplu e-posta (SMTP) ───────────────────
+  // ── Toplu e-posta (SMTP) → BullMQ kuyruğuna al ─────
   async sendBulkEmail(actor: AuthUser, dto: BulkEmailDto) {
-    let recipients: string[] = [];
-    if (dto.targetType === 'ALL') {
-      const users = await this.prisma.user.findMany({
-        where: { active: true },
-        select: { email: true },
-      });
-      recipients = users.map((u) => u.email);
-    } else if (dto.targetType === 'USER_IDS') {
-      const users = await this.prisma.user.findMany({
-        where: { id: { in: dto.userIds ?? [] } },
-        select: { email: true },
-      });
-      recipients = users.map((u) => u.email);
-    } else {
-      recipients = dto.emails ?? [];
-    }
-
-    const result = await this.mail.sendBulk(recipients, dto.subject, dto.html);
-    await this.audit.log({
+    const job = await this.queue.add('bulk-email', {
+      targetType: dto.targetType,
+      userIds: dto.userIds,
+      emails: dto.emails,
+      subject: dto.subject,
+      html: dto.html,
       actorUserId: actor.userId,
       actorRole: actor.role,
+    });
+    return { queued: true, jobId: job.id };
+  }
+
+  // Worker tarafından çalıştırılır (gerçek gönderim)
+  async processBulkEmail(data: any) {
+    let recipients: string[] = [];
+    if (data.targetType === 'ALL') {
+      const users = await this.prisma.user.findMany({ where: { active: true }, select: { email: true } });
+      recipients = users.map((u) => u.email);
+    } else if (data.targetType === 'USER_IDS') {
+      const users = await this.prisma.user.findMany({ where: { id: { in: data.userIds ?? [] } }, select: { email: true } });
+      recipients = users.map((u) => u.email);
+    } else {
+      recipients = data.emails ?? [];
+    }
+    const result = await this.mail.sendBulk(recipients, data.subject, data.html);
+    await this.audit.log({
+      actorUserId: data.actorUserId,
+      actorRole: data.actorRole,
       action: 'EMAIL_BULK',
       entityType: 'Email',
-      meta: { targetType: dto.targetType, ...result },
+      meta: { targetType: data.targetType, ...result, queued: true },
     });
     return { ...result, total: recipients.length };
   }
@@ -212,8 +222,21 @@ export class NotificationsController {
   }
 }
 
+// BullMQ worker — kuyruktaki işleri işler
+@Processor('notifications')
+export class NotificationsProcessor extends WorkerHost {
+  constructor(private readonly svc: NotificationsService) {
+    super();
+  }
+  async process(job: Job) {
+    if (job.name === 'bulk-email') return this.svc.processBulkEmail(job.data);
+    return undefined;
+  }
+}
+
 @Module({
-  providers: [NotificationsService, OneSignalProvider],
+  imports: [BullModule.registerQueue({ name: 'notifications' })],
+  providers: [NotificationsService, OneSignalProvider, NotificationsProcessor],
   controllers: [NotificationsController],
 })
 export class NotificationsModule {}
