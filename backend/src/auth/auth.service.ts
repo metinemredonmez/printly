@@ -122,6 +122,13 @@ export class AuthService {
     if (!user.isEmailVerified || !user.active) {
       throw new BadRequestException('2FA için e-posta doğrulanmış ve aktif hesap gerekir');
     }
+    // 2FA zaten açıkken re-setup, mevcut kodu istemeden secret'i ezip 2FA'yı düşürüyordu (H1).
+    // Yeniden kurmak için önce /auth/2fa/disable ile (mevcut TOTP'yle) kapatılmalı.
+    if (user.twoFactorEnabled) {
+      throw new BadRequestException(
+        '2FA zaten aktif. Yeniden kurmak için önce /auth/2fa/disable ile kapatın.',
+      );
+    }
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(user.email, 'Ortak Doku', secret);
     await this.prisma.user.update({

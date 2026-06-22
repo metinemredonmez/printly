@@ -34,9 +34,11 @@ class BillingDto {
 export class BillingService {
   constructor(private prisma: PrismaService) {}
 
+  // Okuma: hassas kimlik alanları MASKELİ döner (yalnız son 4 hane) — H2.
+  // Düzenleme formu tam değer yerine yeniden giriş ister.
   async get(userId: string) {
     const row = await this.prisma.billingInfo.findUnique({ where: { userId } });
-    return row ? this.decryptRow(row) : row;
+    return row ? this.maskRow(row) : row;
   }
 
   // Tek kayıt; varsa güncelle yoksa oluştur. Hassas alanlar şifreli saklanır.
@@ -62,6 +64,18 @@ export class BillingService {
     const out: any = { ...row };
     for (const f of SENSITIVE) {
       if (out[f]) out[f] = safeDecrypt(out[f]);
+    }
+    return out;
+  }
+
+  // Hassas alanları son 4 hane hariç maskele (•••• + son 4) — H2
+  private maskRow(row: BillingInfo): BillingInfo {
+    const out: any = { ...row };
+    for (const f of SENSITIVE) {
+      if (out[f]) {
+        const plain = safeDecrypt(out[f]);
+        out[f] = plain && plain.length > 4 ? `••••${plain.slice(-4)}` : '••••';
+      }
     }
     return out;
   }

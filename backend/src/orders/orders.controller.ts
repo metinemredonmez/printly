@@ -8,16 +8,20 @@ import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorat
 export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
 
+  // Sipariş oluşturma izni — PRODUCTION'da YOK (yalnız müşteri rolleri + admin)
+  @RequirePermission('order:create')
   @Post()
   create(@CurrentUser() user: AuthUser, @Body() dto: CreateOrderDto) {
     return this.orders.create(user, dto);
   }
 
+  @RequirePermission('order:read')
   @Get()
   findAll(@CurrentUser() user: AuthUser) {
     return this.orders.findAll(user);
   }
 
+  @RequirePermission('order:read')
   @Get(':id')
   findOne(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.orders.findOne(user, id);

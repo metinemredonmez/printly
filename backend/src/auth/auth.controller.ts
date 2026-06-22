@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { IsString, Length } from 'class-validator';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -7,6 +8,11 @@ import { VerifyEmailDto, ResendOtpDto } from './dto/verify-email.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { permissionsForRole } from '../common/permissions';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+// 2FA TOTP (6 hane) veya recovery kodu (10 hex) — whitelist bypass'ı kapatır (L1)
+class TwoFactorCodeDto {
+  @IsString() @Length(6, 10) code: string;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -65,12 +71,12 @@ export class AuthController {
   }
 
   @Post('2fa/enable')
-  enable2fa(@CurrentUser() user: AuthUser, @Body('code') code: string) {
-    return this.auth.enableTwoFactor(user.userId, code);
+  enable2fa(@CurrentUser() user: AuthUser, @Body() dto: TwoFactorCodeDto) {
+    return this.auth.enableTwoFactor(user.userId, dto.code);
   }
 
   @Post('2fa/disable')
-  disable2fa(@CurrentUser() user: AuthUser, @Body('code') code: string) {
-    return this.auth.disableTwoFactor(user.userId, code);
+  disable2fa(@CurrentUser() user: AuthUser, @Body() dto: TwoFactorCodeDto) {
+    return this.auth.disableTwoFactor(user.userId, dto.code);
   }
 }

@@ -7,6 +7,7 @@ import {
   IsOptional,
   ValidateNested,
   Min,
+  Max,
   ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -17,9 +18,10 @@ import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorat
 
 class QuoteItemDto {
   @IsString() productId: string;
-  @IsNumber() @Min(0) widthInch: number;
-  @IsNumber() @Min(0) heightInch: number;
-  @IsInt() @Min(1) quantity: number;
+  // Ölçü/adet üst sınırı — astronomik fiyat + Decimal taşması engeli (M4)
+  @IsNumber() @Min(0) @Max(2000) widthInch: number;
+  @IsNumber() @Min(0) @Max(2000) heightInch: number;
+  @IsInt() @Min(1) @Max(100000) quantity: number;
 }
 
 class QuoteExtraDto {

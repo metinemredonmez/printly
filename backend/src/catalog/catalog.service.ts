@@ -1,7 +1,12 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { Prisma } from '@prisma/client';
+import { Prisma, ProductUnit } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateMaterialDto,
@@ -84,7 +89,23 @@ export class CatalogService {
     return p;
   }
 
+  // Fiyatsız ürün (quote $0) engelleme — H3.
+  private assertPricing(unit: ProductUnit | undefined | null, m2?: number, flat?: number) {
+    const hasM2 = (m2 ?? 0) > 0;
+    const hasFlat = (flat ?? 0) > 0;
+    if (unit === ProductUnit.M2 && !hasM2) {
+      throw new BadRequestException('M2 ürün için basePricePerM2 > 0 olmalı');
+    }
+    if (unit === ProductUnit.FLAT && !hasFlat) {
+      throw new BadRequestException('FLAT ürün için flatPrice > 0 olmalı');
+    }
+    if (!unit && !hasM2 && !hasFlat) {
+      throw new BadRequestException('Ürün için fiyat (basePricePerM2 veya flatPrice) gerekli');
+    }
+  }
+
   async createProduct(dto: CreateProductDto) {
+    this.assertPricing(dto.unit, dto.basePricePerM2, dto.flatPrice);
     const p = await this.prisma.product.create({
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },
     });
@@ -93,7 +114,13 @@ export class CatalogService {
   }
 
   async updateProduct(id: string, dto: UpdateProductDto) {
-    await this.getProduct(id, true); // admin: pasif ürünü de güncelleyebilir
+    const existing = await this.getProduct(id, true); // admin: pasif ürünü de güncelleyebilir
+    // Birleştirilmiş değerlerle fiyat tutarlılığını doğrula (H3)
+    this.assertPricing(
+      dto.unit ?? existing.unit,
+      dto.basePricePerM2 ?? Number(existing.basePricePerM2 ?? 0),
+      dto.flatPrice ?? Number(existing.flatPrice ?? 0),
+    );
     const p = await this.prisma.product.update({
       where: { id },
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },
