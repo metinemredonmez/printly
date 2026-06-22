@@ -12,6 +12,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import * as bwipjs from 'bwip-js';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { pdfSafe } from '../common/pdf.util';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Injectable()
@@ -38,7 +39,7 @@ export class LabelsService {
     let y = 432 - 24;
 
     const text = (s: string, size: number, f = font, x = M) => {
-      page.drawText(s ?? '', { x, y, size, font: f, color: rgb(0, 0, 0) });
+      page.drawText(pdfSafe(s), { x, y, size, font: f, color: rgb(0, 0, 0) });
       y -= size + 6;
     };
     const line = () => {
