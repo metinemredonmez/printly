@@ -40,6 +40,13 @@ export class AuthController {
     return this.auth.login(dto);
   }
 
+  // Dev-only: hızlı giriş (prod'da 403)
+  @Public()
+  @Post('mock-login')
+  mockLogin(@Body() dto: ResendOtpDto) {
+    return this.auth.mockLogin(dto.email);
+  }
+
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return user;

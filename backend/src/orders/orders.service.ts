@@ -15,6 +15,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
+import { AuditService } from '../audit/audit.module';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { CreateOrderDto } from './dto';
 
@@ -32,6 +33,7 @@ export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private pricing: PricingService,
+    private audit: AuditService,
   ) {}
 
   async create(authUser: AuthUser, dto: CreateOrderDto) {
@@ -51,7 +53,7 @@ export class OrdersService {
     // BALANCE → ödeme atomik düşümle alınır (PAID). CARD → gerçek gateway gelene dek PENDING.
     const paymentStatus = isBalance ? PaymentStatus.PAID : PaymentStatus.PENDING;
 
-    return this.prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx) => {
       // Bakiye: yarış-koşulsuz ATOMİK düşüm — yalnız yeterliyse düşer.
       let newBalance = 0;
       if (isBalance) {
@@ -151,6 +153,20 @@ export class OrdersService {
 
       return order;
     });
+
+    await this.audit.log({
+      actorUserId: authUser.userId,
+      actorRole: authUser.role,
+      action: 'ORDER_CREATE',
+      entityType: 'Order',
+      entityId: created.id,
+      meta: {
+        total: quote.total,
+        category: dto.category,
+        paymentMethod: dto.paymentMethod,
+      },
+    });
+    return created;
   }
 
   findAll(authUser: AuthUser) {
@@ -192,7 +208,7 @@ export class OrdersService {
       throw new BadRequestException(`Geçersiz geçiş: ${order.status} → ${newStatus}`);
     }
 
-    return this.prisma.order.update({
+    const updated = await this.prisma.order.update({
       where: { id },
       data: {
         status: newStatus,
@@ -207,6 +223,15 @@ export class OrdersService {
       },
       include: { statusEvents: { orderBy: { createdAt: 'asc' } } },
     });
+    await this.audit.log({
+      actorUserId: authUser.userId,
+      actorRole: authUser.role,
+      action: 'ORDER_STATUS_CHANGE',
+      entityType: 'Order',
+      entityId: id,
+      meta: { from: order.status, to: newStatus, note },
+    });
+    return updated;
   }
 
   // Bayi sadece kendi siparişlerini; ADMIN/PRODUCTION hepsini görür.

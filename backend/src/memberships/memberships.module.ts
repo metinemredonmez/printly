@@ -10,6 +10,7 @@ import {
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { Prisma, Role, TransactionType, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.module';
 import { MEMBERSHIP_FEE } from '../common/pricing.util';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
@@ -21,7 +22,10 @@ class UpgradeDto {
 
 @Injectable()
 export class MembershipsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private audit: AuditService,
+  ) {}
 
   getMine(userId: string) {
     return this.prisma.membership.findUnique({ where: { userId } });
@@ -53,7 +57,7 @@ export class MembershipsService {
       if (!leader || leader.role !== Role.TEAM_LEADER) {
         throw new BadRequestException('Geçerli bir ekip lideri seçin');
       }
-      return this.prisma.$transaction(async (tx) => {
+      const membership = await this.prisma.$transaction(async (tx) => {
         // Aidatı atomik düş — yetersizse hiç düşmez (yarış-koşulsuz)
         const affected = await tx.$executeRaw`UPDATE "User" SET balance = balance - ${MEMBERSHIP_FEE}::numeric WHERE id = ${userId} AND balance >= ${MEMBERSHIP_FEE}::numeric`;
         if (affected === 0) {
@@ -109,6 +113,14 @@ export class MembershipsService {
           },
         });
       });
+      await this.audit.log({
+        actorUserId: userId,
+        action: 'MEMBERSHIP_UPGRADE',
+        entityType: 'User',
+        entityId: userId,
+        meta: { tier: 'TEAM_MEMBER', leaderId: dto.leaderId, fee: MEMBERSHIP_FEE },
+      });
+      return membership;
     }
 
     // Ekip Lideri: ücretsiz
@@ -116,11 +128,19 @@ export class MembershipsService {
       where: { id: userId },
       data: { role: Role.TEAM_LEADER, priceMultiplier: 1, leaderId: null },
     });
-    return this.prisma.membership.upsert({
+    const leaderMembership = await this.prisma.membership.upsert({
       where: { userId },
       create: { userId, tier: Role.TEAM_LEADER, monthlyFee: new Prisma.Decimal(0) },
       update: { tier: Role.TEAM_LEADER, monthlyFee: new Prisma.Decimal(0), active: true },
     });
+    await this.audit.log({
+      actorUserId: userId,
+      action: 'MEMBERSHIP_UPGRADE',
+      entityType: 'User',
+      entityId: userId,
+      meta: { tier: 'TEAM_LEADER', fee: 0 },
+    });
+    return leaderMembership;
   }
 }
 

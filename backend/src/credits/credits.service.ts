@@ -1,11 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma, TransactionType, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.module';
 import { BULK_LOAD_FOR_DISCOUNT } from '../common/pricing.util';
 
 @Injectable()
 export class CreditsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private audit: AuditService,
+  ) {}
 
   async balance(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -29,10 +33,15 @@ export class CreditsService {
    * Bakiye yükleme (+). $250 ve üzeri yükleme → %40 indirim hakkı (hasDiscount40).
    * method=CARD ödeme simüle edilir (gerçek gateway Faz 2).
    */
-  async topUp(userId: string, amount: number, method: PaymentMethod = PaymentMethod.CARD) {
+  async topUp(
+    userId: string,
+    amount: number,
+    method: PaymentMethod = PaymentMethod.CARD,
+    actorUserId?: string,
+  ) {
     if (amount <= 0) throw new BadRequestException('Tutar 0’dan büyük olmalı');
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: userId },
         select: { balance: true, hasDiscount40: true },
@@ -69,5 +78,14 @@ export class CreditsService {
 
       return { balance: next, hasDiscount40: grantDiscount };
     });
+
+    await this.audit.log({
+      actorUserId: actorUserId ?? userId,
+      action: 'CREDIT_TOPUP',
+      entityType: 'User',
+      entityId: userId,
+      meta: { amount, method, balanceAfter: result.balance },
+    });
+    return result;
   }
 }

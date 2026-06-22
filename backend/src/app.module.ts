@@ -6,6 +6,9 @@ import * as Joi from 'joi';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { MailModule } from './mail/mail.module';
+import { AuditModule } from './audit/audit.module';
+import { SettingsModule } from './settings/settings.module';
+import { BoardModule } from './board/board.module';
 import { AuthModule } from './auth/auth.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { CatalogModule } from './catalog/catalog.module';
@@ -54,6 +57,8 @@ import { HealthController } from './health.controller';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
     PrismaModule,
     MailModule,
+    AuditModule,
+    SettingsModule,
     AuthModule,
     OrganizationsModule,
     CatalogModule,
@@ -65,6 +70,7 @@ import { HealthController } from './health.controller';
     BillingModule,
     MembershipsModule,
     TransactionsModule,
+    BoardModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

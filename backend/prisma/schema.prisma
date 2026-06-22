@@ -306,6 +306,8 @@ model Order {
   total       Decimal @default(0) @db.Decimal(12, 2)
   totalSqm    Decimal @default(0) @db.Decimal(12, 4)
 
+  boardPosition Int @default(0) // Kanban kolon (status) içi sıra
+
   // Etsy / referanslar
   etsyOrderNo String?
   orderDate   DateTime?
@@ -339,6 +341,34 @@ model Order {
   extras       OrderExtra[]
   assets       Asset[]
   statusEvents OrderStatusEvent[]
+
+  @@index([status, boardPosition])
+}
+
+// ─────────────────────────────────────────────
+// Ayarlar (key-value) & Denetim kaydı
+// ─────────────────────────────────────────────
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actorRole   String?
+  action      String   // ORDER_STATUS_CHANGE | CREDIT_TOPUP | MEMBERSHIP_UPGRADE | SETTING_UPDATE | ORDER_CREATE ...
+  entityType  String?
+  entityId    String?
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+  @@index([createdAt])
 }
 
 model OrderItem {

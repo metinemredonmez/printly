@@ -26,13 +26,17 @@ export class CreditsController {
   // Kendi bakiyeni yükle (kart ile simüle). $250+ → %40 indirim hakkı.
   @Post('me/topup')
   topUp(@CurrentUser() user: AuthUser, @Body() dto: TopUpDto) {
-    return this.credits.topUp(user.userId, dto.amount);
+    return this.credits.topUp(user.userId, dto.amount, undefined, user.userId);
   }
 
   // Admin: bir kullanıcıya bakiye yükle
   @Roles(Role.ADMIN)
   @Post(':userId/topup')
-  adminTopUp(@Param('userId') userId: string, @Body() dto: TopUpDto) {
-    return this.credits.topUp(userId, dto.amount);
+  adminTopUp(
+    @CurrentUser() admin: AuthUser,
+    @Param('userId') userId: string,
+    @Body() dto: TopUpDto,
+  ) {
+    return this.credits.topUp(userId, dto.amount, undefined, admin.userId);
   }
 }

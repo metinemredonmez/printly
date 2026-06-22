@@ -3,6 +3,7 @@ import {
   ConflictException,
   UnauthorizedException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -100,6 +101,18 @@ export class AuthService {
     if (!user.isEmailVerified) {
       throw new UnauthorizedException('Önce e-postanızı doğrulayın');
     }
+    return this.issueToken(user);
+  }
+
+  // Dev-only: şifre/OTP olmadan hızlı giriş (test kolaylığı). Prod'da kapalı.
+  async mockLogin(email: string) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Mock login yalnızca geliştirmede kullanılabilir');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
     return this.issueToken(user);
   }
 
