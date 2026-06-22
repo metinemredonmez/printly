@@ -5,13 +5,16 @@ import {
   Get,
   Post,
   Body,
+  Param,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { Prisma, Role, TransactionType, PaymentMethod } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
 import { MEMBERSHIP_FEE } from '../common/pricing.util';
+import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 class UpgradeDto {
@@ -31,17 +34,24 @@ export class MembershipsService {
     return this.prisma.membership.findUnique({ where: { userId } });
   }
 
-  // Lider seçimi için: tüm Ekip Liderleri
+  // Lider seçimi için: tüm Ekip Liderleri (e-posta PII sızdırma — id+ad yeterli)
   listLeaders() {
     return this.prisma.user.findMany({
       where: { role: Role.TEAM_LEADER, active: true },
-      select: { id: true, fullName: true, email: true },
+      select: { id: true, fullName: true },
       orderBy: { fullName: 'asc' },
     });
   }
 
   async upgrade(userId: string, dto: UpgradeDto) {
-    if (dto.tier !== Role.TEAM_MEMBER && dto.tier !== Role.TEAM_LEADER) {
+    // Self-servis yalnız Ekip Üyeliği (aidatlı). Ekip Lideri yükseltmesi yönetici onayı ister
+    // (ücretsiz lider + fiyat çarpanı 1x suistimalini kapatır — K2/H3).
+    if (dto.tier === Role.TEAM_LEADER) {
+      throw new ForbiddenException(
+        'Ekip Lideri yükseltmesi yönetici onayı gerektirir (self-servis kapalı)',
+      );
+    }
+    if (dto.tier !== Role.TEAM_MEMBER) {
       throw new BadRequestException('Geçersiz üyelik tipi');
     }
 
@@ -123,22 +133,29 @@ export class MembershipsService {
       return membership;
     }
 
-    // Ekip Lideri: ücretsiz
+    // Buraya yalnız TEAM_MEMBER akışı gelir; TEAM_LEADER yukarıda reddedildi.
+    throw new BadRequestException('Geçersiz üyelik tipi');
+  }
+
+  // ADMIN: bir kullanıcıyı Ekip Lideri yap (self-servis DEĞİL — fiyat çarpanı 1x'e düşer)
+  async promoteToLeader(actorUserId: string, targetUserId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
     await this.prisma.user.update({
-      where: { id: userId },
+      where: { id: targetUserId },
       data: { role: Role.TEAM_LEADER, priceMultiplier: 1, leaderId: null },
     });
     const leaderMembership = await this.prisma.membership.upsert({
-      where: { userId },
-      create: { userId, tier: Role.TEAM_LEADER, monthlyFee: new Prisma.Decimal(0) },
+      where: { userId: targetUserId },
+      create: { userId: targetUserId, tier: Role.TEAM_LEADER, monthlyFee: new Prisma.Decimal(0) },
       update: { tier: Role.TEAM_LEADER, monthlyFee: new Prisma.Decimal(0), active: true },
     });
     await this.audit.log({
-      actorUserId: userId,
+      actorUserId,
       action: 'MEMBERSHIP_UPGRADE',
       entityType: 'User',
-      entityId: userId,
-      meta: { tier: 'TEAM_LEADER', fee: 0 },
+      entityId: targetUserId,
+      meta: { tier: 'TEAM_LEADER', fee: 0, by: 'admin' },
     });
     return leaderMembership;
   }
@@ -161,6 +178,13 @@ export class MembershipsController {
   @Post('upgrade')
   upgrade(@CurrentUser() user: AuthUser, @Body() dto: UpgradeDto) {
     return this.memberships.upgrade(user.userId, dto);
+  }
+
+  // ADMIN: bir kullanıcıyı Ekip Lideri yap (self-servis lider yükseltmesi kapalı)
+  @Roles(Role.ADMIN)
+  @Post('leader/:userId')
+  promoteLeader(@CurrentUser() admin: AuthUser, @Param('userId') userId: string) {
+    return this.memberships.promoteToLeader(admin.userId, userId);
   }
 }
 

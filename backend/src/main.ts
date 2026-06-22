@@ -4,9 +4,18 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
+// Prisma BigInt alanları (ör. Asset.sizeBytes) JSON yanıtında 500 vermesin.
+// JSON.stringify BigInt'i serialize edemez → global toJSON ile Number'a çevir.
+(BigInt.prototype as unknown as { toJSON: () => number }).toJSON = function () {
+  return Number(this);
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+
+  // nginx/reverse-proxy arkasında gerçek istemci IP'si (rate-limit + loglar doğru çalışsın)
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
   app.setGlobalPrefix('api');
 
@@ -15,7 +24,9 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      // enableImplicitConversion KAPALI: "false"/1 gibi değerleri boolean'a sessizce
+      // çevirip @IsBoolean'ı baypas etmesini engeller (H4). Sayısal query yok (hepsi string).
+      transformOptions: { enableImplicitConversion: false },
     }),
   );
 

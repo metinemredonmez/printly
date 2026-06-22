@@ -18,7 +18,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentStatus } from '@prisma/client';
+import { refundOnCancel } from '../common/refund.util';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -105,15 +106,22 @@ export class BoardService {
       throw new BadRequestException(`Geçersiz geçiş: ${order.status} → ${toStatus}`);
     }
 
-    const updated = await this.prisma.order.update({
-      where: { id: orderId },
-      data: {
-        status: toStatus,
-        boardPosition: position,
-        statusEvents: statusChanged
-          ? { create: { fromStatus: order.status, toStatus, byUserId: authUser.userId } }
-          : undefined,
-      },
+    const updated = await this.prisma.$transaction(async (tx) => {
+      // Board'dan iptale sürüklenirse de BALANCE+PAID siparişte atomik iade
+      const didRefund = statusChanged
+        ? await refundOnCancel(tx, order, toStatus)
+        : false;
+      return tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: toStatus,
+          boardPosition: position,
+          ...(didRefund ? { paymentStatus: PaymentStatus.REFUNDED } : {}),
+          statusEvents: statusChanged
+            ? { create: { fromStatus: order.status, toStatus, byUserId: authUser.userId } }
+            : undefined,
+        },
+      });
     });
 
     if (statusChanged) {

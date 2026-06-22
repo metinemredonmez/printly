@@ -19,6 +19,7 @@ import {
   IsBoolean,
   IsOptional,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { Role, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -54,7 +55,16 @@ class UpdateRoleDto {
   @IsEnum(Role) role: Role;
 }
 class UpdateActiveDto {
-  @IsBoolean() active: boolean;
+  // Katı boolean parse: yalnız gerçek boolean veya "true"/"false" kabul.
+  // enableImplicitConversion'ın "false"/1 → true coercion'ını engeller (güvenlik-kritik alan).
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value; // diğer her şey @IsBoolean ile 400
+  })
+  @IsBoolean()
+  active: boolean;
 }
 
 @Injectable()

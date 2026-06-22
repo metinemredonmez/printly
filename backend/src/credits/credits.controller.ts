@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { IsNumber, Min } from 'class-validator';
+import { IsNumber, Min, Max } from 'class-validator';
 import { Role } from '@prisma/client';
 import { CreditsService } from './credits.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 class TopUpDto {
-  @IsNumber() @Min(1) amount: number;
+  // 2 ondalık, 1–100.000 USD aralığı (Decimal(12,2) taşması + saçma tutar koruması)
+  @IsNumber({ maxDecimalPlaces: 2 }) @Min(1) @Max(100000) amount: number;
 }
 
 @Controller('credits')
@@ -23,13 +24,23 @@ export class CreditsController {
     return this.credits.ledger(user.userId);
   }
 
-  // Kendi bakiyeni yükle (kart ile simüle). $250+ → %40 indirim hakkı.
+  // Kendi bakiyeni yükleme TALEBİ (PENDING). Bakiye/indirim ödeme onayından sonra işlenir.
   @Post('me/topup')
-  topUp(@CurrentUser() user: AuthUser, @Body() dto: TopUpDto) {
-    return this.credits.topUp(user.userId, dto.amount, undefined, user.userId);
+  requestTopUp(@CurrentUser() user: AuthUser, @Body() dto: TopUpDto) {
+    return this.credits.requestTopUp(user.userId, dto.amount);
   }
 
-  // Admin: bir kullanıcıya bakiye yükle
+  // Admin / ödeme webhook'u: PENDING yükleme talebini onayla → bakiyeye işle
+  @Roles(Role.ADMIN)
+  @Post('topup/:transactionId/confirm')
+  confirmTopUp(
+    @CurrentUser() admin: AuthUser,
+    @Param('transactionId') transactionId: string,
+  ) {
+    return this.credits.confirmTopUp(admin.userId, transactionId);
+  }
+
+  // Admin: bir kullanıcıya bakiyeyi ANINDA yükle (tahsilat yapıldı varsayımı)
   @Roles(Role.ADMIN)
   @Post(':userId/topup')
   adminTopUp(

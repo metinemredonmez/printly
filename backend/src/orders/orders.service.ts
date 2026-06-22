@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { AuditService } from '../audit/audit.module';
 import { AuthUser } from '../common/decorators/current-user.decorator';
+import { refundOnCancel } from '../common/refund.util';
 import { CreateOrderDto } from './dto';
 
 const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -208,20 +209,26 @@ export class OrdersService {
       throw new BadRequestException(`Geçersiz geçiş: ${order.status} → ${newStatus}`);
     }
 
-    const updated = await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: newStatus,
-        statusEvents: {
-          create: {
-            fromStatus: order.status,
-            toStatus: newStatus,
-            note,
-            byUserId: authUser.userId,
+    const { updated, refunded } = await this.prisma.$transaction(async (tx) => {
+      // İptalde BALANCE+PAID siparişte atomik bakiye iadesi
+      const didRefund = await refundOnCancel(tx, order, newStatus);
+      const o = await tx.order.update({
+        where: { id },
+        data: {
+          status: newStatus,
+          ...(didRefund ? { paymentStatus: PaymentStatus.REFUNDED } : {}),
+          statusEvents: {
+            create: {
+              fromStatus: order.status,
+              toStatus: newStatus,
+              note,
+              byUserId: authUser.userId,
+            },
           },
         },
-      },
-      include: { statusEvents: { orderBy: { createdAt: 'asc' } } },
+        include: { statusEvents: { orderBy: { createdAt: 'asc' } } },
+      });
+      return { updated: o, refunded: didRefund };
     });
     await this.audit.log({
       actorUserId: authUser.userId,
@@ -229,7 +236,7 @@ export class OrdersService {
       action: 'ORDER_STATUS_CHANGE',
       entityType: 'Order',
       entityId: id,
-      meta: { from: order.status, to: newStatus, note },
+      meta: { from: order.status, to: newStatus, note, refunded },
     });
     return updated;
   }
