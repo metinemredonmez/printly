@@ -22,6 +22,7 @@ import { EtsyStoresModule } from './etsy-stores/etsy-stores.module';
 import { BillingModule } from './billing/billing.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -56,6 +57,9 @@ import { HealthController } from './health.controller';
         SMTP_USER: Joi.string().allow('').default(''),
         SMTP_PASS: Joi.string().allow('').default(''),
         SMTP_FROM: Joi.string().allow('').default('Ortak Doku <noreply@ortakdoku.com>'),
+        // OneSignal push (Ortak Doku'nun KENDİ app'i; boşsa push gönderilmez)
+        ONESIGNAL_APP_ID: Joi.string().allow('').default(''),
+        ONESIGNAL_API_KEY: Joi.string().allow('').default(''),
       }),
     }),
     // Global rate-limit: varsayılan 120 istek/dk; hassas auth endpoint'leri @Throttle ile daha sıkı.
@@ -91,6 +95,7 @@ import { HealthController } from './health.controller';
     MembershipsModule,
     TransactionsModule,
     BoardModule,
+    NotificationsModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

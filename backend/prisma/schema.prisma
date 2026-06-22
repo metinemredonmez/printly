@@ -162,6 +162,45 @@ model User {
   createdOrders Order[]        @relation("OrderCreatedBy")
   transactions  Transaction[]
   creditLedger  CreditLedger[]
+  devices       UserDevice[]
+}
+
+// ─────────────────────────────────────────────
+// Bildirim (push cihaz + log)
+// ─────────────────────────────────────────────
+
+model UserDevice {
+  id           String   @id @default(cuid())
+  deviceToken  String   @unique // OneSignal subscription/player id
+  platform     String   // IOS | ANDROID | WEB
+  isActive     Boolean  @default(true)
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+}
+
+model PushNotificationLog {
+  id              String    @id @default(cuid())
+  title           String
+  body            String
+  data            Json?
+  targetType      String    // ALL | USER_IDS | SEGMENT
+  targetIds       String[]
+  totalRecipients Int       @default(0)
+  successCount    Int       @default(0)
+  failureCount    Int       @default(0)
+  status          String    @default("PENDING") // PENDING | SENT | FAILED
+  providerMsgId   String?
+  errorMessage    String?
+  sentAt          DateTime?
+  createdByUserId String?
+  createdAt       DateTime  @default(now())
+
+  @@index([status, createdAt])
 }
 
 model OtpCode {

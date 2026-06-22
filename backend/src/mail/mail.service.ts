@@ -47,4 +47,30 @@ export class MailService {
     await this.transporter.sendMail({ from: this.from, to: email, subject, text, html });
     this.logger.log(`OTP e-postası gönderildi → ${email}`);
   }
+
+  // Toplu/broadcast e-posta (duyuru/bildirim). Dev'de SMTP yoksa log'a yazar.
+  async sendBulk(
+    recipients: string[],
+    subject: string,
+    html: string,
+    text?: string,
+  ): Promise<{ sent: number; failed: number }> {
+    let sent = 0;
+    let failed = 0;
+    const body = text ?? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    for (const to of recipients) {
+      try {
+        if (!this.configured) {
+          this.logger.log(`[DEV MAIL] → ${to}: ${subject}`);
+        } else {
+          await this.transporter.sendMail({ from: this.from, to, subject, html, text: body });
+        }
+        sent++;
+      } catch {
+        failed++;
+      }
+    }
+    this.logger.log(`Toplu e-posta: ${sent} gönderildi, ${failed} hata`);
+    return { sent, failed };
+  }
 }
