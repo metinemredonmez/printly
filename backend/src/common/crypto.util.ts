@@ -26,3 +26,19 @@ export function decrypt(payload: string): string {
     decipher.final(),
   ]).toString('utf8');
 }
+
+// iv:tag:cipher formatında mı? (şifreli vs eski düz metin ayrımı)
+export function isEncrypted(v: string | null | undefined): boolean {
+  return !!v && /^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$/.test(v);
+}
+
+// Şifreliyse çöz, değilse (eski düz metin) olduğu gibi döndür.
+export function safeDecrypt(v: string | null | undefined): string | null {
+  if (!v) return v ?? null;
+  if (!isEncrypted(v)) return v;
+  try {
+    return decrypt(v);
+  } catch {
+    return v;
+  }
+}

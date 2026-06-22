@@ -13,6 +13,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { pdfSafe } from '../common/pdf.util';
+import { safeDecrypt } from '../common/crypto.util';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 const money = (n: number) => `$${n.toFixed(2)}`;
@@ -62,8 +63,8 @@ export class InvoicesService {
     y -= 14;
     if (b) {
       const taxLine = b.country === 'TR'
-        ? (b.taxNo ? `Vergi No: ${b.taxNo} (${b.taxOffice ?? ''})` : b.tc ? `TC: ${b.tc}` : '')
-        : (b.ein ? `EIN: ${b.ein} (${b.state ?? ''})` : b.ssn ? `SSN/ITIN: ${b.ssn}` : '');
+        ? (b.taxNo ? `Vergi No: ${safeDecrypt(b.taxNo)} (${b.taxOffice ?? ''})` : b.tc ? `TC: ${safeDecrypt(b.tc)}` : '')
+        : (b.ein ? `EIN: ${safeDecrypt(b.ein)} (${b.state ?? ''})` : b.ssn ? `SSN/ITIN: ${safeDecrypt(b.ssn)}` : '');
       if (b.address) { t(b.address.slice(0, 80), 9); y -= 12; }
       if (taxLine) { t(taxLine, 9); y -= 12; }
     }

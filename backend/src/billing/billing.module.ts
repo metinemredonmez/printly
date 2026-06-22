@@ -7,9 +7,13 @@ import {
   Body,
 } from '@nestjs/common';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { BillingCountry, BillingType } from '@prisma/client';
+import { BillingCountry, BillingType, BillingInfo } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { encrypt, safeDecrypt } from '../common/crypto.util';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+// At-rest şifrelenecek hassas kimlik alanları
+const SENSITIVE: (keyof BillingInfo)[] = ['tc', 'ssn', 'ein', 'taxNo'];
 
 class BillingDto {
   @IsEnum(BillingCountry) country: BillingCountry;
@@ -30,17 +34,36 @@ class BillingDto {
 export class BillingService {
   constructor(private prisma: PrismaService) {}
 
-  get(userId: string) {
-    return this.prisma.billingInfo.findUnique({ where: { userId } });
+  async get(userId: string) {
+    const row = await this.prisma.billingInfo.findUnique({ where: { userId } });
+    return row ? this.decryptRow(row) : row;
   }
 
-  // Tek kayıt; varsa güncelle yoksa oluştur.
-  upsert(userId: string, dto: BillingDto) {
-    return this.prisma.billingInfo.upsert({
+  // Tek kayıt; varsa güncelle yoksa oluştur. Hassas alanlar şifreli saklanır.
+  async upsert(userId: string, dto: BillingDto) {
+    const data = this.encryptDto(dto);
+    const row = await this.prisma.billingInfo.upsert({
       where: { userId },
-      create: { ...dto, userId },
-      update: { ...dto },
+      create: { ...data, userId },
+      update: { ...data },
     });
+    return this.decryptRow(row); // sahibine düz metin döndür
+  }
+
+  private encryptDto(dto: BillingDto): BillingDto {
+    const out: any = { ...dto };
+    for (const f of SENSITIVE) {
+      if (out[f]) out[f] = encrypt(String(out[f]));
+    }
+    return out;
+  }
+
+  private decryptRow(row: BillingInfo): BillingInfo {
+    const out: any = { ...row };
+    for (const f of SENSITIVE) {
+      if (out[f]) out[f] = safeDecrypt(out[f]);
+    }
+    return out;
   }
 }
 
