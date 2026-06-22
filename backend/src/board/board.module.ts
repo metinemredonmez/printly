@@ -138,16 +138,19 @@ export class BoardService {
   }
 
   // Kolon içi toplu sıralama (Pure pattern).
+  // updateMany + where {id,status}: yalnız o kolondaki kart taşınır; yok olan id sessiz atlanır
+  // (yanlış kolon/yabancı id taşıma + ham 500 önlenir — L4/L3).
   async reorder(status: OrderStatus, items: ReorderItem[]) {
-    await this.prisma.$transaction(
+    const results = await this.prisma.$transaction(
       items.map((it) =>
-        this.prisma.order.update({
-          where: { id: it.id },
+        this.prisma.order.updateMany({
+          where: { id: it.id, status },
           data: { boardPosition: it.position },
         }),
       ),
     );
-    return { updated: items.length, status };
+    const updated = results.reduce((sum, r) => sum + r.count, 0);
+    return { updated, status };
   }
 }
 

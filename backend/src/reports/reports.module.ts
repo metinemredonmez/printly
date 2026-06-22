@@ -78,11 +78,13 @@ export class ReportsService {
 
   // En çok sipariş veren bayiler
   async topDealers() {
+    // Gelir = yalnız ÖDENMİŞ siparişler; sıralama gerçek gelire göre (L11).
     const groups = await this.prisma.order.groupBy({
       by: ['userId'],
+      where: { paymentStatus: PaymentStatus.PAID },
       _count: { _all: true },
       _sum: { total: true },
-      orderBy: { _count: { userId: 'desc' } },
+      orderBy: { _sum: { total: 'desc' } },
       take: 10,
     });
     const users = await this.prisma.user.findMany({

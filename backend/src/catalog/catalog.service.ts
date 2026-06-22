@@ -71,12 +71,16 @@ export class CatalogService {
     );
   }
 
-  async getProduct(id: string) {
+  // includeInactive=false (varsayılan, tüketici uçları): pasif ürün 404 (L1).
+  // Admin işlemleri (update/silme) includeInactive=true ile pasif ürünü de görebilir.
+  async getProduct(id: string, includeInactive = false) {
     const p = await this.prisma.product.findUnique({
       where: { id },
       include: { material: true },
     });
-    if (!p) throw new NotFoundException('Ürün bulunamadı');
+    if (!p || (!includeInactive && !p.active)) {
+      throw new NotFoundException('Ürün bulunamadı');
+    }
     return p;
   }
 
@@ -89,7 +93,7 @@ export class CatalogService {
   }
 
   async updateProduct(id: string, dto: UpdateProductDto) {
-    await this.getProduct(id);
+    await this.getProduct(id, true); // admin: pasif ürünü de güncelleyebilir
     const p = await this.prisma.product.update({
       where: { id },
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },

@@ -84,12 +84,14 @@ export class AuthService {
   async resendOtp(email: string) {
     const normalized = email.toLowerCase();
     const user = await this.prisma.user.findUnique({ where: { email: normalized } });
-    if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
-    if (user.isEmailVerified) {
-      throw new BadRequestException('E-posta zaten doğrulanmış');
+    // Enumeration önleme (L8): var/yok sızdırma — yalnız uygunsa kod gönder, her durumda nötr yanıt.
+    if (user && !user.isEmailVerified) {
+      await this.sendOtp(normalized);
     }
-    await this.sendOtp(normalized);
-    return { message: 'Yeni kod gönderildi', email: normalized };
+    return {
+      message: 'E-posta kayıtlı ve doğrulanmamışsa yeni kod gönderildi',
+      email: normalized,
+    };
   }
 
   async login(dto: LoginDto) {
