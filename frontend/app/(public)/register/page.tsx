@@ -3,14 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LangSwitcher } from '@/components/lang-switcher';
 import { api } from '@/lib/api';
 import { homeFor, type User } from '@/lib/types';
 
 export default function RegisterPage() {
+  const t = useTranslations('auth');
+  const tc = useTranslations('common');
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState({ email: '', password: '', fullName: '' });
@@ -22,10 +26,10 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await api('/auth/register', { method: 'POST', json: form });
-      toast.success('Doğrulama kodu e-postanıza gönderildi');
+      toast.success(t('otpSent'));
       setStep(2);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Kayıt başarısız');
+      toast.error(err instanceof Error ? err.message : t('registerFailed'));
     } finally {
       setLoading(false);
     }
@@ -41,12 +45,12 @@ export default function RegisterPage() {
         body: JSON.stringify({ email: form.email, code }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message ?? 'Doğrulama başarısız');
-      toast.success('Hesabınız oluşturuldu');
+      if (!res.ok) throw new Error(data?.message ?? t('verifyFailed'));
+      toast.success(t('accountCreated'));
       router.replace(homeFor((data.user as User)?.role));
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Doğrulama başarısız');
+      toast.error(err instanceof Error ? err.message : t('verifyFailed'));
     } finally {
       setLoading(false);
     }
@@ -55,9 +59,12 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <div className="flex justify-end mb-3">
+          <LangSwitcher />
+        </div>
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-extrabold text-navy">Hesap Oluştur</h1>
-          <p className="text-sm text-slate-500">Bayi başvurusu</p>
+          <h1 className="text-2xl font-extrabold text-navy">{t('registerTitle')}</h1>
+          <p className="text-sm text-slate-500">{t('registerSubtitle')}</p>
         </div>
         {step === 1 ? (
           <form
@@ -65,7 +72,7 @@ export default function RegisterPage() {
             className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-5"
           >
             <div className="space-y-2">
-              <Label htmlFor="fullName">Ad Soyad</Label>
+              <Label htmlFor="fullName">{t('fullName')}</Label>
               <Input
                 id="fullName"
                 required
@@ -74,7 +81,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">E-posta</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -84,7 +91,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Şifre (min 8)</Label>
+              <Label htmlFor="password">{t('passwordHint')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -95,12 +102,12 @@ export default function RegisterPage() {
               />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? '…' : 'Doğrulama Kodu Gönder'}
+              {loading ? '…' : t('sendCode')}
             </Button>
             <p className="text-center text-sm text-slate-500">
-              Zaten hesabın var mı?{' '}
+              {t('haveAccount')}{' '}
               <Link href="/login" className="text-primary hover:underline">
-                Giriş yap
+                {t('loginTitle')}
               </Link>
             </p>
           </form>
@@ -110,10 +117,10 @@ export default function RegisterPage() {
             className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-5"
           >
             <p className="text-sm text-slate-600">
-              <strong>{form.email}</strong> adresine gönderilen 6 haneli kodu girin.
+              <strong>{form.email}</strong> {t('enterOtp')}
             </p>
             <div className="space-y-2">
-              <Label htmlFor="code">Doğrulama Kodu</Label>
+              <Label htmlFor="code">{t('verifyCode')}</Label>
               <Input
                 id="code"
                 inputMode="numeric"
@@ -124,14 +131,14 @@ export default function RegisterPage() {
               />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? '…' : 'Doğrula & Kayıt Ol'}
+              {loading ? '…' : t('verifyRegister')}
             </Button>
             <button
               type="button"
               onClick={() => setStep(1)}
               className="w-full text-sm text-slate-500 hover:underline"
             >
-              Geri dön
+              {tc('back')}
             </button>
           </form>
         )}

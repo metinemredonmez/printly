@@ -3,13 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LangSwitcher } from '@/components/lang-switcher';
 import { api } from '@/lib/api';
 
 export default function ForgotPage() {
+  const t = useTranslations('auth');
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');
@@ -22,10 +25,10 @@ export default function ForgotPage() {
     setLoading(true);
     try {
       await api('/auth/forgot-password', { method: 'POST', json: { email } });
-      toast.success('E-posta kayıtlıysa sıfırlama kodu gönderildi');
+      toast.success(t('resetSent'));
       setStep(2);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'İşlem başarısız');
+      toast.error(err instanceof Error ? err.message : t('loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -36,10 +39,10 @@ export default function ForgotPage() {
     setLoading(true);
     try {
       await api('/auth/reset-password', { method: 'POST', json: { email, code, newPassword } });
-      toast.success('Şifreniz güncellendi, giriş yapabilirsiniz');
+      toast.success(t('passwordUpdated'));
       router.replace('/login');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Sıfırlama başarısız');
+      toast.error(err instanceof Error ? err.message : t('verifyFailed'));
     } finally {
       setLoading(false);
     }
@@ -48,13 +51,16 @@ export default function ForgotPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <h1 className="text-2xl font-extrabold text-navy text-center mb-8">Şifre Sıfırlama</h1>
+        <div className="flex justify-end mb-3">
+          <LangSwitcher />
+        </div>
+        <h1 className="text-2xl font-extrabold text-navy text-center mb-8">{t('forgotTitle')}</h1>
         <form
           onSubmit={step === 1 ? sendCode : reset}
           className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-5"
         >
           <div className="space-y-2">
-            <Label htmlFor="email">E-posta</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
@@ -67,7 +73,7 @@ export default function ForgotPage() {
           {step === 2 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="code">Kod</Label>
+                <Label htmlFor="code">{t('verifyCode')}</Label>
                 <Input
                   id="code"
                   inputMode="numeric"
@@ -77,7 +83,7 @@ export default function ForgotPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="np">Yeni Şifre</Label>
+                <Label htmlFor="np">{t('newPassword')}</Label>
                 <Input
                   id="np"
                   type="password"
@@ -90,11 +96,11 @@ export default function ForgotPage() {
             </>
           )}
           <Button type="submit" className="w-full h-11" disabled={loading}>
-            {loading ? '…' : step === 1 ? 'Kod Gönder' : 'Şifreyi Güncelle'}
+            {loading ? '…' : step === 1 ? t('sendResetCode') : t('updatePassword')}
           </Button>
           <p className="text-center text-sm">
             <Link href="/login" className="text-primary hover:underline">
-              Girişe dön
+              {t('backToLogin')}
             </Link>
           </p>
         </form>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { api } from '@/lib/api';
 
@@ -12,22 +13,23 @@ interface Dashboard {
 }
 
 export default function AdminHome() {
+  const t = useTranslations('adminHome');
   const { data, isLoading } = useQuery({
     queryKey: ['reports', 'dashboard'],
     queryFn: () => api<Dashboard>('/reports/dashboard'),
   });
 
   const cards = [
-    { label: 'Toplam Sipariş', value: data?.totalOrders },
-    { label: 'Gelir (USD)', value: data?.revenue },
-    { label: 'Aktif Bayi', value: data?.activeDealers },
+    { label: t('totalOrders'), value: data?.totalOrders },
+    { label: t('revenue'), value: data?.revenue },
+    { label: t('activeDealers'), value: data?.activeDealers },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">Operasyon Dashboard</h1>
-        <p className="text-slate-500">Genel durum ve KPI&apos;lar.</p>
+        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <p className="text-slate-500">{t('subtitle')}</p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map((c) => (
@@ -39,9 +41,7 @@ export default function AdminHome() {
           </Card>
         ))}
       </div>
-      <p className="text-xs text-slate-400">
-        Detaylı raporlar, Kanban ve üretim ekranları sıradaki fazda eklenecek.
-      </p>
+      <p className="text-xs text-slate-400">{t('comingNext')}</p>
     </div>
   );
 }
