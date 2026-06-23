@@ -38,6 +38,8 @@ import { TicketsModule } from './tickets/tickets.module';
 import { SearchModule } from './search/search.module';
 import { NotificationCenterModule } from './notification-center/notification-center.module';
 import { GdprModule } from './gdpr/gdpr.module';
+import { MapModule } from './map/map.module';
+import { ScanModule } from './scan/scan.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -149,6 +151,8 @@ import { HealthController } from './health.controller';
     SearchModule,
     NotificationCenterModule,
     GdprModule,
+    MapModule,
+    ScanModule,
   ],
   controllers: [HealthController],
   providers: [

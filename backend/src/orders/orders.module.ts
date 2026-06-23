@@ -7,5 +7,6 @@ import { PricingModule } from '../pricing/pricing.module';
   imports: [PricingModule],
   providers: [OrdersService],
   controllers: [OrdersController],
+  exports: [OrdersService], // QR scan modülü kullanır
 })
 export class OrdersModule {}
