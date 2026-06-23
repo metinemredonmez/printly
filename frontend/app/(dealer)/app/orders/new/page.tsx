@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, PartyPopper } from 'lucide-react';
 import { api } from '@/lib/api';
 import { money } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { FileUploader } from '@/components/file-uploader';
 
 interface Product {
   id: string;
@@ -43,6 +44,7 @@ export default function NewOrderWizard() {
   const t = useTranslations('wizard');
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [createdId, setCreatedId] = useState<string | null>(null);
 
   const [category, setCategory] = useState('');
   const [productId, setProductId] = useState('');
@@ -101,12 +103,13 @@ export default function NewOrderWizard() {
       }),
     onSuccess: (o) => {
       toast.success(t('created'));
-      router.replace(`/app/orders/${o.id}`);
+      setCreatedId(o.id);
+      setStep(6);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : t('createFailed')),
   });
 
-  const steps = ['stepCategory', 'stepProduct', 'stepSize', 'stepPayment', 'stepDelivery'];
+  const steps = ['stepCategory', 'stepProduct', 'stepSize', 'stepPayment', 'stepDelivery', 'stepFiles'];
   const canNext =
     (step === 1 && !!category) ||
     (step === 2 && !!productId) ||
@@ -307,20 +310,47 @@ export default function NewOrderWizard() {
             </div>
           </div>
         )}
+
+        {/* Step 6: dosya yükleme (sipariş oluşturulduktan sonra) */}
+        {step === 6 && createdId && (
+          <div className="space-y-5">
+            <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
+              <PartyPopper className="h-6 w-6 text-emerald-600 shrink-0" />
+              <div>
+                <div className="font-bold text-emerald-800">{t('orderCreatedTitle')}</div>
+                <div className="text-sm text-emerald-700">{t('orderCreatedDesc')}</div>
+              </div>
+            </div>
+            <div>
+              <Label>{t('filesOptional')}</Label>
+              <div className="mt-2">
+                <FileUploader orderId={createdId} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
-          {t('prev')}
-        </Button>
+        {step < 6 ? (
+          <Button variant="outline" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
+            {t('prev')}
+          </Button>
+        ) : (
+          <span />
+        )}
         {step < 5 ? (
           <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext}>
             {t('next')}
           </Button>
-        ) : (
+        ) : step === 5 ? (
           <Button onClick={() => create.mutate()} disabled={create.isPending}>
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
             {t('submit')}
+          </Button>
+        ) : (
+          <Button onClick={() => router.replace(`/app/orders/${createdId}`)}>
+            {t('goToOrder')}
           </Button>
         )}
       </div>
