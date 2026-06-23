@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { AuditService } from '../audit/audit.module';
 import { SettingsService } from '../settings/settings.module';
+import { WebhooksService } from '../webhooks/webhooks.module';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { refundOnCancel } from '../common/refund.util';
 import { CreateOrderDto } from './dto';
@@ -37,6 +38,7 @@ export class OrdersService {
     private pricing: PricingService,
     private audit: AuditService,
     private settings: SettingsService,
+    private webhooks: WebhooksService,
   ) {}
 
   // Üretim-öncesi onay (H2/#33) — staff onaylar; gate updateStatus'ta uygulanır
@@ -327,6 +329,17 @@ export class OrdersService {
       entityId: id,
       meta: { from: order.status, to: newStatus, note, refunded },
     });
+    // Partner webhook (O2/#37): bayinin aboneliklerine imzalı bildirim
+    await this.webhooks.dispatch(
+      'order.status_changed',
+      { userId: order.userId, organizationId: order.organizationId },
+      {
+        orderId: id,
+        orderNumber: order.orderNumber,
+        from: order.status,
+        to: newStatus,
+      },
+    );
     return updated;
   }
 

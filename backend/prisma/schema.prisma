@@ -644,3 +644,48 @@ model Proof {
 
   @@index([orderId, status])
 }
+
+// ─────────────────────────────────────────────
+// Partner API: dışa açık imzalı webhook abonelikleri (O2/#37)
+// ─────────────────────────────────────────────
+model WebhookSubscription {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  url            String
+  secret         String // HMAC-SHA256 imzalama
+  events         String[] @default([]) // ['order.status_changed', 'proof.responded', ...]
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// Kapasite-bazlı iç üretim routing (O5/#39)
+// ─────────────────────────────────────────────
+enum ProductionStation {
+  PRINT // TIFF büyük format baskı (wallpaper)
+  CNC // ahşap oyma
+  CUT // kesim (decal)
+  PACK // paketleme
+}
+
+enum ProductionJobStatus {
+  QUEUED
+  IN_PROGRESS
+  DONE
+}
+
+model ProductionJob {
+  id        String              @id @default(cuid())
+  orderId   String
+  station   ProductionStation
+  status    ProductionJobStatus @default(QUEUED)
+  note      String?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([station, status])
+  @@index([orderId])
+}

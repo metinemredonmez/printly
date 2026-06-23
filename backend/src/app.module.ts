@@ -45,6 +45,9 @@ import { MapModule } from './map/map.module';
 import { ScanModule } from './scan/scan.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ProofsModule } from './proofs/proofs.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
+import { ProductionModule } from './production/production.module';
+import { WhitelabelModule } from './whitelabel/whitelabel.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -182,6 +185,9 @@ import { HealthController } from './health.controller';
     ScanModule,
     SubscriptionsModule,
     ProofsModule,
+    WebhooksModule,
+    ProductionModule,
+    WhitelabelModule,
   ],
   controllers: [HealthController],
   providers: [
