@@ -49,7 +49,7 @@
     "exceljs": "^4.4.0",
     "express-basic-auth": "^1.2.1",
     "joi": "^17.13.3",
-    "nodemailer": "^6.9.15",
+    "nodemailer": "^9.0.1",
     "otplib": "^12.0.1",
     "papaparse": "^5.5.4",
     "passport": "^0.7.0",
