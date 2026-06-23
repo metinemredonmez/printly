@@ -7,6 +7,9 @@ import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter'
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { BullModule } from '@nestjs/bullmq';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
+import basicAuth from 'express-basic-auth';
 import * as Joi from 'joi';
 
 import { PrismaModule } from './prisma/prisma.module';
@@ -82,6 +85,21 @@ import { HealthController } from './health.controller';
         // OneSignal push (Ortak Doku'nun KENDİ app'i; boşsa push gönderilmez)
         ONESIGNAL_APP_ID: Joi.string().allow('').default(''),
         ONESIGNAL_API_KEY: Joi.string().allow('').default(''),
+        // Bull Board (kuyruk dashboard) basic-auth
+        BULLBOARD_USER: Joi.string().allow('').default('admin'),
+        BULLBOARD_PASS: Joi.string().allow('').default('change-me-please'),
+      }),
+    }),
+    // Kuyruk izleme paneli — /admin/queues (basic-auth korumalı, #22)
+    BullBoardModule.forRoot({
+      route: '/admin/queues',
+      adapter: ExpressAdapter,
+      middleware: basicAuth({
+        challenge: true,
+        users: {
+          [process.env.BULLBOARD_USER || 'admin']:
+            process.env.BULLBOARD_PASS || 'change-me-please',
+        },
       }),
     }),
     // Global rate-limit: varsayılan 120 istek/dk; hassas auth endpoint'leri @Throttle ile daha sıkı.
@@ -118,6 +136,13 @@ import { HealthController } from './health.controller';
             tls: isTls ? {} : undefined,
             // BullMQ gereği (ioredis bloklamayan komutlar) — yönetilen Redis'te şart
             maxRetriesPerRequest: null,
+          },
+          // Güvenilirlik: 3 deneme + exponential backoff; Redis şişmesin diye temizlik
+          defaultJobOptions: {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 5000 },
+            removeOnComplete: 1000,
+            removeOnFail: 5000,
           },
         };
       },

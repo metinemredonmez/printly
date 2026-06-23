@@ -17,7 +17,16 @@ import {
   IsIn,
   IsObject,
 } from 'class-validator';
-import { BullModule, InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
+import {
+  BullModule,
+  InjectQueue,
+  Processor,
+  WorkerHost,
+  OnWorkerEvent,
+} from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { Queue, Job } from 'bullmq';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -234,6 +243,8 @@ export class NotificationsController {
 // BullMQ worker — kuyruktaki işleri işler
 @Processor('notifications')
 export class NotificationsProcessor extends WorkerHost {
+  private readonly logger = new Logger('NotificationsQueue');
+
   constructor(private readonly svc: NotificationsService) {
     super();
   }
@@ -241,10 +252,25 @@ export class NotificationsProcessor extends WorkerHost {
     if (job.name === 'bulk-email') return this.svc.processBulkEmail(job.data);
     return undefined;
   }
+
+  // Tüm denemeler tükenince alarm — gözlemlenebilirlik (#22)
+  @OnWorkerEvent('failed')
+  onFailed(job: Job, err: Error) {
+    this.logger.error(
+      `Job ${job.id} (${job.name}) ${job.attemptsMade}/${job.opts.attempts} denemede başarısız: ${err.message}`,
+    );
+  }
 }
 
 @Module({
-  imports: [BullModule.registerQueue({ name: 'notifications' })],
+  imports: [
+    BullModule.registerQueue({ name: 'notifications' }),
+    // Kuyruğu Bull Board paneline tanıt (#22)
+    BullBoardModule.forFeature({
+      name: 'notifications',
+      adapter: BullMQAdapter,
+    }),
+  ],
   providers: [NotificationsService, OneSignalProvider, NotificationsProcessor],
   controllers: [NotificationsController],
 })
