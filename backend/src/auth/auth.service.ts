@@ -184,16 +184,17 @@ export class AuthService {
     }
     for (const hash of user.twoFactorRecoveryCodes) {
       if (await bcrypt.compare(code, hash)) {
-        // kullanılan yedek kodu çıkar
-        await this.prisma.user.update({
-          where: { id: user.id },
+        // Atomik tüketim (TOCTOU): yalnız kod hâlâ listedeyse çıkar; eşzamanlı 2.
+        // istek aynı kodu tüketmişse count=0 → geçersiz say (kod tek-kullanımlık).
+        const res = await this.prisma.user.updateMany({
+          where: { id: user.id, twoFactorRecoveryCodes: { has: hash } },
           data: {
             twoFactorRecoveryCodes: user.twoFactorRecoveryCodes.filter(
               (h) => h !== hash,
             ),
           },
         });
-        return true;
+        return res.count === 1;
       }
     }
     return false;

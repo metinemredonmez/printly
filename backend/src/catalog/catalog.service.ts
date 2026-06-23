@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { Prisma, ProductUnit } from '@prisma/client';
+import { Prisma, ProductUnit, ProductCategory } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateMaterialDto,
@@ -89,6 +89,20 @@ export class CatalogService {
     return p;
   }
 
+  // Kategori → beklenen birim (WALLPAPER=m², diğerleri=flat) — M5
+  private expectedUnit(category: ProductCategory): ProductUnit {
+    return category === ProductCategory.WALLPAPER ? ProductUnit.M2 : ProductUnit.FLAT;
+  }
+
+  // unit verildiyse kategoriyle uyumlu olmalı (tutarsız fiyat dalı önlenir — M5)
+  private assertCategoryUnit(category: ProductCategory | undefined, unit?: ProductUnit | null) {
+    if (category && unit && unit !== this.expectedUnit(category)) {
+      throw new BadRequestException(
+        `${category} ürünü için birim ${this.expectedUnit(category)} olmalı (verilen: ${unit})`,
+      );
+    }
+  }
+
   // Fiyatsız ürün (quote $0) engelleme — H3.
   private assertPricing(unit: ProductUnit | undefined | null, m2?: number, flat?: number) {
     const hasM2 = (m2 ?? 0) > 0;
@@ -105,6 +119,7 @@ export class CatalogService {
   }
 
   async createProduct(dto: CreateProductDto) {
+    this.assertCategoryUnit(dto.category, dto.unit);
     this.assertPricing(dto.unit, dto.basePricePerM2, dto.flatPrice);
     const p = await this.prisma.product.create({
       data: { ...dto, subTypes: dto.subTypes as Prisma.InputJsonValue },
@@ -115,7 +130,8 @@ export class CatalogService {
 
   async updateProduct(id: string, dto: UpdateProductDto) {
     const existing = await this.getProduct(id, true); // admin: pasif ürünü de güncelleyebilir
-    // Birleştirilmiş değerlerle fiyat tutarlılığını doğrula (H3)
+    // Birleştirilmiş değerlerle kategori-birim + fiyat tutarlılığı (M5/H3)
+    this.assertCategoryUnit(dto.category ?? existing.category, dto.unit ?? existing.unit);
     this.assertPricing(
       dto.unit ?? existing.unit,
       dto.basePricePerM2 ?? Number(existing.basePricePerM2 ?? 0),

@@ -44,10 +44,15 @@ export class BillingService {
   // Tek kayıt; varsa güncelle yoksa oluştur. Hassas alanlar şifreli saklanır.
   async upsert(userId: string, dto: BillingDto) {
     const data = this.encryptDto(dto);
+    // Ülke değişince diğer ülkeye özgü stale PII'yi temizle (L13)
+    const clear =
+      dto.country === BillingCountry.US
+        ? { tc: null, taxNo: null, taxOffice: null }
+        : { ssn: null, ein: null, state: null };
     const row = await this.prisma.billingInfo.upsert({
       where: { userId },
       create: { ...data, userId },
-      update: { ...data },
+      update: { ...data, ...clear },
     });
     return this.decryptRow(row); // sahibine düz metin döndür
   }

@@ -56,13 +56,15 @@ export class SettingsService {
       create: { key, value: value as Prisma.InputJsonValue },
       update: { value: value as Prisma.InputJsonValue },
     });
+    // Hassas anahtar değerlerini audit meta'sına ham yazma (secret/key/token/pass...)
+    const isSensitive = /secret|key|token|password|pass|credential/i.test(key);
     await this.audit.log({
       actorUserId: actor?.userId,
       actorRole: actor?.role,
       action: 'SETTING_UPDATE',
       entityType: 'Setting',
       entityId: key,
-      meta: { value },
+      meta: { value: isSensitive ? '***' : value },
     });
     return row;
   }
