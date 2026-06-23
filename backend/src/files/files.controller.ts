@@ -1,11 +1,22 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { FilesService } from './files.service';
-import { InitiateUploadDto, CompleteUploadDto, AbortUploadDto } from './dto';
+import {
+  InitiateUploadDto,
+  CompleteUploadDto,
+  AbortUploadDto,
+  ValidateSpecDto,
+} from './dto';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly files: FilesService) {}
+
+  // Baskı dosyası ürün gereksinimlerine uyuyor mu? (yükleme öncesi) — H3/#34
+  @Post('validate-spec')
+  validateSpec(@Body() dto: ValidateSpecDto) {
+    return this.files.validateSpec(dto);
+  }
 
   // 1) Yükleme başlat → presigned URL(ler)
   @Post('initiate')

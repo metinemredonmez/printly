@@ -36,3 +36,12 @@ export class AbortUploadDto {
   @IsString() assetId: string;
   @IsString() uploadId: string;
 }
+
+// Baskı dosyası ürün gereksinimlerine uyuyor mu? (H3/#34)
+export class ValidateSpecDto {
+  @IsString() productId: string;
+  @IsOptional() @IsString() format?: string; // tiff | pdf | png ...
+  @IsOptional() @IsInt() @Min(1) dpi?: number;
+  @IsOptional() @IsInt() @Min(1) widthPx?: number;
+  @IsOptional() @IsInt() @Min(1) heightPx?: number;
+}

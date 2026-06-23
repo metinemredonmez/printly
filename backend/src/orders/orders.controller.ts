@@ -30,6 +30,13 @@ export class OrdersController {
     });
   }
 
+  // Üretim-öncesi onay (personel) — H2/#33
+  @RequirePermission('order:updateStatus')
+  @Post(':id/approve')
+  approve(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.orders.approve(user, id);
+  }
+
   // Arşivle / arşivden çıkar (personel) — #13
   @RequirePermission('order:updateStatus')
   @Post(':id/archive')

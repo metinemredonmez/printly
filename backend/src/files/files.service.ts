@@ -60,6 +60,43 @@ export class FilesService {
    * Yükleme başlatır. Küçük dosya → tek presigned PUT, büyük → multipart.
    * Boyut + uzantı doğrulanır; orderId verilmişse sipariş sahipliği kontrol edilir.
    */
+  // Baskı dosyası ürün gereksinimlerine (minDpi / requiredFormats) uyuyor mu? (H3/#34)
+  async validateSpec(dto: {
+    productId: string;
+    format?: string;
+    dpi?: number;
+    widthPx?: number;
+    heightPx?: number;
+  }) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: dto.productId },
+      select: { minDpi: true, requiredFormats: true, name: true },
+    });
+    if (!product) throw new NotFoundException('Ürün bulunamadı');
+    const issues: string[] = [];
+    if (product.requiredFormats?.length && dto.format) {
+      const ok = product.requiredFormats
+        .map((f) => f.toLowerCase())
+        .includes(dto.format.toLowerCase());
+      if (!ok) {
+        issues.push(
+          `Format ".${dto.format}" izinli değil (izinli: ${product.requiredFormats.join(', ')})`,
+        );
+      }
+    }
+    if (product.minDpi != null && dto.dpi != null && dto.dpi < product.minDpi) {
+      issues.push(`Çözünürlük ${dto.dpi} DPI yetersiz (min ${product.minDpi} DPI)`);
+    }
+    return {
+      valid: issues.length === 0,
+      issues,
+      requirements: {
+        minDpi: product.minDpi,
+        requiredFormats: product.requiredFormats,
+      },
+    };
+  }
+
   async initiate(user: AuthUser, dto: InitiateUploadDto) {
     const role = dto.role ?? AssetRole.OTHER;
 

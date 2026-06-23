@@ -309,6 +309,9 @@ model Product {
   flatPrice      Decimal?       @db.Decimal(12, 2)  // FLAT ürünler için (1× fiyat)
   subTypes       Json?          // wallpaper alt türleri: [{key,label}]
   active         Boolean        @default(true)
+  // Baskı dosya gereksinimleri (H3/#34) — yükleme öncesi/sonrası doğrulama
+  minDpi          Int?           // gerekli minimum çözünürlük (örn. 150)
+  requiredFormats String[]       @default([]) // izinli formatlar: ['tiff','pdf']
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -375,6 +378,13 @@ model Order {
   clientLng     Float?
 
   archivedAt DateTime? // arşiv (#13) — null değilse arşivlenmiş
+
+  // Üretim-öncesi onay penceresi (H2/#33) — onaylanmadan IN_PRODUCTION'a geçemez
+  approvedAt        DateTime?
+  approvedByUserId  String?
+
+  // Numune sipariş (D2/#41) — bayiye düşük maliyetli fiziksel örnek
+  isSample Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

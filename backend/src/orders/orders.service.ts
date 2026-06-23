@@ -16,6 +16,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { AuditService } from '../audit/audit.module';
+import { SettingsService } from '../settings/settings.module';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 import { refundOnCancel } from '../common/refund.util';
 import { CreateOrderDto } from './dto';
@@ -35,7 +36,29 @@ export class OrdersService {
     private prisma: PrismaService,
     private pricing: PricingService,
     private audit: AuditService,
+    private settings: SettingsService,
   ) {}
+
+  // Üretim-öncesi onay (H2/#33) — staff onaylar; gate updateStatus'ta uygulanır
+  async approve(authUser: AuthUser, id: string) {
+    if (authUser.role !== Role.ADMIN && authUser.role !== Role.PRODUCTION) {
+      throw new ForbiddenException('Yalnız personel onaylayabilir');
+    }
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException('Sipariş bulunamadı');
+    const updated = await this.prisma.order.update({
+      where: { id },
+      data: { approvedAt: new Date(), approvedByUserId: authUser.userId },
+    });
+    await this.audit.log({
+      actorUserId: authUser.userId,
+      actorRole: authUser.role,
+      action: 'ORDER_APPROVE',
+      entityType: 'Order',
+      entityId: id,
+    });
+    return updated;
+  }
 
   async create(authUser: AuthUser, dto: CreateOrderDto) {
     const user = await this.prisma.user.findUnique({
@@ -259,6 +282,20 @@ export class OrdersService {
     const allowed = TRANSITIONS[order.status] ?? [];
     if (!allowed.includes(newStatus)) {
       throw new BadRequestException(`Geçersiz geçiş: ${order.status} → ${newStatus}`);
+    }
+
+    // H2 (#33): RECEIVED→IN_PRODUCTION onay gerektirir (ayardan kapatılabilir).
+    // Pahalı m²/CNC siparişinde hatalı dosya/ölçüyle üretime düşmeyi engeller.
+    if (newStatus === OrderStatus.IN_PRODUCTION && order.status === OrderStatus.RECEIVED) {
+      const requireApproval = await this.settings.get<boolean>(
+        'requireProductionApproval',
+        true,
+      );
+      if (requireApproval && !order.approvedAt) {
+        throw new BadRequestException(
+          'Üretime geçmeden önce sipariş onaylanmalı (POST /orders/:id/approve)',
+        );
+      }
     }
 
     const { updated, refunded } = await this.prisma.$transaction(async (tx) => {

@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsBoolean,
   IsEnum,
+  IsArray,
   Min,
 } from 'class-validator';
 import { ProductCategory, ProductUnit } from '@prisma/client';
@@ -31,6 +32,9 @@ export class CreateProductDto {
   @IsOptional() @IsNumber() @Min(0) flatPrice?: number; // FLAT ürün (1× fiyat)
   @IsOptional() subTypes?: unknown; // wallpaper alt türleri
   @IsOptional() @IsString() materialId?: string;
+  // Baskı dosya gereksinimleri (H3/#34)
+  @IsOptional() @IsInt() @Min(1) minDpi?: number;
+  @IsOptional() @IsArray() @IsString({ each: true }) requiredFormats?: string[];
 }
 
 export class UpdateProductDto {
@@ -43,6 +47,8 @@ export class UpdateProductDto {
   @IsOptional() subTypes?: unknown;
   @IsOptional() @IsString() materialId?: string;
   @IsOptional() @IsBoolean() active?: boolean;
+  @IsOptional() @IsInt() @Min(1) minDpi?: number;
+  @IsOptional() @IsArray() @IsString({ each: true }) requiredFormats?: string[];
 }
 
 export class CreateExtraOptionDto {
