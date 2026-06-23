@@ -44,6 +44,7 @@ import { GdprModule } from './gdpr/gdpr.module';
 import { MapModule } from './map/map.module';
 import { ScanModule } from './scan/scan.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ProofsModule } from './proofs/proofs.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -180,6 +181,7 @@ import { HealthController } from './health.controller';
     MapModule,
     ScanModule,
     SubscriptionsModule,
+    ProofsModule,
   ],
   controllers: [HealthController],
   providers: [

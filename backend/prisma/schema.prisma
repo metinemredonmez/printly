@@ -619,3 +619,28 @@ model NotificationPreference {
   marketing    Boolean  @default(false)
   updatedAt    DateTime @updatedAt
 }
+
+// ─────────────────────────────────────────────
+// Dijital proof onayı (H1-proof/#35) — baskı öncesi bayi/müşteri onayı
+// ─────────────────────────────────────────────
+enum ProofStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Proof {
+  id                String      @id @default(cuid())
+  orderId           String
+  fileName          String
+  r2Key             String?
+  note              String? // staff açıklaması
+  status            ProofStatus @default(PENDING)
+  createdByUserId   String // proof'u yükleyen personel
+  respondedByUserId String? // onaylayan/reddeden bayi
+  respondedAt       DateTime?
+  responseNote      String?
+  createdAt         DateTime    @default(now())
+
+  @@index([orderId, status])
+}
