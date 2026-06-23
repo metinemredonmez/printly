@@ -17,11 +17,16 @@ import {
   ProductCategory,
   ProductionStation,
   ProductionJobStatus,
+  TransactionType,
+  TransactionStatus,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
+import { SettingsService } from '../settings/settings.module';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+type Tier = { name: string; minLoad: number; priority: boolean };
 
 // Kategori → üretim istasyonu (O5/#39)
 const STATION_BY_CATEGORY: Record<ProductCategory, ProductionStation> = {
@@ -39,7 +44,26 @@ export class ProductionService {
   constructor(
     private prisma: PrismaService,
     private audit: AuditService,
+    private settings: SettingsService,
   ) {}
+
+  // Bayinin planına göre öncelik (D1/#40)
+  private async ownerPriority(userId: string): Promise<boolean> {
+    const loads = await this.prisma.transaction.aggregate({
+      where: {
+        userId,
+        type: TransactionType.BALANCE_LOAD,
+        status: TransactionStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+    const total = Number(loads._sum.amount ?? 0);
+    const tiers = await this.settings.get<Tier[]>('membershipTiers', []);
+    const tier = [...tiers]
+      .sort((a, b) => b.minLoad - a.minLoad)
+      .find((t) => total >= t.minLoad);
+    return tier?.priority ?? false;
+  }
 
   // Siparişi istasyon kuyruklarına yönlendir — kalemlerin kategorisine göre job üret
   async route(user: AuthUser, orderId: string) {
@@ -62,9 +86,10 @@ export class ProductionService {
     }
     stations.add(ProductionStation.PACK);
 
+    const priority = await this.ownerPriority(order.userId);
     const jobs = await this.prisma.$transaction(
       [...stations].map((station) =>
-        this.prisma.productionJob.create({ data: { orderId, station } }),
+        this.prisma.productionJob.create({ data: { orderId, station, priority } }),
       ),
     );
     await this.audit.log({
@@ -85,7 +110,8 @@ export class ProductionService {
         station,
         status: { in: [ProductionJobStatus.QUEUED, ProductionJobStatus.IN_PROGRESS] },
       },
-      orderBy: { createdAt: 'asc' },
+      // Öncelikli bayiler önce (D1/#40), sonra FIFO
+      orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
       take: 300,
     });
   }

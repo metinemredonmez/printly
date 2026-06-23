@@ -682,6 +682,7 @@ model ProductionJob {
   orderId   String
   station   ProductionStation
   status    ProductionJobStatus @default(QUEUED)
+  priority  Boolean             @default(false) // üst plan bayilerine öncelik (D1/#40)
   note      String?
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt

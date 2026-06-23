@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsArray,
   IsEnum,
+  IsBoolean,
   ValidateNested,
   ArrayMinSize,
   Min,
@@ -45,6 +46,9 @@ export class CreateOrderDto {
   extras?: OrderExtraInput[];
 
   @IsEnum(PaymentMethod) paymentMethod: PaymentMethod;
+
+  // Numune sipariş (D2/#41) — sabit düşük ücret, ölçü/fiyat motoru baypas
+  @IsOptional() @IsBoolean() isSample?: boolean;
 
   @IsOptional() @IsString() etsyStoreId?: string;
   @IsOptional() @IsString() etsyOrderNo?: string;

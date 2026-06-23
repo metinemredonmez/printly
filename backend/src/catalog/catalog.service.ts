@@ -44,6 +44,42 @@ export class CatalogService {
     );
   }
 
+  // Şeffaf malzeme/finish fiyat tablosu (D4/#42) — bayiye açık fiyatlandırma
+  async priceTable() {
+    const [products, materials, extras] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { active: true },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          unit: true,
+          basePricePerM2: true,
+          flatPrice: true,
+          material: { select: { name: true, widthInch: true } },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.material.findMany({
+        where: { active: true },
+        select: { id: true, name: true, widthInch: true, settings: true },
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.extraOption.findMany({
+        where: { active: true },
+        select: { id: true, name: true, price: true },
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+    return {
+      currency: 'USD',
+      note: 'Fiyatlar 1× (Ekip) bazlıdır; USER rolü 2× öder. m² ürünlerde fiyat alan×birim.',
+      products,
+      materials,
+      extras,
+    };
+  }
+
   async createMaterial(dto: CreateMaterialDto) {
     const m = await this.prisma.material.create({
       data: { ...dto, settings: dto.settings as Prisma.InputJsonValue },

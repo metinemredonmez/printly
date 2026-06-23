@@ -41,6 +41,12 @@ export class CatalogController {
     return this.catalog.updateMaterial(id, dto);
   }
 
+  // Şeffaf fiyat tablosu (D4/#42)
+  @Get('price-table')
+  priceTable() {
+    return this.catalog.priceTable();
+  }
+
   // Products
   @Get('products')
   listProducts() {

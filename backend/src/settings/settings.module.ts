@@ -28,6 +28,14 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   membershipFee: 30,
   bulkLoadForDiscount: 250,
   discountRate: 0.4,
+  sampleFee: 5, // numune sipariş sabit ücreti (D2/#41)
+  // Kademeli bayi planı (D1/#40): kümülatif yüklemeye göre indirim + öncelikli üretim
+  membershipTiers: [
+    { name: 'Standart', minLoad: 0, discountRate: 0.4, priority: false },
+    { name: 'Pro', minLoad: 2500, discountRate: 0.45, priority: true },
+    { name: 'Elit', minLoad: 10000, discountRate: 0.5, priority: true },
+  ],
+  requireProductionApproval: true, // H2/#33
 };
 
 @Injectable()

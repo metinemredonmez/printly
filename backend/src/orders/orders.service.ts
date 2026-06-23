@@ -85,12 +85,24 @@ export class OrdersService {
       }
     }
 
-    const quote = await this.pricing.quoteOrder(
+    let quote = await this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],
       user.priceMultiplier,
       user.hasDiscount40,
     );
+
+    // Numune sipariş (D2/#41): sabit düşük ücret, indirim yok
+    if (dto.isSample) {
+      const sampleFee = await this.settings.get<number>('sampleFee', 5);
+      quote = {
+        ...quote,
+        subtotal: sampleFee,
+        extrasTotal: 0,
+        discount40: 0,
+        total: sampleFee,
+      };
+    }
 
     const isBalance = dto.paymentMethod === PaymentMethod.BALANCE;
     // BALANCE → ödeme atomik düşümle alınır (PAID). CARD → gerçek gateway gelene dek PENDING.
@@ -122,6 +134,7 @@ export class OrdersService {
           productType: dto.productType,
           paymentMethod: dto.paymentMethod,
           paymentStatus,
+          isSample: dto.isSample ?? false,
           status: OrderStatus.RECEIVED,
           subtotal: quote.subtotal,
           extrasTotal: quote.extrasTotal,

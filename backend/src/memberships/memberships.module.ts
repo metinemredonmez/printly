@@ -10,12 +10,21 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Prisma, Role, TransactionType, PaymentMethod } from '@prisma/client';
+import {
+  Prisma,
+  Role,
+  TransactionType,
+  TransactionStatus,
+  PaymentMethod,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
+import { SettingsService } from '../settings/settings.module';
 import { MEMBERSHIP_FEE } from '../common/pricing.util';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+type Tier = { name: string; minLoad: number; discountRate: number; priority: boolean };
 
 class UpgradeDto {
   // Sadece TEAM_MEMBER / TEAM_LEADER seçilebilir
@@ -28,10 +37,32 @@ export class MembershipsService {
   constructor(
     private prisma: PrismaService,
     private audit: AuditService,
+    private settings: SettingsService,
   ) {}
 
   getMine(userId: string) {
     return this.prisma.membership.findUnique({ where: { userId } });
+  }
+
+  // Kümülatif yüklemeye göre bayi planı/indirimi (D1/#40)
+  async myTier(userId: string) {
+    const loads = await this.prisma.transaction.aggregate({
+      where: {
+        userId,
+        type: TransactionType.BALANCE_LOAD,
+        status: TransactionStatus.SUCCESS,
+      },
+      _sum: { amount: true },
+    });
+    const cumulativeLoad = Number(loads._sum.amount ?? 0);
+    const tiers = await this.settings.get<Tier[]>('membershipTiers', [
+      { name: 'Standart', minLoad: 0, discountRate: 0.4, priority: false },
+    ]);
+    const tier =
+      [...tiers]
+        .sort((a, b) => b.minLoad - a.minLoad)
+        .find((t) => cumulativeLoad >= t.minLoad) ?? tiers[0];
+    return { cumulativeLoad, tier, allTiers: tiers };
   }
 
   // Lider seçimi için: tüm Ekip Liderleri (e-posta PII sızdırma — id+ad yeterli)
@@ -168,6 +199,12 @@ export class MembershipsController {
   @Get('me')
   getMine(@CurrentUser() user: AuthUser) {
     return this.memberships.getMine(user.userId);
+  }
+
+  // Kümülatif yüklemeye göre bayi planı + indirim/öncelik (D1/#40)
+  @Get('tier')
+  myTier(@CurrentUser() user: AuthUser) {
+    return this.memberships.myTier(user.userId);
   }
 
   @Get('leaders')
