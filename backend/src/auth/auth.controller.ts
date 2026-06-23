@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { IsString, Length } from 'class-validator';
+import { IsString, Length, IsEmail, MinLength } from 'class-validator';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -12,6 +12,16 @@ import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorat
 // 2FA TOTP (6 hane) veya recovery kodu (10 hex) — whitelist bypass'ı kapatır (L1)
 class TwoFactorCodeDto {
   @IsString() @Length(6, 10) code: string;
+}
+
+class ForgotPasswordDto {
+  @IsEmail() email: string;
+}
+
+class ResetPasswordDto {
+  @IsEmail() email: string;
+  @IsString() @Length(6, 6) code: string;
+  @IsString() @MinLength(8) newPassword: string;
 }
 
 @Controller('auth')
@@ -38,6 +48,21 @@ export class AuthController {
   @Post('resend-otp')
   resendOtp(@Body() dto: ResendOtpDto) {
     return this.auth.resendOtp(dto.email);
+  }
+
+  // Şifre sıfırlama: kod iste → kodla yeni şifre belirle (#30)
+  @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.auth.forgotPassword(dto.email);
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.auth.resetPassword(dto);
   }
 
   @Public()

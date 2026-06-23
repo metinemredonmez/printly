@@ -27,6 +27,7 @@ import {
   AbortUploadDto,
   CompletePartDto,
 } from './dto';
+import { mimeMatchesExt } from '../common/file-validation.util';
 
 const PART_SIZE = 10 * 1024 * 1024; // 10 MB
 const MULTIPART_THRESHOLD = 15 * 1024 * 1024; // bunun üstü multipart
@@ -74,6 +75,12 @@ export class FilesService {
     if (!allowed.includes(ext)) {
       throw new BadRequestException(
         `İzin verilmeyen dosya türü ".${ext}". ${role} için: ${allowed.join(', ')}`,
+      );
+    }
+    // Beyan edilen MIME uzantıyla tutarlı olmalı (sahte uzantı/MIME karışımı engeli — #31)
+    if (!mimeMatchesExt(ext, dto.mime)) {
+      throw new BadRequestException(
+        `Beyan edilen tür (${dto.mime}) uzantı ".${ext}" ile uyuşmuyor`,
       );
     }
     // orderId verildiyse sahiplik

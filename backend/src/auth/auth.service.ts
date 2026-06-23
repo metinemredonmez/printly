@@ -214,18 +214,59 @@ export class AuthService {
   }
 
   // ── yardımcılar ──────────────────────────────
-  private async sendOtp(email: string) {
+  private async sendOtp(
+    email: string,
+    purpose: OtpPurpose = OtpPurpose.EMAIL_VERIFY,
+  ) {
     const code = String(randomInt(0, 1000000)).padStart(6, '0'); // kriptografik 6 hane
     const codeHash = await bcrypt.hash(code, 10);
     await this.prisma.otpCode.create({
       data: {
         email,
         codeHash,
-        purpose: OtpPurpose.EMAIL_VERIFY,
+        purpose,
         expiresAt: new Date(Date.now() + OTP_TTL_MS),
       },
     });
     await this.mail.sendOtp(email, code);
+  }
+
+  // Şifre sıfırlama talebi — enumeration önleme (nötr yanıt) (#30)
+  async forgotPassword(email: string) {
+    const normalized = email.toLowerCase();
+    const user = await this.prisma.user.findUnique({ where: { email: normalized } });
+    if (user && user.active) {
+      await this.sendOtp(normalized, OtpPurpose.PASSWORD_RESET);
+    }
+    return {
+      message: 'E-posta kayıtlıysa şifre sıfırlama kodu gönderildi',
+      email: normalized,
+    };
+  }
+
+  // Kod doğruysa şifreyi günceller (OTP tek-kullanımlık)
+  async resetPassword(dto: { email: string; code: string; newPassword: string }) {
+    const email = dto.email.toLowerCase();
+    const otp = await this.prisma.otpCode.findFirst({
+      where: { email, purpose: OtpPurpose.PASSWORD_RESET, consumedAt: null },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!otp) throw new BadRequestException('Geçerli kod bulunamadı, tekrar isteyin');
+    if (otp.expiresAt < new Date()) {
+      throw new BadRequestException('Kodun süresi doldu, tekrar isteyin');
+    }
+    const ok = await bcrypt.compare(dto.code, otp.codeHash);
+    if (!ok) throw new BadRequestException('Kod hatalı');
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+    await this.prisma.$transaction([
+      this.prisma.user.update({ where: { email }, data: { passwordHash } }),
+      this.prisma.otpCode.update({
+        where: { id: otp.id },
+        data: { consumedAt: new Date() },
+      }),
+    ]);
+    return { message: 'Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz' };
   }
 
   private issueToken(user: User) {
