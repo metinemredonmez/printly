@@ -28,6 +28,7 @@ B2B Print-on-Demand sipariş + üretim takip platformu. Bayiler Etsy üzerinden 
 | [GENEL-BACKEND-ANALIZ.md](GENEL-BACKEND-ANALIZ.md) | Backend genel denetim (7 boyut, ~61/100, kritik para/güvenlik bulguları + yol haritası) |
 | [ENDPOINT-TEST-RAPORU.md](ENDPOINT-TEST-RAPORU.md) | 72 endpoint canlı test (67 geçti/4 kaldı) + tekilleştirilmiş kod bulguları |
 | [YAPILACAKLAR-YOL-HARITASI.md](YAPILACAKLAR-YOL-HARITASI.md) | Öncelikli backend yapılacaklar (P0→CRED) |
+| [KIYASLAMA-POD-PLATFORMLARI.md](KIYASLAMA-POD-PLATFORMLARI.md) | Printful/Printify/Gooten kıyaslama + gap analizi + rakip-ilhamı yol haritası |
 | [MUSTERI-KURULUM-LISTESI.md](MUSTERI-KURULUM-LISTESI.md) | Müşteri hesap/kurulum listesi |
 
 ## Çalıştırma (backend)
