@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,11 +45,7 @@ function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-5"
-    >
-      <h2 className="text-lg font-bold text-navy">{t('loginTitle')}</h2>
+    <form onSubmit={onSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="email">{t('email')}</Label>
         <Input
@@ -58,6 +55,7 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="ornek@ortakdoku.com"
+          className="h-11 bg-slate-50"
         />
       </div>
       <div className="space-y-2">
@@ -68,6 +66,7 @@ function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="h-11 bg-slate-50"
         />
       </div>
       {need2fa && (
@@ -79,11 +78,16 @@ function LoginForm() {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder={t('code2faPlaceholder')}
+            className="h-11 bg-slate-50"
             autoFocus
           />
         </div>
       )}
-      <Button type="submit" className="w-full h-11" disabled={loading}>
+      <Button
+        type="submit"
+        className="w-full h-11 bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20"
+        disabled={loading}
+      >
         {loading ? t('signingIn') : t('loginTitle')}
       </Button>
 
@@ -110,7 +114,7 @@ function LoginForm() {
       </button>
 
       <div className="flex items-center justify-between text-sm">
-        <Link href="/forgot" className="text-primary hover:underline">
+        <Link href="/forgot" className="text-primary hover:underline font-medium">
           {t('forgotPassword')}
         </Link>
         <Link href="/register" className="text-slate-500 hover:underline">
@@ -126,23 +130,69 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const t = useTranslations('auth');
   const tc = useTranslations('common');
+  const feats = [t('feat1'), t('feat2'), t('feat3')];
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-end mb-3">
-          <LangSwitcher />
-        </div>
-        <div className="text-center mb-8">
-          <div className="inline-flex h-12 w-12 rounded-2xl bg-primary text-white items-center justify-center font-extrabold text-xl mb-3">
-            OD
+    <div className="min-h-screen grid lg:grid-cols-2">
+      {/* Sol marka paneli */}
+      <div className="relative hidden lg:flex flex-col justify-between bg-navy text-white p-12 overflow-hidden">
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center font-extrabold text-lg">
+              OD
+            </div>
+            <span className="font-extrabold text-xl">{tc('appName')}</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-navy">{tc('appName')}</h1>
-          <p className="text-sm text-slate-500">{tc('tagline')}</p>
         </div>
-        <Suspense fallback={<div className="text-center text-slate-400">{tc('loading')}</div>}>
-          <LoginForm />
-        </Suspense>
+        <div className="relative z-10 space-y-6">
+          <h2 className="text-4xl font-extrabold leading-tight">{t('brandHeadline')}</h2>
+          <p className="text-slate-300 text-lg">{t('brandSub')}</p>
+          <ul className="space-y-3 pt-2">
+            {feats.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-slate-200">
+                <CircleCheck className="h-5 w-5 text-brand-accent shrink-0" />
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="relative z-10 text-xs text-slate-500">
+          © 2026 Ortak Doku — B2B Print-on-Demand
+        </div>
+        {/* dekoratif daireler */}
+        <svg
+          className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] opacity-30"
+          viewBox="0 0 400 400"
+          fill="none"
+        >
+          <circle cx="200" cy="200" r="160" stroke="#1F5EFF" strokeWidth="2" strokeDasharray="8 8" />
+          <circle cx="200" cy="200" r="100" stroke="#6B8E23" strokeWidth="2" strokeDasharray="4 4" />
+          <circle cx="200" cy="200" r="40" fill="#1F5EFF" opacity="0.4" />
+        </svg>
+      </div>
+
+      {/* Sağ form */}
+      <div className="flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-between mb-8">
+            <div className="lg:hidden flex items-center gap-2">
+              <div className="h-9 w-9 rounded-xl bg-primary text-white flex items-center justify-center font-extrabold">
+                OD
+              </div>
+              <span className="font-extrabold text-navy">{tc('appName')}</span>
+            </div>
+            <LangSwitcher className="ml-auto" />
+          </div>
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold text-navy">{t('loginTitle')}</h1>
+            <p className="text-sm text-slate-500">{tc('tagline')}</p>
+          </div>
+          <Suspense fallback={<div className="text-center text-slate-400">{tc('loading')}</div>}>
+            <LoginForm />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
