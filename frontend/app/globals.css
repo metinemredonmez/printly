@@ -140,3 +140,42 @@
     @apply font-sans;
   }
 }
+
+/* Marka giriş animasyonları (Magic UI BlurFade estetiği — saf CSS, SSR-dostu) */
+@keyframes od-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+@keyframes od-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes od-spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.od-fade-up {
+  animation: od-fade-up 0.7s cubic-bezier(0.21, 0.6, 0.35, 1) both;
+}
+.od-float {
+  animation: od-float 5s ease-in-out infinite;
+}
+.od-spin-slow {
+  animation: od-spin-slow 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .od-fade-up,
+  .od-float,
+  .od-spin-slow {
+    animation: none;
+  }
+}

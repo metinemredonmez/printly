@@ -47,40 +47,61 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="px-6 md:px-10 py-16 max-w-6xl mx-auto grid lg:grid-cols-2 items-center gap-10">
-        <div className="space-y-6">
-          <span className="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-primary">
-            {t('badge')}
-          </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-navy leading-tight tracking-tight">
-            {t('heroTitle')}
-          </h1>
-          <p className="text-lg text-slate-600">{t('heroDesc')}</p>
-          <div className="flex gap-3">
-            <Link
-              href="/register"
-              className="px-7 py-3.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-colors"
+      <div className="relative overflow-hidden">
+        {/* yumuşak gradient mesh arka plan */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            background:
+              'radial-gradient(60% 50% at 15% 10%, rgba(31,94,255,0.10), transparent 70%), radial-gradient(50% 50% at 85% 30%, rgba(107,142,35,0.10), transparent 70%)',
+          }}
+        />
+        <section className="px-6 md:px-10 py-16 max-w-6xl mx-auto grid lg:grid-cols-2 items-center gap-10">
+          <div className="space-y-6">
+            <span
+              className="od-fade-up inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-primary"
+              style={{ animationDelay: '0.05s' }}
             >
-              {t('applyNow')}
-            </Link>
-            <Link
-              href="/login"
-              className="px-7 py-3.5 border border-primary text-primary font-bold rounded-xl hover:bg-blue-50 transition-colors"
+              {t('badge')}
+            </span>
+            <h1
+              className="od-fade-up text-4xl sm:text-5xl font-extrabold text-navy leading-tight tracking-tight"
+              style={{ animationDelay: '0.15s' }}
             >
-              {tc('login')}
-            </Link>
+              {t('heroTitle')}
+            </h1>
+            <p className="od-fade-up text-lg text-slate-600" style={{ animationDelay: '0.25s' }}>
+              {t('heroDesc')}
+            </p>
+            <div className="od-fade-up flex gap-3" style={{ animationDelay: '0.35s' }}>
+              <Link
+                href="/register"
+                className="px-7 py-3.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
+              >
+                {t('applyNow')}
+              </Link>
+              <Link
+                href="/login"
+                className="px-7 py-3.5 border border-primary text-primary font-bold rounded-xl hover:bg-blue-50 transition-colors"
+              >
+                {tc('login')}
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="hidden lg:flex justify-center">
-          <div className="h-72 w-72 rounded-full border-4 border-dashed border-primary/30 flex items-center justify-center">
-            <div className="h-40 w-40 rounded-full bg-navy flex items-center justify-center">
-              <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center">
-                <div className="h-10 w-10 rounded-full bg-brand-accent" />
+          <div className="hidden lg:flex justify-center">
+            <div className="od-float relative h-72 w-72">
+              <div className="od-spin-slow absolute inset-0 rounded-full border-4 border-dashed border-primary/30" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-40 w-40 rounded-full bg-navy flex items-center justify-center shadow-2xl shadow-blue-900/20">
+                  <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-brand-accent" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section className="px-6 md:px-10 py-12 max-w-6xl mx-auto w-full">
         <h2 className="text-3xl font-extrabold text-navy text-center mb-10">{t('capsTitle')}</h2>
@@ -90,7 +111,8 @@ export default async function Home() {
             return (
               <div
                 key={c.title}
-                className="bg-white p-6 rounded-2xl border border-slate-100 hover:shadow-xl transition-shadow"
+                className="od-fade-up bg-white p-6 rounded-2xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all"
+                style={{ animationDelay: `${0.1 + i * 0.08}s` }}
               >
                 <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center mb-4">
                   <Icon className="h-6 w-6" />
@@ -109,7 +131,11 @@ export default async function Home() {
           <p className="text-center text-slate-500 mb-10">{t('plansSubtitle')}</p>
           <div className="grid md:grid-cols-3 gap-5">
             {plans.map((p, i) => (
-              <div key={p.name} className={`rounded-3xl border-2 ${PLAN_COLORS[i]} p-7 bg-white`}>
+              <div
+                key={p.name}
+                className={`od-fade-up rounded-3xl border-2 ${PLAN_COLORS[i]} p-7 bg-white hover:-translate-y-1 transition-transform`}
+                style={{ animationDelay: `${0.1 + i * 0.1}s` }}
+              >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xl font-extrabold text-navy">{p.name}</h3>
                   <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
