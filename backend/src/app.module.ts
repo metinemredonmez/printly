@@ -33,6 +33,11 @@ import { LabelsModule } from './labels/labels.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { AdminUsersModule } from './admin-users/admin-users.module';
 import { TenantModule, TenantMiddleware } from './tenant/tenant.module';
+import { DocumentsModule } from './documents/documents.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { SearchModule } from './search/search.module';
+import { NotificationCenterModule } from './notification-center/notification-center.module';
+import { GdprModule } from './gdpr/gdpr.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -139,6 +144,11 @@ import { HealthController } from './health.controller';
     InvoicesModule,
     AdminUsersModule,
     TenantModule,
+    DocumentsModule,
+    TicketsModule,
+    SearchModule,
+    NotificationCenterModule,
+    GdprModule,
   ],
   controllers: [HealthController],
   providers: [

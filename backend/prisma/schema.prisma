@@ -279,6 +279,8 @@ model Transaction {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt]) // kullanıcı işlem geçmişi (P1 perf)
 }
 
 // ─────────────────────────────────────────────
@@ -369,6 +371,10 @@ model Order {
   clientZip     String?
   clientPhone   String?
   clientNote    String?
+  clientLat     Float? // harita/canlı aktivite (#15)
+  clientLng     Float?
+
+  archivedAt DateTime? // arşiv (#13) — null değilse arşivlenmiş
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -390,6 +396,10 @@ model Order {
   statusEvents OrderStatusEvent[]
 
   @@index([status, boardPosition])
+  @@index([userId]) // bayi siparişleri (P1 perf)
+  @@index([organizationId])
+  @@index([archivedAt])
+  @@index([createdAt])
 }
 
 // ─────────────────────────────────────────────
@@ -505,4 +515,97 @@ model CreditLedger {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// Document yönetimi (sipariş/bayi belgeleri — R2)
+// ─────────────────────────────────────────────
+model Document {
+  id               String   @id @default(cuid())
+  fileName         String
+  r2Key            String   @unique
+  mimeType         String?
+  sizeBytes        Int?
+  category         String   @default("GENERAL") // ORDER | DEALER | GENERAL
+  orderId          String?
+  userId           String?
+  organizationId   String?
+  uploadedByUserId String
+  createdAt        DateTime @default(now())
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// ─────────────────────────────────────────────
+// Ticket / destek
+// ─────────────────────────────────────────────
+enum TicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Ticket {
+  id               String          @id @default(cuid())
+  subject          String
+  status           TicketStatus    @default(OPEN)
+  priority         TicketPriority  @default(NORMAL)
+  userId           String // açan
+  organizationId   String?
+  orderId          String?
+  assignedToUserId String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  messages         TicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model TicketMessage {
+  id           String   @id @default(cuid())
+  ticketId     String
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorUserId String
+  body         String
+  internal     Boolean  @default(false) // yalnız staff görür
+  createdAt    DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+// ─────────────────────────────────────────────
+// Bildirim merkezi (in-app) + tercihler
+// ─────────────────────────────────────────────
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String // ORDER_STATUS | TICKET | SYSTEM ...
+  title     String
+  body      String?
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+}
+
+model NotificationPreference {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  email        Boolean  @default(true)
+  push         Boolean  @default(true)
+  orderUpdates Boolean  @default(true)
+  marketing    Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
 }

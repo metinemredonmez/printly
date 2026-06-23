@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateStatusDto } from './dto';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -17,8 +17,30 @@ export class OrdersController {
 
   @RequirePermission('order:read')
   @Get()
-  findAll(@CurrentUser() user: AuthUser) {
-    return this.orders.findAll(user);
+  findAll(
+    @CurrentUser() user: AuthUser,
+    @Query('archived') archived?: string,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    return this.orders.findAll(user, {
+      archived: archived === 'true',
+      skip: skip ? parseInt(skip, 10) : undefined,
+      take: take ? parseInt(take, 10) : undefined,
+    });
+  }
+
+  // Arşivle / arşivden çıkar (personel) — #13
+  @RequirePermission('order:updateStatus')
+  @Post(':id/archive')
+  archive(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.orders.setArchived(user, id, true);
+  }
+
+  @RequirePermission('order:updateStatus')
+  @Post(':id/unarchive')
+  unarchive(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.orders.setArchived(user, id, false);
   }
 
   @RequirePermission('order:read')

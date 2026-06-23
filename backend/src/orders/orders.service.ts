@@ -187,12 +187,47 @@ export class OrdersService {
     return created;
   }
 
-  findAll(authUser: AuthUser) {
+  // Arşivlenmemiş varsayılan + pagination (P1). archived=true ile arşiv listelenir.
+  findAll(
+    authUser: AuthUser,
+    opts: { archived?: boolean; skip?: number; take?: number } = {},
+  ) {
+    const take = Math.min(Math.max(opts.take ?? 50, 1), 200);
     return this.prisma.order.findMany({
-      where: this.scopeFilter(authUser),
+      where: {
+        ...this.scopeFilter(authUser),
+        archivedAt: opts.archived ? { not: null } : null,
+      },
       orderBy: { createdAt: 'desc' },
-      include: { items: true, extras: true, user: { select: { id: true, email: true, fullName: true } } },
+      skip: opts.skip && opts.skip > 0 ? opts.skip : undefined,
+      take,
+      include: {
+        items: true,
+        extras: true,
+        user: { select: { id: true, email: true, fullName: true } },
+      },
     });
+  }
+
+  // Arşivle / arşivden çıkar (yalnız personel) — #13
+  async setArchived(authUser: AuthUser, id: string, archived: boolean) {
+    if (authUser.role !== Role.ADMIN && authUser.role !== Role.PRODUCTION) {
+      throw new ForbiddenException('Yalnız personel arşivleyebilir');
+    }
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException('Sipariş bulunamadı');
+    const updated = await this.prisma.order.update({
+      where: { id },
+      data: { archivedAt: archived ? new Date() : null },
+    });
+    await this.audit.log({
+      actorUserId: authUser.userId,
+      actorRole: authUser.role,
+      action: archived ? 'ORDER_ARCHIVE' : 'ORDER_UNARCHIVE',
+      entityType: 'Order',
+      entityId: id,
+    });
+    return updated;
   }
 
   async findOne(authUser: AuthUser, id: string) {
