@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
+import { ListSkeleton } from '@/components/skeletons';
 import { money } from '@/lib/format';
 
 interface Card {
@@ -60,7 +61,7 @@ export default function KanbanPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-slate-400 text-sm">…</div>
+        <ListSkeleton rows={5} />
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           {cols.map((col) => (

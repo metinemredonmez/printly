@@ -11,6 +11,7 @@ import { StatCard } from '@/components/stat-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TableSkeleton } from '@/components/skeletons';
 
 type Me = { balance: number; hasDiscount40: boolean };
 type Tier = { cumulativeLoad: number; tier: { name: string } };
@@ -139,7 +140,7 @@ export default function CreditsPage() {
           <div className="col-span-2 text-right">{t('balanceAfter')}</div>
         </div>
         {ledgerQ.isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <TableSkeleton rows={6} cols={4} />
         ) : ledger.length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('ledgerEmpty')}</div>
         ) : (

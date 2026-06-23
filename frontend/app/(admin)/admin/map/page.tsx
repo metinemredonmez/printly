@@ -13,6 +13,7 @@ import {
 import { api } from '@/lib/api';
 import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
+import { ListSkeleton } from '@/components/skeletons';
 import { money, shortDate } from '@/lib/format';
 
 type ActiveOrder = {
@@ -100,9 +101,7 @@ export default function MapPage() {
           </div>
 
           {orders.isLoading ? (
-            <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-slate-400 text-sm">
-              …
-            </div>
+            <ListSkeleton rows={4} />
           ) : orderList.length === 0 ? (
             <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center">
               <MapPin className="h-8 w-8 text-slate-300 mx-auto mb-3" />
@@ -162,7 +161,7 @@ export default function MapPage() {
 
           <div className="bg-white rounded-2xl border border-slate-100 p-5">
             {activity.isLoading ? (
-              <div className="py-6 text-center text-slate-400 text-sm">…</div>
+              <ListSkeleton rows={4} />
             ) : eventList.length === 0 ? (
               <div className="py-6 text-center">
                 <Activity className="h-8 w-8 text-slate-300 mx-auto mb-3" />

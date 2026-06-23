@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ListSkeleton } from '@/components/skeletons';
 
 interface Me {
   userId: string;
@@ -88,7 +89,7 @@ export default function ProfilePage() {
         </div>
 
         {me.isLoading ? (
-          <div className="text-sm text-slate-400">…</div>
+          <ListSkeleton rows={2} />
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -124,7 +125,7 @@ export default function ProfilePage() {
           </div>
 
           {org.isLoading ? (
-            <div className="text-sm text-slate-400">…</div>
+            <ListSkeleton rows={2} />
           ) : (
             <form
               className="space-y-4"

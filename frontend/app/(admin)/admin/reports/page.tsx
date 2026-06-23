@@ -18,6 +18,7 @@ import { api } from '@/lib/api';
 import { StatCard } from '@/components/stat-card';
 import { money, num } from '@/lib/format';
 import { Button } from '@/components/ui/button';
+import { TableSkeleton, ListSkeleton } from '@/components/skeletons';
 
 interface DealerRow {
   userId: string;
@@ -152,7 +153,7 @@ export default function ReportsPage() {
             <div className="col-span-3 text-right">{t('revenue')}</div>
           </div>
           {dealers.isLoading ? (
-            <div className="p-10 text-center text-sm text-slate-400">…</div>
+            <TableSkeleton rows={6} cols={3} />
           ) : dealerRows.length === 0 ? (
             <div className="p-10 text-center text-sm text-slate-400">{t('emptyDealers')}</div>
           ) : (
@@ -187,7 +188,7 @@ export default function ReportsPage() {
             <h2 className="font-bold text-navy">{t('monthlyRevenue')}</h2>
           </div>
           {revenue.isLoading ? (
-            <div className="p-10 text-center text-sm text-slate-400">…</div>
+            <ListSkeleton rows={6} />
           ) : revRows.length === 0 ? (
             <div className="p-10 text-center text-sm text-slate-400">{t('emptyRevenue')}</div>
           ) : (

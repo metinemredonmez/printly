@@ -9,6 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import { api } from '@/lib/api';
 import { shortDate } from '@/lib/format';
 import { Button } from '@/components/ui/button';
+import { ListSkeleton } from '@/components/skeletons';
 
 interface Message {
   id: string;
@@ -56,7 +57,12 @@ export function TicketDetail({
     onError: (e) => toast.error(e instanceof Error ? e.message : 'Hata'),
   });
 
-  if (isLoading) return <div className="text-slate-400 text-sm">…</div>;
+  if (isLoading)
+    return (
+      <div className="space-y-4 max-w-2xl">
+        <ListSkeleton rows={3} />
+      </div>
+    );
   if (!tk) return <div className="text-slate-400 text-sm">—</div>;
 
   return (

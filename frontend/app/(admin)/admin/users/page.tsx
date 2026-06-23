@@ -10,6 +10,7 @@ import { shortDate } from '@/lib/format';
 import { StatCard } from '@/components/stat-card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { TableSkeleton } from '@/components/skeletons';
 
 type Role = 'USER' | 'TEAM_MEMBER' | 'TEAM_LEADER' | 'ADMIN' | 'PRODUCTION';
 
@@ -120,7 +121,7 @@ export default function AdminUsersPage() {
         </div>
 
         {isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <TableSkeleton rows={6} cols={4} />
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
         ) : (

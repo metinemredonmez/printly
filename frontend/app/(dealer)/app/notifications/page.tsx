@@ -19,6 +19,7 @@ import { shortDate } from '@/lib/format';
 import { StatCard } from '@/components/stat-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ListSkeleton } from '@/components/skeletons';
 
 type Notif = {
   id: string;
@@ -134,7 +135,9 @@ export default function NotificationsPage() {
           <h2 className="text-base font-bold text-navy">{t('listTitle')}</h2>
         </div>
         {listQ.isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <div className="p-4">
+            <ListSkeleton rows={5} />
+          </div>
         ) : list.length === 0 ? (
           <div className="p-10 text-center">
             <Bell className="h-8 w-8 text-slate-300 mx-auto" />

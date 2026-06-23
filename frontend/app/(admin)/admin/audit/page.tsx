@@ -6,6 +6,7 @@ import { ScrollText, Hash, User, Clock } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { shortDate } from '@/lib/format';
+import { ListSkeleton, EmptyState } from '@/components/skeletons';
 
 interface AuditEntry {
   id: string;
@@ -52,13 +53,15 @@ export default function AdminAudit() {
         </div>
 
         {logs.isLoading ? (
-          <div className="px-5 py-10 text-center text-slate-400 text-sm">…</div>
-        ) : items.length === 0 ? (
-          <div className="px-5 py-14 text-center">
-            <ScrollText className="h-10 w-10 mx-auto text-slate-300" />
-            <p className="mt-3 text-sm font-medium text-navy">{t('emptyTitle')}</p>
-            <p className="text-xs text-slate-400">{t('emptyDesc')}</p>
+          <div className="p-5">
+            <ListSkeleton rows={6} />
           </div>
+        ) : items.length === 0 ? (
+          <EmptyState
+            icon={ScrollText}
+            title={t('emptyTitle')}
+            description={t('emptyDesc')}
+          />
         ) : (
           <ul className="divide-y divide-slate-100">
             {items.map((e) => {

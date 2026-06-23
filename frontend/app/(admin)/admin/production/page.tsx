@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ScanLine, Zap } from 'lucide-react';
 import { api } from '@/lib/api';
 import { shortDate } from '@/lib/format';
+import { TableSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -107,7 +108,7 @@ export default function ProductionPage() {
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-100 font-bold text-navy">{t('queue')}</div>
         {isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <TableSkeleton rows={6} cols={3} />
         ) : (data ?? []).length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
         ) : (

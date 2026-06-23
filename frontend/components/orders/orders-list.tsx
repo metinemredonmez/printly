@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { money, shortDate } from '@/lib/format';
 import { OrderStatusBadge } from '@/components/order-status-badge';
 import { Input } from '@/components/ui/input';
+import { TableSkeleton } from '@/components/skeletons';
 import type { Order } from '@/lib/orders';
 
 export function OrdersList({
@@ -88,7 +89,7 @@ export function OrdersList({
           <div className="col-span-2 text-right">{t('status')}</div>
         </div>
         {isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <TableSkeleton rows={6} cols={5} />
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
         ) : (

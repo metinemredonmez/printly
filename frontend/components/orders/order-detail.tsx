@@ -8,7 +8,9 @@ import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { money, shortDate } from '@/lib/format';
 import { OrderStatusBadge } from '@/components/order-status-badge';
+import { OrderProofs } from '@/components/orders/order-proofs';
 import { Button } from '@/components/ui/button';
+import { ListSkeleton } from '@/components/skeletons';
 import { ORDER_STATUSES, type Order } from '@/lib/orders';
 
 export function OrderDetail({
@@ -62,7 +64,12 @@ export function OrderDetail({
     onError: (e) => toast.error(e instanceof Error ? e.message : 'Hata'),
   });
 
-  if (isLoading) return <div className="text-slate-400 text-sm">…</div>;
+  if (isLoading)
+    return (
+      <div className="space-y-5 max-w-4xl">
+        <ListSkeleton rows={4} />
+      </div>
+    );
   if (!o) return <div className="text-slate-400 text-sm">{t('notFound')}</div>;
 
   return (
@@ -145,6 +152,8 @@ export function OrderDetail({
               ))}
             </div>
           </div>
+
+          <OrderProofs orderId={id} staff={staff} />
 
           {o.clientName && (
             <div className="bg-white rounded-2xl border border-slate-100 p-5">

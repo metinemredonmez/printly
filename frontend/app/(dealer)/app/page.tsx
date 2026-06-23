@@ -7,6 +7,7 @@ import { Wallet, ShoppingCart, Crown, Percent, PlusCircle, ArrowRight } from 'lu
 import { api } from '@/lib/api';
 import { StatCard } from '@/components/stat-card';
 import { OrderStatusBadge } from '@/components/order-status-badge';
+import { StatCardsSkeleton, TableSkeleton } from '@/components/skeletons';
 import { money, shortDate } from '@/lib/format';
 
 interface Order {
@@ -56,34 +57,36 @@ export default function DealerHome() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label={t('balance')}
-          value={credits.isLoading ? '…' : money(credits.data?.balance)}
-          icon={Wallet}
-          accent="primary"
-        />
-        <StatCard
-          label={t('activeOrders')}
-          value={orders.isLoading ? '…' : active}
-          icon={ShoppingCart}
-          accent="emerald"
-        />
-        <StatCard
-          label={t('membership')}
-          value={tier.isLoading ? '…' : (tier.data?.tier?.name ?? '—')}
-          icon={Crown}
-          accent="amber"
-        />
-        <StatCard
-          label={t('discount')}
-          value={
-            credits.isLoading ? '…' : credits.data?.hasDiscount40 ? t('discountActive') : t('discountInactive')
-          }
-          icon={Percent}
-          accent={credits.data?.hasDiscount40 ? 'emerald' : 'navy'}
-        />
-      </div>
+      {credits.isLoading || orders.isLoading || tier.isLoading ? (
+        <StatCardsSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            label={t('balance')}
+            value={money(credits.data?.balance)}
+            icon={Wallet}
+            accent="primary"
+          />
+          <StatCard
+            label={t('activeOrders')}
+            value={active}
+            icon={ShoppingCart}
+            accent="emerald"
+          />
+          <StatCard
+            label={t('membership')}
+            value={tier.data?.tier?.name ?? '—'}
+            icon={Crown}
+            accent="amber"
+          />
+          <StatCard
+            label={t('discount')}
+            value={credits.data?.hasDiscount40 ? t('discountActive') : t('discountInactive')}
+            icon={Percent}
+            accent={credits.data?.hasDiscount40 ? 'emerald' : 'navy'}
+          />
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
@@ -92,7 +95,9 @@ export default function DealerHome() {
             {t('viewAll')} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        {recent.length === 0 ? (
+        {orders.isLoading ? (
+          <TableSkeleton rows={6} cols={3} />
+        ) : recent.length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('noOrders')}</div>
         ) : (
           <div className="divide-y divide-slate-100">

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ListSkeleton } from '@/components/skeletons';
 
 interface EtsyStore {
   id: string;
@@ -109,7 +110,7 @@ export default function StoresPage() {
 
       {/* Liste */}
       {stores.isLoading ? (
-        <div className="text-sm text-slate-400">…</div>
+        <ListSkeleton rows={4} />
       ) : list.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center">
           <div className="h-12 w-12 rounded-2xl bg-slate-100 text-navy flex items-center justify-center mx-auto">

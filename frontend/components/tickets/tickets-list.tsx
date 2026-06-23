@@ -11,6 +11,7 @@ import { shortDate } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TableSkeleton } from '@/components/skeletons';
 
 interface Ticket {
   id: string;
@@ -90,7 +91,7 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         {isLoading ? (
-          <div className="p-10 text-center text-slate-400 text-sm">…</div>
+          <TableSkeleton rows={5} cols={2} />
         ) : (data ?? []).length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
         ) : (

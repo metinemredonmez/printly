@@ -599,5 +599,26 @@
     "pref_orderUpdates_desc": "Sipariş durumu değiştiğinde haberdar olun.",
     "pref_marketing": "Pazarlama",
     "pref_marketing_desc": "Kampanya ve duyuru e-postaları."
+  },
+  "proofs": {
+    "title": "Dijital Provalar",
+    "empty": "Bu sipariş için henüz prova yok.",
+    "statusPENDING": "Onay Bekliyor",
+    "statusAPPROVED": "Onaylandı",
+    "statusREJECTED": "Reddedildi",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "approved": "Prova onaylandı",
+    "rejected": "Prova reddedildi",
+    "actionFailed": "İşlem başarısız",
+    "rejectReason": "Ret sebebini yazın (opsiyonel):",
+    "responseNote": "Yanıt",
+    "viewFile": "Dosyayı gör",
+    "addProof": "Yeni prova ekle (personel)",
+    "fileNamePlaceholder": "Dosya adı (örn. prova-v1.pdf)",
+    "notePlaceholder": "Not (opsiyonel)",
+    "add": "Ekle",
+    "created": "Prova oluşturuldu",
+    "createFailed": "Prova oluşturulamadı"
   }
 }

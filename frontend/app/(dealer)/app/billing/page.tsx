@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ListSkeleton } from '@/components/skeletons';
 
 type Country = 'TR' | 'US';
 type EntityType = 'individual' | 'company';
@@ -129,7 +130,7 @@ export default function BillingPage() {
       </div>
 
       {billing.isLoading ? (
-        <div className="text-sm text-slate-400">…</div>
+        <ListSkeleton rows={3} />
       ) : (
         <form
           className="space-y-6"

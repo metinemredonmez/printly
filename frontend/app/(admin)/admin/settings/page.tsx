@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ListSkeleton } from '@/components/skeletons';
 
 type SettingsMap = Record<string, unknown>;
 
@@ -78,7 +79,7 @@ export default function AdminSettings() {
       </div>
 
       {settings.isLoading ? (
-        <div className="text-slate-400">…</div>
+        <ListSkeleton rows={4} />
       ) : keys.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center">
           <Settings2 className="h-10 w-10 text-slate-300 mx-auto mb-3" />

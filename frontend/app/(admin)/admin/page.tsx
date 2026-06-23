@@ -7,6 +7,7 @@ import { ShoppingCart, DollarSign, Users, Layers, ArrowRight } from 'lucide-reac
 import { api } from '@/lib/api';
 import { StatCard } from '@/components/stat-card';
 import { OrderStatusBadge } from '@/components/order-status-badge';
+import { StatCardsSkeleton, TableSkeleton } from '@/components/skeletons';
 import { money, num, shortDate } from '@/lib/format';
 
 interface Dashboard {
@@ -66,12 +67,16 @@ export default function AdminHome() {
         <p className="text-slate-500">{t('last30d')}</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label={t('totalOrders')} value={dash.isLoading ? '…' : num(d?.orders.total)} icon={ShoppingCart} accent="primary" sub={`${d?.orders.last30d ?? 0} ${t('last30d')}`} />
-        <StatCard label={t('paidRevenue')} value={dash.isLoading ? '…' : money(d?.revenue.paid)} icon={DollarSign} accent="emerald" sub={`${money(d?.revenue.pending)} ${t('pendingRevenue')}`} />
-        <StatCard label={t('activeDealers')} value={dash.isLoading ? '…' : num(d?.users.total)} icon={Users} accent="amber" />
-        <StatCard label={t('producedSqm')} value={dash.isLoading ? '…' : `${(d?.production.totalSqm ?? 0).toFixed(1)} m²`} icon={Layers} accent="navy" />
-      </div>
+      {dash.isLoading ? (
+        <StatCardsSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label={t('totalOrders')} value={num(d?.orders.total)} icon={ShoppingCart} accent="primary" sub={`${d?.orders.last30d ?? 0} ${t('last30d')}`} />
+          <StatCard label={t('paidRevenue')} value={money(d?.revenue.paid)} icon={DollarSign} accent="emerald" sub={`${money(d?.revenue.pending)} ${t('pendingRevenue')}`} />
+          <StatCard label={t('activeDealers')} value={num(d?.users.total)} icon={Users} accent="amber" />
+          <StatCard label={t('producedSqm')} value={`${(d?.production.totalSqm ?? 0).toFixed(1)} m²`} icon={Layers} accent="navy" />
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Durum dağılımı */}
@@ -128,6 +133,9 @@ export default function AdminHome() {
             {t('viewAll')} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
+        {orders.isLoading ? (
+          <TableSkeleton rows={6} cols={3} />
+        ) : (
         <div className="divide-y divide-slate-100">
           {(orders.data ?? []).map((o) => (
             <Link
@@ -148,6 +156,7 @@ export default function AdminHome() {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </div>
   );

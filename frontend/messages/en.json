@@ -599,5 +599,26 @@
     "pref_orderUpdates_desc": "Get notified when an order status changes.",
     "pref_marketing": "Marketing",
     "pref_marketing_desc": "Campaign and announcement emails."
+  },
+  "proofs": {
+    "title": "Digital Proofs",
+    "empty": "No proofs for this order yet.",
+    "statusPENDING": "Awaiting Approval",
+    "statusAPPROVED": "Approved",
+    "statusREJECTED": "Rejected",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Proof approved",
+    "rejected": "Proof rejected",
+    "actionFailed": "Action failed",
+    "rejectReason": "Enter rejection reason (optional):",
+    "responseNote": "Response",
+    "viewFile": "View file",
+    "addProof": "Add new proof (staff)",
+    "fileNamePlaceholder": "File name (e.g. proof-v1.pdf)",
+    "notePlaceholder": "Note (optional)",
+    "add": "Add",
+    "created": "Proof created",
+    "createFailed": "Could not create proof"
   }
 }
