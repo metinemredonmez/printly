@@ -54,7 +54,7 @@ export default async function Home() {
             <LangSwitcher />
             <Link
               href="/login"
-              className="px-5 h-11 inline-flex items-center gap-2 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl transition-all shadow-md shadow-blue-100"
+              className="px-4 h-9 inline-flex items-center gap-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors"
             >
               <LogIn className="h-4 w-4" />
               {tc('login')}
@@ -107,7 +107,7 @@ export default async function Home() {
               <div className="od-fade-up pt-2" style={{ animationDelay: '0.4s' }}>
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   {t('applyNow')} <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -219,7 +219,7 @@ export default async function Home() {
             <div className="lg:col-span-4 lg:text-right">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {t('applyNow')} <ArrowRight className="h-4 w-4" />
               </Link>

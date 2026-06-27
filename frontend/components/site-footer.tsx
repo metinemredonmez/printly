@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { toast } from 'sonner';
-import { Mail, MapPin, Apple, Play, Send, ShieldCheck } from 'lucide-react';
-import { LogoMark } from '@/components/logo';
+import { Mail, MapPin, Send, ShieldCheck } from 'lucide-react';
+import { LogoMark, AppleLogo, GooglePlayLogo } from '@/components/logo';
 
 const SOCIALS: { label: string; href: string; path: string }[] = [
   { label: 'LinkedIn', href: '#', path: 'M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.4 8.65 22 10.7 22 14v7h-4v-6.2c0-1.48-.03-3.38-2.06-3.38-2.06 0-2.38 1.6-2.38 3.27V21H9V9Z' },
@@ -124,8 +124,8 @@ export function SiteFooter() {
                 : 'Production tracking and QR scanning in your pocket. Soon on the App Store and Google Play.'}
             </p>
             <div className="flex gap-3 lg:justify-end flex-wrap">
-              <StoreBadge icon={<Apple className="h-5 w-5" />} store="App Store" soon={tr ? 'Çok Yakında' : 'Coming Soon'} />
-              <StoreBadge icon={<Play className="h-5 w-5" />} store="Google Play" soon={tr ? 'Çok Yakında' : 'Coming Soon'} />
+              <StoreBadge icon={<AppleLogo className="h-6 w-6 text-white" />} top="Download on the" store="App Store" />
+              <StoreBadge icon={<GooglePlayLogo className="h-6 w-6" />} top="GET IT ON" store="Google Play" />
             </div>
           </div>
         </div>
@@ -205,14 +205,17 @@ export function SiteFooter() {
   );
 }
 
-function StoreBadge({ icon, store, soon }: { icon: React.ReactNode; store: string; soon: string }) {
+function StoreBadge({ icon, top, store }: { icon: React.ReactNode; top: string; store: string }) {
   return (
-    <div className="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 opacity-90">
-      <span className="text-white">{icon}</span>
-      <span className="text-left leading-tight">
-        <span className="block text-[10px] text-amber-300 font-semibold uppercase tracking-wide">{soon}</span>
-        <span className="block text-sm text-white font-semibold">{store}</span>
+    <span
+      className="inline-flex items-center gap-2.5 rounded-lg bg-black/90 border border-white/15 px-3.5 py-1.5 cursor-default select-none hover:bg-black transition-colors"
+      title={store + ' — yakında'}
+    >
+      {icon}
+      <span className="text-left leading-tight text-white">
+        <span className="block text-[9px] uppercase tracking-wide text-slate-300">{top}</span>
+        <span className="block text-[15px] font-medium -mt-0.5">{store}</span>
       </span>
-    </div>
+    </span>
   );
 }
