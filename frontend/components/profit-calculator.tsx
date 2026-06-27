@@ -5,18 +5,24 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { ArrowRight, TrendingUp } from 'lucide-react';
 
-// Üye (1×) maliyet fiyatları — iş modeliyle uyumlu
-const PRODUCTS = [
-  { key: 'wallpaper', tr: 'Duvar Kağıdı', en: 'Wallpaper', unit: 'm2' as const, price: 23 },
-  { key: 'decal', tr: 'Wall Decal', en: 'Wall Decal', unit: 'flat' as const, price: 15 },
-  { key: 'wood', tr: 'Wood / CNC', en: 'Wood / CNC', unit: 'flat' as const, price: 35 },
+// Üye (1×) maliyet fiyatları — canlı katalog verisi yoksa bu varsayılanlara düşer
+type LiveCat = { key: string; minPrice: number | null };
+const BASE = [
+  { key: 'wallpaper', cat: 'WALLPAPER', tr: 'Duvar Kağıdı', en: 'Wallpaper', unit: 'm2' as const, fallback: 23 },
+  { key: 'decal', cat: 'WALL_DECAL', tr: 'Wall Decal', en: 'Wall Decal', unit: 'flat' as const, fallback: 15 },
+  { key: 'wood', cat: 'WOOD', tr: 'Wood / CNC', en: 'Wood / CNC', unit: 'flat' as const, fallback: 35 },
 ];
 
 const money = (n: number) =>
   '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-export function ProfitCalculator() {
+export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
   const tr = useLocale() === 'tr';
+  // Canlı kategori fiyatı (en düşük 1× fiyat) varsa onu, yoksa varsayılanı kullan
+  const PRODUCTS = BASE.map((b) => {
+    const live = categories?.find((c) => c.key === b.cat);
+    return { ...b, price: live?.minPrice && live.minPrice > 0 ? live.minPrice : b.fallback };
+  });
   const [pi, setPi] = useState(0);
   const [w, setW] = useState(24);
   const [h, setH] = useState(36);

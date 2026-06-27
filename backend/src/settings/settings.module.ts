@@ -35,6 +35,46 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
     { name: 'Pro', minLoad: 2500, discountRate: 0.45, priority: true },
     { name: 'Elit', minLoad: 10000, discountRate: 0.5, priority: true },
   ],
+  // ── Landing / pazarlama içeriği (admin düzenleyebilir → PUT /api/settings/:key) ──
+  'landing.tierFeatures': [
+    { label: 'Fiyat çarpanı', labelEn: 'Price multiplier', user: '2×', member: '1×', leader: '1×' },
+    { label: 'Aylık aidat', labelEn: 'Monthly fee', user: '—', member: '$30', leader: '—' },
+    { label: '$250 yükle → %40 indirim', labelEn: 'Load $250 → 40% off', user: true, member: true, leader: true },
+    { label: 'Etsy mağaza bağlama', labelEn: 'Connect Etsy stores', user: true, member: true, leader: true },
+    { label: 'Canlı m² fiyatlandırma', labelEn: 'Live m² pricing', user: true, member: true, leader: true },
+    { label: 'Güvenli dosya yükleme (R2)', labelEn: 'Secure file upload (R2)', user: true, member: true, leader: true },
+    { label: 'Öncelikli destek', labelEn: 'Priority support', user: false, member: true, leader: true },
+    { label: 'Öncelikli üretim kuyruğu', labelEn: 'Priority production queue', user: false, member: true, leader: true },
+    { label: 'Hacim indirimi', labelEn: 'Volume discount', user: false, member: true, leader: true },
+    { label: 'Ekip yönetimi (üye davet)', labelEn: 'Team management', user: false, member: false, leader: true },
+  ],
+  'landing.stats': [
+    { value: '3', label: 'Ürün kategorisi', labelEn: 'Product categories' },
+    { value: '%40', label: 'Bayi indirimi', labelEn: 'Dealer discount' },
+    { value: '7/24', label: 'Sipariş takibi', labelEn: 'Order tracking' },
+    { value: 'ABD', label: 'Hedef pazar', labelEn: 'Target market' },
+  ],
+  'landing.trustBadges': [
+    { label: 'Etsy entegre', labelEn: 'Etsy integrated' },
+    { label: 'R2 güvenli depolama', labelEn: 'R2 secure storage' },
+    { label: 'ABD’ye kargo', labelEn: 'Ships to US' },
+    { label: 'TIFF/DPI doğrulama', labelEn: 'TIFF/DPI validation' },
+    { label: 'Dijital proof onayı', labelEn: 'Digital proof approval' },
+  ],
+  'landing.faqs': [
+    { q: 'Ortak Doku nedir?', a: 'Bayilerin Etsy mağazalarında ABD pazarına duvar kağıdı, wall decal ve ahşap/CNC ürünleri sattığı bir B2B print-on-demand üretim ve operasyon altyapısıdır.', qEn: 'What is Ortak Doku?', aEn: 'A B2B print-on-demand production & operations platform where resellers sell wallpaper, wall decals and wood/CNC products to the US market via their Etsy stores.' },
+    { q: 'Nasıl başlarım?', a: 'Başvuru formunu doldur, üyelik planını seç, Etsy mağazanı bağla ve ilk siparişini ver.', qEn: 'How do I start?', aEn: 'Fill the application, pick a membership plan, connect your Etsy store and place your first order.' },
+    { q: 'Fiyatlandırma nasıl çalışır?', a: 'Duvar kağıdı m² bazlı, decal ve ahşap sabit fiyatlıdır. Ekip üyeleri 1× (yarı) fiyat öder; $250 yükleyince %40 indirim açılır.', qEn: 'How does pricing work?', aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $250 unlocks a 40% discount.' },
+    { q: 'Baskı dosyası gereksinimleri neler?', a: 'Yüklenen dosyalar ürünün gerektirdiği minimum DPI ve formatı (TIFF/PDF) karşılamalıdır; sistem otomatik doğrular.', qEn: 'What are the print file requirements?', aEn: 'Uploaded files must meet the product’s minimum DPI and format (TIFF/PDF); the system validates automatically.' },
+    { q: 'Siparişi nasıl takip ederim?', a: 'Her sipariş üretim aşamalarında durum güncellemesi alır; markalı takip sayfasından kargo durumunu görebilirsin.', qEn: 'How do I track an order?', aEn: 'Every order gets status updates through production stages; you can follow shipping on a branded tracking page.' },
+    { q: 'Ödemeler nasıl yapılır?', a: 'Cüzdanına bakiye yükler, siparişlerde bu bakiyeden düşersin. Toplu yükleme indirim kademelerini açar.', qEn: 'How are payments handled?', aEn: 'You load balance into your wallet and orders are deducted from it. Bulk loading unlocks discount tiers.' },
+  ],
+  'landing.integrations': [
+    { name: 'Etsy', status: 'soon' },
+    { name: 'QuickBooks', status: 'soon' },
+    { name: 'Stripe', status: 'soon' },
+    { name: 'Cloudflare R2', status: 'connected' },
+  ],
   requireProductionApproval: true, // H2/#33
 };
 

@@ -48,6 +48,7 @@ import { ProofsModule } from './proofs/proofs.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProductionModule } from './production/production.module';
 import { WhitelabelModule } from './whitelabel/whitelabel.module';
+import { PublicModule } from './public/public.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -188,6 +189,7 @@ import { HealthController } from './health.controller';
     WebhooksModule,
     ProductionModule,
     WhitelabelModule,
+    PublicModule,
   ],
   controllers: [HealthController],
   providers: [

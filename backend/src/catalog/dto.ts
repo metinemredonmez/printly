@@ -28,6 +28,7 @@ export class CreateProductDto {
   @IsEnum(ProductCategory) category: ProductCategory;
   @IsOptional() @IsEnum(ProductUnit) unit?: ProductUnit;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() imageUrl?: string;
   @IsOptional() @IsNumber() @Min(0) basePricePerM2?: number; // M2 ürün (1× fiyat)
   @IsOptional() @IsNumber() @Min(0) flatPrice?: number; // FLAT ürün (1× fiyat)
   @IsOptional() subTypes?: unknown; // wallpaper alt türleri
@@ -42,6 +43,7 @@ export class UpdateProductDto {
   @IsOptional() @IsEnum(ProductCategory) category?: ProductCategory;
   @IsOptional() @IsEnum(ProductUnit) unit?: ProductUnit;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() imageUrl?: string;
   @IsOptional() @IsNumber() @Min(0) basePricePerM2?: number;
   @IsOptional() @IsNumber() @Min(0) flatPrice?: number;
   @IsOptional() subTypes?: unknown;

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import {
   Rocket,
   ArrowRight,
@@ -18,6 +18,11 @@ import { Logo } from '@/components/logo';
 import { HeroSlider } from '@/components/hero-slider';
 import { ProfitCalculator } from '@/components/profit-calculator';
 import { PlanComparison } from '@/components/plan-comparison';
+import { ProductShowcase } from '@/components/product-showcase';
+import { TrustBand } from '@/components/trust-band';
+import { LandingFaq } from '@/components/landing-faq';
+import { IntegrationsBand } from '@/components/integrations-band';
+import { getLandingData } from '@/lib/public';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 // her kapasite kartı için ilgili blurlu arka görsel
@@ -42,6 +47,10 @@ export default async function Home() {
   const stats = t.raw('stats') as { value: string; label: string }[];
   const steps = t.raw('steps') as { title: string; desc: string }[];
   const testimonials = t.raw('testimonials') as { quote: string; name: string; role: string }[];
+  const locale = await getLocale();
+  const tr = locale === 'tr';
+  // Canlı landing verisi (backend kapalıysa null → bileşenler varsayılana düşer)
+  const landing = await getLandingData();
 
   const nav = [
     { href: '#ecosystem', label: t('navEcosystem') },
@@ -151,6 +160,8 @@ export default async function Home() {
           </div>
         </section>
 
+        <TrustBand tr={tr} badges={landing?.content.trustBadges} />
+
         {/* İSTATİSTİK BANDI */}
         <section className="border-y border-slate-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -199,6 +210,9 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* ÜRÜN VİTRİNİ */}
+        <ProductShowcase tr={tr} categories={landing?.categories} products={landing?.products} />
+
         {/* NASIL ÇALIŞIR */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
@@ -222,7 +236,7 @@ export default async function Home() {
         </section>
 
         {/* KÂR HESAPLAYICI */}
-        <ProfitCalculator />
+        <ProfitCalculator categories={landing?.categories} />
 
         {/* ÜYELİK PLANLARI */}
         <section id="production" className="bg-white border-y border-slate-100 py-14">
@@ -264,9 +278,12 @@ export default async function Home() {
             </div>
 
             {/* Plan karşılaştırma matrisi */}
-            <PlanComparison />
+            <PlanComparison tiers={landing?.tiers} featureMatrix={landing?.featureMatrix} />
           </div>
         </section>
+
+        {/* SSS */}
+        <LandingFaq tr={tr} faqs={landing?.content.faqs} />
 
         {/* MÜŞTERİ YORUMLARI */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -292,6 +309,9 @@ export default async function Home() {
             ))}
           </div>
         </section>
+
+        {/* ENTEGRASYONLAR */}
+        <IntegrationsBand tr={tr} integrations={landing?.content.integrations} />
 
         {/* CTA */}
         <section id="technology" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">

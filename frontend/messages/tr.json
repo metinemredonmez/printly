@@ -504,6 +504,8 @@
     "fFormats": "İzinli Formatlar",
     "formatsHint": "Virgülle ayır: tiff, pdf",
     "fDescription": "Açıklama",
+    "fImageUrl": "Görsel URL",
+    "fImageUrlHint": "Landing ürün vitrininde gösterilir (opsiyonel)",
     "fWidthInch": "Genişlik (inç)",
     "fCode": "Kod",
     "fPrice": "Fiyat (1×)",

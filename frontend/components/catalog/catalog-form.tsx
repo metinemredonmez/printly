@@ -227,6 +227,14 @@ export function CatalogFormDialog({
                   onChange={(e) => set('description', e.target.value)}
                 />
               </Field>
+
+              <Field label={t('fImageUrl')} hint={t('fImageUrlHint')}>
+                <Input
+                  value={form.imageUrl ?? ''}
+                  onChange={(e) => set('imageUrl', e.target.value)}
+                  placeholder="https://…"
+                />
+              </Field>
             </>
           )}
 
@@ -368,6 +376,7 @@ function buildBody(kind: CatalogKind, form: Row): Row {
     category: form.category,
     unit: form.unit,
     description: form.description || undefined,
+    imageUrl: form.imageUrl || undefined,
     basePricePerM2: form.unit === 'M2' ? num(form.basePricePerM2) : undefined,
     flatPrice: form.unit === 'FLAT' ? num(form.flatPrice) : undefined,
     materialId: form.materialId || undefined,

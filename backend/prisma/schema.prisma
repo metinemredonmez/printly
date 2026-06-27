@@ -305,6 +305,7 @@ model Product {
   category      ProductCategory
   unit          ProductUnit     @default(M2)
   description   String?
+  imageUrl       String?        // vitrin/landing görseli (admin yönetir)
   basePricePerM2 Decimal?       @db.Decimal(12, 4) // M2 ürünler için (1× fiyat)
   flatPrice      Decimal?       @db.Decimal(12, 2)  // FLAT ürünler için (1× fiyat)
   subTypes       Json?          // wallpaper alt türleri: [{key,label}]

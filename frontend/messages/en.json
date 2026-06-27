@@ -504,6 +504,8 @@
     "fFormats": "Allowed Formats",
     "formatsHint": "Comma separated: tiff, pdf",
     "fDescription": "Description",
+    "fImageUrl": "Image URL",
+    "fImageUrlHint": "Shown in the landing product showcase (optional)",
     "fWidthInch": "Width (in)",
     "fCode": "Code",
     "fPrice": "Price (1×)",
