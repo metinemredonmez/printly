@@ -213,10 +213,10 @@ export default async function Home() {
                 >
                   {/* başlığa uygun blurlu arka görsel (hafif) */}
                   <div
-                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.38] dark:opacity-[0.45] blur-[1.5px] scale-110 group-hover:opacity-60 transition-opacity duration-300"
+                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.55] dark:opacity-[0.6] blur-[1px] scale-110 group-hover:opacity-75 transition-opacity duration-300"
                     style={{ backgroundImage: `url(${CARD_IMG[i % CARD_IMG.length]})` }}
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/82 via-white/68 to-white/55 dark:from-slate-900/82 dark:via-slate-900/68 dark:to-slate-900/55" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/92 via-white/72 to-white/30 dark:from-slate-900/92 dark:via-slate-900/72 dark:to-slate-900/30" />
                   {/* başlık konusuna uygun ince renk vurgusu */}
                   <div
                     className={`pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity ${a.blob}`}
