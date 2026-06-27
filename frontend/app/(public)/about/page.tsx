@@ -29,24 +29,24 @@ export default function AboutPage() {
       <Section heading={tr ? 'Ne Yapıyoruz' : 'What We Do'}>
         <p>
           {tr
-            ? 'Ortak Doku; duvar kağıdı (metrekare bazlı), wall decal ve CNC ahşap üretimini tek bir panelde bir araya getirir. Sipariş anından teslimat anına kadar tüm süreç şeffaf ve takip edilebilirdir:'
-            : 'Ortak Doku brings wallpaper (priced per square meter), wall decal and CNC wood production together in a single dashboard. From the moment an order is placed to delivery, the entire process stays transparent and traceable:'}
+            ? 'Ortak Doku; duvar kağıdı (metrekare bazlı), wall decal ve CNC ahşap üretimini tek bir panelde bir araya getirir. Sipariş anından teslimat anına kadar tüm süreç şeffaf ve takip edilebilirdir. Tek bir entegrasyonla şu ürün gruplarını üretebilirsiniz:'
+            : 'Ortak Doku brings wallpaper (priced per square meter), wall decal and CNC wood production together in a single dashboard. From the moment an order is placed to delivery, the entire process stays transparent and traceable. With a single integration you can produce the following product groups:'}
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
             {tr
-              ? 'Canlı fiyatlandırma: Ölçü, malzeme ve adet seçimine göre anlık ve net maliyet hesabı.'
-              : 'Live pricing: instant, clear cost calculation based on size, material and quantity selections.'}
+              ? 'Duvar kağıdı (m² bazlı): Ölçüye göre metrekare üzerinden anlık fiyatlandırılan, baskı kalitesi yüksek özel üretim.'
+              : 'Wallpaper (per m²): high-quality custom production priced instantly per square meter based on dimensions.'}
           </li>
           <li>
             {tr
-              ? 'Üretim takibi: Her siparişin hangi aşamada olduğunu gerçek zamanlı izleme.'
-              : 'Production tracking: real-time visibility into the stage of every order.'}
+              ? 'Wall decal: Farklı boyut ve malzeme seçenekleriyle uygulanması kolay, kesime hazır duvar çıkartmaları.'
+              : 'Wall decal: easy-to-apply, cut-ready wall stickers with a range of size and material options.'}
           </li>
           <li>
             {tr
-              ? 'Etsy entegrasyonu: Mağazanızdaki siparişleri otomatik olarak üretim ağına aktarma.'
-              : 'Etsy integration: automatically push your store orders into the production network.'}
+              ? 'CNC ahşap: Hassas CNC işçiliğiyle üretilen, dekoratif ve fonksiyonel özel ahşap ürünler.'
+              : 'CNC wood: decorative and functional custom wood products crafted with precision CNC machining.'}
           </li>
         </ul>
       </Section>
@@ -65,8 +65,8 @@ export default function AboutPage() {
           </li>
           <li>
             {tr
-              ? 'Şeffaf fiyat: Gizli ücret yok; her kalemin maliyetini sipariş öncesinde görürsünüz.'
-              : 'Transparent pricing: no hidden fees — you see the cost of every line item before ordering.'}
+              ? 'Şeffaf m² fiyat: Gizli ücret yok; her kalemin metrekare maliyetini sipariş öncesinde net olarak görürsünüz.'
+              : 'Transparent per-m² pricing: no hidden fees — you see the per-square-meter cost of every line item clearly before ordering.'}
           </li>
           <li>
             {tr
@@ -81,11 +81,71 @@ export default function AboutPage() {
         </ul>
       </Section>
 
+      <Section heading={tr ? 'Değerlerimiz' : 'Our Values'}>
+        <p>
+          {tr
+            ? 'İş yapış biçimimizi belirleyen ve her kararda bize yol gösteren dört temel değerimiz var:'
+            : 'Four core values shape the way we work and guide us in every decision:'}
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            {tr
+              ? 'Şeffaflık: Fiyattan üretim aşamasına kadar her şeyi açıkça görünür kılarız.'
+              : 'Transparency: we keep everything — from pricing to the production stage — openly visible.'}
+          </li>
+          <li>
+            {tr
+              ? 'Kalite: Her siparişi ilk günkü özenle, yüksek üretim standartlarıyla tamamlarız.'
+              : 'Quality: we complete every order with first-day care and high production standards.'}
+          </li>
+          <li>
+            {tr
+              ? 'Hız: Siparişten kargoya kadar süreci kısaltarak teslimatı hızlandırırız.'
+              : 'Speed: we shorten the path from order to shipment and accelerate delivery.'}
+          </li>
+          <li>
+            {tr
+              ? 'Güvenilirlik: Verdiğimiz sözü tutar, satıcının operasyonunu güvenle taşırız.'
+              : 'Reliability: we keep our promises and carry the seller’s operation with confidence.'}
+          </li>
+        </ul>
+      </Section>
+
+      <Section heading={tr ? 'Nasıl Çalışır' : 'How It Works'}>
+        <p>
+          {tr
+            ? 'Ortak Doku ile çalışmaya başlamak dört basit adımdan oluşur:'
+            : 'Getting started with Ortak Doku takes just four simple steps:'}
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            {tr
+              ? 'Başvur: Satıcı hesabınızı oluşturup başvurunuzu gönderin.'
+              : 'Apply: create your seller account and submit your application.'}
+          </li>
+          <li>
+            {tr
+              ? 'Mağaza bağla: Etsy mağazanızı tek tıkla platforma entegre edin.'
+              : 'Connect your store: integrate your Etsy store with the platform in one click.'}
+          </li>
+          <li>
+            {tr
+              ? 'Sipariş düşer: Mağazanızdaki siparişler otomatik olarak üretim ağına aktarılır.'
+              : 'Orders flow in: your store orders are automatically routed into the production network.'}
+          </li>
+          <li>
+            {tr
+              ? 'Üret & kargola: Ürün sizin adınıza üretilir ve doğrudan müşterinize gönderilir.'
+              : 'Produce & ship: the product is made on your behalf and shipped directly to your customer.'}
+          </li>
+        </ul>
+      </Section>
+
       <Section heading={tr ? 'İletişim' : 'Contact'}>
         <p>
           {tr
-            ? 'Bizimle iletişime geçmek için: genel sorular info@ortakdoku.com, teknik destek support@ortakdoku.com, güvenlik bildirimleri security@ortakdoku.com. Merkez ofisimiz İstanbul’dadır.'
-            : 'To get in touch with us: general inquiries info@ortakdoku.com, technical support support@ortakdoku.com, security reports security@ortakdoku.com. Our head office is located in Istanbul.'}
+            ? 'Bizimle iletişime geçmek için: genel sorular ve iş birliği talepleri için info@ortakdoku.com adresine yazabilirsiniz. Teknik destek için support@ortakdoku.com, güvenlik bildirimleri için security@ortakdoku.com adreslerini kullanabilirsiniz. Merkez ofisimiz İstanbul’dadır.'
+            : 'To get in touch with us: for general inquiries and partnership requests, write to info@ortakdoku.com. For technical support use support@ortakdoku.com, and for security reports use security@ortakdoku.com. Our head office is located in Istanbul.'}
         </p>
       </Section>
     </LegalShell>
