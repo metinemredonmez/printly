@@ -164,10 +164,10 @@ export default async function Home() {
                   {/* ilgili blurlu arka görsel (faint) */}
                   <div className="pointer-events-none absolute inset-0">
                     <div
-                      className="absolute inset-0 bg-cover bg-center blur-md scale-110 opacity-[0.14] group-hover:opacity-25 transition-opacity"
+                      className="absolute inset-0 bg-cover bg-center blur-[3px] scale-110 opacity-30 group-hover:opacity-50 transition-opacity duration-300"
                       style={{ backgroundImage: `url(${CARD_BG[i % CARD_BG.length]})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/85 to-white/55" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/70 to-white/45" />
                   </div>
                   <div className="relative space-y-4">
                     <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">

@@ -27,9 +27,8 @@ export function HeroSlider() {
           style={{ backgroundImage: `url(${s})`, opacity: idx === i ? 1 : 0 }}
         />
       ))}
-      {/* sol opak → sağ görsel görünür (yazı okunur, görsel hissedilir) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA]/85 to-[#F8F9FA]/45" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#F8F9FA] via-transparent to-[#F8F9FA]/30" />
+      {/* sol opak → sağ görsel NET görünür (yazı okunur, görsel belirgin) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA]/95 from-20% via-[#F8F9FA]/55 to-[#F8F9FA]/10" />
 
       {/* slayt göstergeleri */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
