@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LangSwitcher } from '@/components/lang-switcher';
 import { PasswordStrength, scorePassword } from '@/components/password-strength';
+import { LogoMark } from '@/components/logo';
 import { api } from '@/lib/api';
 
 export default function ForgotPage() {
@@ -60,9 +61,9 @@ export default function ForgotPage() {
       {/* Sol marka paneli */}
       <div className="relative hidden lg:flex flex-col justify-between bg-navy text-white p-12 overflow-hidden">
         <Link href="/" className="relative z-10 flex items-center gap-3 w-fit">
-          <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center font-extrabold text-lg">
-            OD
-          </div>
+          <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
+            <LogoMark className="h-7 w-7" />
+          </span>
           <span className="font-extrabold text-xl">{tc('appName')}</span>
         </Link>
         <div className="relative z-10 space-y-6">

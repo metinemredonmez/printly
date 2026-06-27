@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LangSwitcher } from '@/components/lang-switcher';
+import { Logo, LogoMark } from '@/components/logo';
 import { login } from '@/lib/api';
 import { homeFor, type User } from '@/lib/types';
 
@@ -140,9 +141,9 @@ export default function LoginPage() {
       <div className="relative hidden lg:flex flex-col justify-between bg-navy text-white p-12 overflow-hidden">
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-3 w-fit">
-            <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center font-extrabold text-lg">
-              OD
-            </div>
+            <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
+              <LogoMark className="h-7 w-7" />
+            </span>
             <span className="font-extrabold text-xl">{tc('appName')}</span>
           </Link>
         </div>
@@ -177,11 +178,8 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-8">
-            <Link href="/" className="lg:hidden flex items-center gap-2">
-              <div className="h-9 w-9 rounded-xl bg-primary text-white flex items-center justify-center font-extrabold">
-                OD
-              </div>
-              <span className="font-extrabold text-navy">{tc('appName')}</span>
+            <Link href="/" className="lg:hidden flex items-center">
+              <Logo className="h-8 w-auto" />
             </Link>
             <LangSwitcher className="ml-auto" />
           </div>

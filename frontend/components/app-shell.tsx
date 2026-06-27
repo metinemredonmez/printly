@@ -29,6 +29,7 @@ import {
 import { logout } from '@/lib/api';
 import { useMe } from '@/lib/useMe';
 import { LangSwitcher } from '@/components/lang-switcher';
+import { LogoMark } from '@/components/logo';
 
 type NavItem = { href: string; key: string; icon: LucideIcon };
 
@@ -85,8 +86,8 @@ export function AppShell({
   const SidebarInner = (
     <>
       <div className="h-16 flex items-center gap-3 px-6 border-b border-white/10">
-        <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center font-extrabold">
-          OD
+        <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center">
+          <LogoMark className="h-6 w-6" />
         </div>
         <div className="flex-1">
           <div className="font-bold leading-none">{tc('appName')}</div>
