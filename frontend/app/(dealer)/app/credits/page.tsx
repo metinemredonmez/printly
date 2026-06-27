@@ -72,7 +72,7 @@ export default function CreditsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 
@@ -101,7 +101,7 @@ export default function CreditsPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 p-5">
-        <h2 className="text-base font-bold text-navy">{t('topupTitle')}</h2>
+        <h2 className="text-base font-semibold text-navy">{t('topupTitle')}</h2>
         <p className="text-xs text-slate-500 mt-1">{t('topupHint')}</p>
         <form onSubmit={onSubmit} className="mt-4 flex flex-col sm:flex-row sm:items-end gap-3">
           <div className="flex-1 max-w-xs">
@@ -131,7 +131,7 @@ export default function CreditsPage() {
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-base font-bold text-navy">{t('ledgerTitle')}</h2>
+          <h2 className="text-base font-semibold text-navy">{t('ledgerTitle')}</h2>
         </div>
         <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 text-[11px] font-semibold uppercase text-slate-400">
           <div className="col-span-5">{t('reason')}</div>
@@ -162,7 +162,7 @@ export default function CreditsPage() {
                   </div>
                   <div className="md:col-span-3 text-sm text-slate-500">{shortDate(row.createdAt)}</div>
                   <div
-                    className={`md:col-span-2 text-right font-bold text-sm ${
+                    className={`md:col-span-2 text-right font-semibold text-sm ${
                       positive ? 'text-emerald-600' : 'text-rose-600'
                     }`}
                   >

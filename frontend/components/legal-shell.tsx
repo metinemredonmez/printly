@@ -52,7 +52,7 @@ export function LegalShell({
 export function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="text-lg font-bold text-navy mb-2">{heading}</h2>
+      <h2 className="text-lg font-semibold text-navy mb-2">{heading}</h2>
       <div className="text-sm text-slate-600 leading-relaxed space-y-2">{children}</div>
     </section>
   );

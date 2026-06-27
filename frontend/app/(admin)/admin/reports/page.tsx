@@ -83,7 +83,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-slate-500">{t('subtitle')}</p>
       </div>
 
@@ -113,7 +113,7 @@ export default function ReportsPage() {
       <div className="bg-white rounded-2xl border border-slate-100 p-5">
         <div className="flex items-center gap-2 mb-4">
           <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-          <h2 className="font-bold text-navy">{t('exportTitle')}</h2>
+          <h2 className="font-semibold text-navy">{t('exportTitle')}</h2>
         </div>
         <div className="grid sm:grid-cols-3 gap-3">
           {EXPORTS.map(({ kind, icon: Icon, accent }) => (
@@ -145,7 +145,7 @@ export default function ReportsPage() {
         <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
             <Trophy className="h-4 w-4 text-amber-500" />
-            <h2 className="font-bold text-navy">{t('dealerPerformance')}</h2>
+            <h2 className="font-semibold text-navy">{t('dealerPerformance')}</h2>
           </div>
           <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 text-[11px] font-semibold uppercase text-slate-400">
             <div className="col-span-6">{t('dealer')}</div>
@@ -164,7 +164,7 @@ export default function ReportsPage() {
                   className="grid grid-cols-2 md:grid-cols-12 gap-3 px-5 py-3.5 items-center"
                 >
                   <div className="md:col-span-6 flex items-center gap-3 min-w-0">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-[11px] font-bold text-navy">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-[11px] font-semibold text-navy">
                       {i + 1}
                     </span>
                     <span className="truncate text-sm font-semibold text-navy">{d.dealer}</span>
@@ -172,7 +172,7 @@ export default function ReportsPage() {
                   <div className="md:col-span-3 text-right text-sm text-slate-600">
                     {num(d.orders)}
                   </div>
-                  <div className="md:col-span-3 text-right text-sm font-bold text-navy">
+                  <div className="md:col-span-3 text-right text-sm font-semibold text-navy">
                     {money(d.revenue)}
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default function ReportsPage() {
         <div className="bg-white rounded-2xl border border-slate-100 p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="h-4 w-4 text-primary" />
-            <h2 className="font-bold text-navy">{t('monthlyRevenue')}</h2>
+            <h2 className="font-semibold text-navy">{t('monthlyRevenue')}</h2>
           </div>
           {revenue.isLoading ? (
             <ListSkeleton rows={6} />
@@ -204,7 +204,7 @@ export default function ReportsPage() {
                       style={{ width: `${Math.max((r.total / maxRev) * 100, 3)}%` }}
                     />
                   </div>
-                  <span className="w-24 shrink-0 text-right text-xs font-bold text-navy">
+                  <span className="w-24 shrink-0 text-right text-xs font-semibold text-navy">
                     {money(r.total)}
                   </span>
                 </div>

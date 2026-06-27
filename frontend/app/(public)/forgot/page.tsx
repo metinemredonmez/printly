@@ -64,10 +64,10 @@ export default function ForgotPage() {
           <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
             <LogoMark className="h-7 w-7" />
           </span>
-          <span className="font-extrabold text-xl">{tc('appName')}</span>
+          <span className="font-semibold text-xl">{tc('appName')}</span>
         </Link>
         <div className="relative z-10 space-y-6">
-          <h2 className="text-4xl font-extrabold leading-tight">{t('brandHeadline')}</h2>
+          <h2 className="text-4xl font-semibold leading-tight">{t('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{t('brandSub')}</p>
           <ul className="space-y-3 pt-2">
             {[t('feat1'), t('feat2'), t('feat3')].map((x) => (
@@ -100,7 +100,7 @@ export default function ForgotPage() {
             <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center mb-3">
               <KeyRound className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-extrabold text-navy">{t('forgotTitle')}</h1>
+            <h1 className="text-2xl font-semibold text-navy">{t('forgotTitle')}</h1>
             <p className="text-sm text-slate-500">
               {step === 1 ? t('forgotHint1') : t('forgotHint2')}
             </p>

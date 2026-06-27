@@ -24,7 +24,7 @@ export default function GlobalRouteError({
         <div className="mx-auto h-16 w-16 rounded-2xl bg-rose-50 flex items-center justify-center mb-5">
           <AlertTriangle className="h-8 w-8 text-rose-500" />
         </div>
-        <h1 className="text-xl font-extrabold text-navy">
+        <h1 className="text-xl font-semibold text-navy">
           {tr ? 'Bir şeyler ters gitti' : 'Something went wrong'}
         </h1>
         <p className="text-sm text-slate-500 mt-2">

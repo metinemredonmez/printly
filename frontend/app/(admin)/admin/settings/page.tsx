@@ -74,7 +74,7 @@ export default function AdminSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-slate-500">{t('subtitle')}</p>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminSettings() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <code className="font-bold text-navy text-sm break-all">{key}</code>
+                      <code className="font-semibold text-navy text-sm break-all">{key}</code>
                       <Badge variant="secondary">{typeof value}</Badge>
                     </div>
                   </div>

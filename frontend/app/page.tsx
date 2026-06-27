@@ -66,6 +66,14 @@ export default async function Home() {
       <main className="flex-1">
         {/* HERO */}
         <section id="ecosystem" className="relative overflow-hidden">
+          {/* blurlu arka görsel */}
+          <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-40"
+              style={{ backgroundImage: 'url(/banners/hero.jpg)' }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA]/95 via-[#F8F9FA]/80 to-[#F8F9FA]/55" />
+          </div>
           <div
             className="pointer-events-none absolute inset-0 -z-10"
             style={{
@@ -82,7 +90,7 @@ export default async function Home() {
                 <Rocket className="h-3.5 w-3.5" /> {t('badge')}
               </span>
               <h1
-                className="od-fade-up text-4xl sm:text-5xl lg:text-6xl font-extrabold text-navy leading-tight tracking-tight"
+                className="od-fade-up text-4xl sm:text-5xl lg:text-6xl font-semibold text-navy leading-tight tracking-tight"
                 style={{ animationDelay: '0.15s' }}
               >
                 {t('heroTitle')}
@@ -99,7 +107,7 @@ export default async function Home() {
               <div className="od-fade-up pt-2" style={{ animationDelay: '0.4s' }}>
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
                 >
                   {t('applyNow')} <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -137,7 +145,7 @@ export default async function Home() {
         {/* 6 KAPASİTE */}
         <section id="operations" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-extrabold text-navy">{t('capsTitle')}</h2>
+            <h2 className="text-3xl font-semibold text-navy">{t('capsTitle')}</h2>
             <p className="text-slate-500 max-w-2xl mx-auto">{t('capsSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,7 +160,7 @@ export default async function Home() {
                   <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy">{c.title}</h3>
+                  <h3 className="text-lg font-semibold text-navy">{c.title}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">{c.desc}</p>
                 </div>
               );
@@ -164,7 +172,7 @@ export default async function Home() {
         <section id="production" className="bg-white border-y border-slate-100 py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-extrabold text-navy mb-2">{t('plansTitle')}</h2>
+              <h2 className="text-3xl font-semibold text-navy mb-2">{t('plansTitle')}</h2>
               <p className="text-slate-500">{t('plansSubtitle')}</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -175,12 +183,12 @@ export default async function Home() {
                   style={{ animationDelay: `${0.1 + i * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl font-extrabold text-navy">{p.name}</h3>
+                    <h3 className="text-xl font-semibold text-navy">{p.name}</h3>
                     <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
                       {p.badge}
                     </span>
                   </div>
-                  <div className="text-2xl font-extrabold text-primary mb-4">{p.price}</div>
+                  <div className="text-2xl font-semibold text-primary mb-4">{p.price}</div>
                   <ul className="space-y-2 mb-6">
                     {p.features.map((ft) => (
                       <li key={ft} className="flex items-center gap-2 text-sm text-slate-600">
@@ -191,7 +199,7 @@ export default async function Home() {
                   </ul>
                   <Link
                     href="/register"
-                    className="block text-center px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-sm transition-colors"
+                    className="block text-center px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-semibold text-sm transition-colors"
                   >
                     {t('startWithPlan')}
                   </Link>
@@ -205,13 +213,13 @@ export default async function Home() {
         <section id="technology" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="bg-navy text-white p-10 md:p-14 rounded-3xl grid lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <h2 className="text-2xl md:text-3xl font-extrabold">{t('ctaTitle')}</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold">{t('ctaTitle')}</h2>
               <p className="text-slate-300 leading-relaxed">{t('ctaDesc')}</p>
             </div>
             <div className="lg:col-span-4 lg:text-right">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg transition-all hover:-translate-y-0.5"
               >
                 {t('applyNow')} <ArrowRight className="h-4 w-4" />
               </Link>

@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 

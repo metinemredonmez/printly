@@ -144,11 +144,11 @@ export default function LoginPage() {
             <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
               <LogoMark className="h-7 w-7" />
             </span>
-            <span className="font-extrabold text-xl">{tc('appName')}</span>
+            <span className="font-semibold text-xl">{tc('appName')}</span>
           </Link>
         </div>
         <div className="relative z-10 space-y-6">
-          <h2 className="text-4xl font-extrabold leading-tight">{t('brandHeadline')}</h2>
+          <h2 className="text-4xl font-semibold leading-tight">{t('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{t('brandSub')}</p>
           <ul className="space-y-3 pt-2">
             {feats.map((f) => (
@@ -184,7 +184,7 @@ export default function LoginPage() {
             <LangSwitcher className="ml-auto" />
           </div>
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold text-navy">{t('loginTitle')}</h1>
+            <h1 className="text-2xl font-semibold text-navy">{t('loginTitle')}</h1>
             <p className="text-sm text-slate-500">{tc('tagline')}</p>
           </div>
           <Suspense fallback={<div className="text-center text-slate-400">{tc('loading')}</div>}>

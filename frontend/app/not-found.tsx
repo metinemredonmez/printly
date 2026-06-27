@@ -14,8 +14,8 @@ export default function NotFound() {
         <div className="mx-auto h-16 w-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-5">
           <Compass className="h-8 w-8 text-primary" />
         </div>
-        <div className="text-5xl font-extrabold text-navy tracking-tight">404</div>
-        <h1 className="text-lg font-bold text-navy mt-2">
+        <div className="text-5xl font-semibold text-navy tracking-tight">404</div>
+        <h1 className="text-lg font-semibold text-navy mt-2">
           {tr ? 'Sayfa bulunamadı' : 'Page not found'}
         </h1>
         <p className="text-sm text-slate-500 mt-2">

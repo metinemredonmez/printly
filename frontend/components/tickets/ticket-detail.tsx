@@ -71,7 +71,7 @@ export function TicketDetail({
         <ArrowLeft className="h-4 w-4" /> {t('back')}
       </Link>
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-navy">{tk.subject}</h1>
+        <h1 className="text-xl font-semibold text-navy">{tk.subject}</h1>
         <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
           {t(tk.status as 'OPEN')}
         </span>
@@ -85,7 +85,7 @@ export function TicketDetail({
               m.internal ? 'bg-amber-50 border border-amber-100' : 'bg-white border border-slate-100'
             }`}
           >
-            {m.internal && <div className="text-[10px] font-bold text-amber-600 mb-1">{t('internal')}</div>}
+            {m.internal && <div className="text-[10px] font-semibold text-amber-600 mb-1">{t('internal')}</div>}
             <div className="text-slate-700 whitespace-pre-wrap">{m.body}</div>
             <div className="text-[10px] text-slate-400 mt-2">{shortDate(m.createdAt)}</div>
           </div>

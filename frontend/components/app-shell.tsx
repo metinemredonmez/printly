@@ -90,7 +90,7 @@ export function AppShell({
           <LogoMark className="h-6 w-6" />
         </div>
         <div className="flex-1">
-          <div className="font-bold leading-none">{tc('appName')}</div>
+          <div className="font-semibold leading-none">{tc('appName')}</div>
           <div className="text-[10px] text-slate-400 uppercase tracking-wide">
             {area === 'admin' ? t('operations') : t('dealerPortal')}
           </div>
@@ -152,7 +152,7 @@ export function AppShell({
             <button className="md:hidden text-navy" onClick={() => setOpen(true)}>
               <Menu className="h-5 w-5" />
             </button>
-            <div className="font-bold text-navy hidden sm:block">
+            <div className="font-semibold text-navy hidden sm:block">
               {area === 'admin' ? t('opsConsole') : t('dealerPortal')}
             </div>
           </div>
@@ -162,7 +162,7 @@ export function AppShell({
               <div className="text-sm font-semibold text-navy">{me?.email ?? '—'}</div>
               <div className="text-[11px] text-slate-400">{me?.role ?? ''}</div>
             </div>
-            <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">
+            <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm shrink-0">
               {(me?.email ?? '?').slice(0, 1).toUpperCase()}
             </div>
           </div>

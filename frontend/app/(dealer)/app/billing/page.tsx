@@ -125,7 +125,7 @@ export default function BillingPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 
@@ -145,7 +145,7 @@ export default function BillingPage() {
               <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
                 <Globe2 className="h-5 w-5" />
               </div>
-              <div className="font-bold text-navy">{t('general')}</div>
+              <div className="font-semibold text-navy">{t('general')}</div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -197,7 +197,7 @@ export default function BillingPage() {
                 <div className="h-9 w-9 rounded-xl bg-slate-100 text-navy flex items-center justify-center">
                   <Building2 className="h-5 w-5" />
                 </div>
-                <div className="font-bold text-navy">
+                <div className="font-semibold text-navy">
                   {isTR ? t('trDetails') : t('usDetails')}
                 </div>
               </div>

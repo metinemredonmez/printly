@@ -56,7 +56,7 @@ export default function KanbanPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-slate-500">{t('subtitle')}</p>
       </div>
 
@@ -75,7 +75,7 @@ export default function KanbanPage() {
               className={`bg-slate-50 rounded-2xl border-t-4 ${COL_BORDER[col.status] ?? 'border-t-slate-300'} p-2 min-h-[300px]`}
             >
               <div className="flex items-center justify-between px-2 py-2">
-                <span className="text-xs font-bold text-navy uppercase">{tos(col.status)}</span>
+                <span className="text-xs font-semibold text-navy uppercase">{tos(col.status)}</span>
                 <span className="text-[11px] bg-white rounded-full px-2 py-0.5 text-slate-500 font-semibold">
                   {col.count}
                 </span>
@@ -92,7 +92,7 @@ export default function KanbanPage() {
                     <div className="text-[11px] text-slate-400">{c.category}</div>
                     <div className="flex items-center justify-between mt-1.5">
                       <span className="text-[11px] text-slate-500 truncate">{c.clientName ?? '—'}</span>
-                      <span className="font-bold text-navy text-xs">{money(c.total)}</span>
+                      <span className="font-semibold text-navy text-xs">{money(c.total)}</span>
                     </div>
                   </div>
                 ))}

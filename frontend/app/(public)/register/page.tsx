@@ -126,10 +126,10 @@ export default function RegisterPage() {
           <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
             <LogoMark className="h-7 w-7" />
           </span>
-          <span className="font-extrabold text-xl">{tc('appName')}</span>
+          <span className="font-semibold text-xl">{tc('appName')}</span>
         </Link>
         <div className="relative z-10 space-y-6">
-          <h2 className="text-4xl font-extrabold leading-tight">{tw('brandHeadline')}</h2>
+          <h2 className="text-4xl font-semibold leading-tight">{tw('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{tw('brandSub')}</p>
           <ul className="space-y-3 pt-2">
             {[tw('feat1'), tw('feat2'), tw('feat3')].map((x) => (
@@ -159,7 +159,7 @@ export default function RegisterPage() {
 
         <div className="w-full max-w-lg mx-auto flex-1">
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold text-navy">{tw('title')}</h1>
+            <h1 className="text-2xl font-semibold text-navy">{tw('title')}</h1>
             <p className="text-sm text-slate-500">{tw('subtitle')}</p>
           </div>
 
@@ -197,13 +197,13 @@ export default function RegisterPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-navy">{tw(`plan_${p.key}`)}</span>
+                        <span className="font-semibold text-navy">{tw(`plan_${p.key}`)}</span>
                         {p.recommended && (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-accent/15 text-brand-accent">
                             {tw('recommended')}
                           </span>
                         )}
-                        <span className="ml-auto text-sm font-bold text-primary">{tw(`plan_${p.key}_price`)}</span>
+                        <span className="ml-auto text-sm font-semibold text-primary">{tw(`plan_${p.key}_price`)}</span>
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5">{tw(`plan_${p.key}_desc`)}</p>
                     </div>
@@ -351,7 +351,7 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label>{t('verifyCode')}</Label>
                 <Input
-                  className="h-12 text-center text-lg tracking-[0.4em] font-bold bg-slate-50"
+                  className="h-12 text-center text-lg tracking-[0.4em] font-semibold bg-slate-50"
                   inputMode="numeric"
                   maxLength={6}
                   value={code}

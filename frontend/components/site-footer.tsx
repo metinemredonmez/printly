@@ -88,7 +88,7 @@ export function SiteFooter() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid gap-8 lg:grid-cols-2 items-center">
           {/* Bülten */}
           <div className="space-y-3">
-            <h3 className="text-white font-bold text-lg">
+            <h3 className="text-white font-semibold text-lg">
               {tr ? 'Bültenimize kayıt olun' : 'Subscribe to our newsletter'}
             </h3>
             <p className="text-sm text-slate-400">
@@ -115,7 +115,7 @@ export function SiteFooter() {
 
           {/* Uygulama — çok yakında */}
           <div className="lg:text-right space-y-3">
-            <h3 className="text-white font-bold text-lg">
+            <h3 className="text-white font-semibold text-lg">
               {tr ? 'Mobil uygulama çok yakında' : 'Mobile app coming soon'}
             </h3>
             <p className="text-sm text-slate-400">
@@ -138,7 +138,7 @@ export function SiteFooter() {
             <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
               <LogoMark className="h-7 w-7" />
             </span>
-            <span className="font-extrabold text-white text-lg">Ortak Doku</span>
+            <span className="font-semibold text-white text-lg">Ortak Doku</span>
           </Link>
           <div className="space-y-1.5 text-sm text-slate-400">
             <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function SiteFooter() {
 
         {COLS.map((col) => (
           <div key={col.titleEn} className="space-y-3">
-            <h3 className="text-white font-bold text-sm">{tr ? col.titleTr : col.titleEn}</h3>
+            <h3 className="text-white font-semibold text-sm">{tr ? col.titleTr : col.titleEn}</h3>
             <ul className="space-y-2">
               {col.items.map((it) => (
                 <li key={it.href + it.en}>
@@ -188,16 +188,16 @@ export function SiteFooter() {
             {tr ? 'Güvenli ödeme altyapısı' : 'Secure payment infrastructure'}
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-center">
-            <PayChip><span className="font-extrabold italic text-[#1A1F71] text-sm tracking-tight">VISA</span></PayChip>
+            <PayChip><span className="font-semibold italic text-[#1A1F71] text-sm tracking-tight">VISA</span></PayChip>
             <PayChip>
               <span className="flex items-center">
                 <span className="h-4 w-4 rounded-full bg-[#EB001B]" />
                 <span className="h-4 w-4 rounded-full bg-[#F79E1B] -ml-2 mix-blend-multiply" />
               </span>
             </PayChip>
-            <PayChip><span className="font-bold text-[#006FCF] text-xs">AMEX</span></PayChip>
-            <PayChip><span className="font-bold text-[#635BFF] text-sm">stripe</span></PayChip>
-            <PayChip><span className="font-bold text-[#2CA01C] text-sm">QuickBooks</span></PayChip>
+            <PayChip><span className="font-semibold text-[#006FCF] text-xs">AMEX</span></PayChip>
+            <PayChip><span className="font-semibold text-[#635BFF] text-sm">stripe</span></PayChip>
+            <PayChip><span className="font-semibold text-[#2CA01C] text-sm">QuickBooks</span></PayChip>
           </div>
         </div>
       </div>

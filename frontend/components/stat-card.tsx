@@ -26,7 +26,7 @@ export function StatCard({
       <div className="flex items-start justify-between">
         <div>
           <div className="text-xs font-medium text-slate-500">{label}</div>
-          <div className="text-2xl font-extrabold text-navy mt-1.5">{value}</div>
+          <div className="text-2xl font-semibold text-navy mt-1.5">{value}</div>
           {sub && <div className="text-[11px] text-slate-400 mt-0.5">{sub}</div>}
         </div>
         <div

@@ -60,13 +60,13 @@ export default function ProductionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-slate-500">{t('subtitle')}</p>
       </div>
 
       {/* QR / barkod okut */}
       <div className="bg-navy text-white rounded-2xl p-5">
-        <div className="flex items-center gap-2 font-bold mb-3">
+        <div className="flex items-center gap-2 font-semibold mb-3">
           <ScanLine className="h-5 w-5" /> {t('scan')}
         </div>
         <form
@@ -106,7 +106,7 @@ export default function ProductionPage() {
 
       {/* Kuyruk */}
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="px-5 py-3 border-b border-slate-100 font-bold text-navy">{t('queue')}</div>
+        <div className="px-5 py-3 border-b border-slate-100 font-semibold text-navy">{t('queue')}</div>
         {isLoading ? (
           <TableSkeleton rows={6} cols={3} />
         ) : (data ?? []).length === 0 ? (

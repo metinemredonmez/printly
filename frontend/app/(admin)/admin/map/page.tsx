@@ -68,7 +68,7 @@ export default function MapPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 
@@ -97,7 +97,7 @@ export default function MapPage() {
         <section className="lg:col-span-2 space-y-4">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-bold text-navy">{t('ordersHeading')}</h2>
+            <h2 className="text-lg font-semibold text-navy">{t('ordersHeading')}</h2>
           </div>
 
           {orders.isLoading ? (
@@ -116,7 +116,7 @@ export default function MapPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="font-bold text-navy text-sm truncate">
+                      <div className="font-semibold text-navy text-sm truncate">
                         {o.orderNumber}
                       </div>
                       <div className="text-xs text-slate-500 mt-0.5 truncate">
@@ -138,7 +138,7 @@ export default function MapPage() {
                   </div>
 
                   <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
-                    <span className="text-sm font-bold text-navy">
+                    <span className="text-sm font-semibold text-navy">
                       {money(o.total)}
                     </span>
                     <span className="text-[11px] text-slate-400">
@@ -154,7 +154,7 @@ export default function MapPage() {
         <aside className="space-y-4">
           <div className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-emerald-600" />
-            <h2 className="text-lg font-bold text-navy">
+            <h2 className="text-lg font-semibold text-navy">
               {t('activityHeading')}
             </h2>
           </div>

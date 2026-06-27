@@ -63,7 +63,7 @@ export default function AdminHome() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('totalOrders')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('totalOrders')}</h1>
         <p className="text-slate-500">{t('last30d')}</p>
       </div>
 
@@ -81,7 +81,7 @@ export default function AdminHome() {
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Durum dağılımı */}
         <div className="bg-white rounded-2xl border border-slate-100 p-5">
-          <h2 className="font-bold text-navy mb-4">{t('statusBreakdown')}</h2>
+          <h2 className="font-semibold text-navy mb-4">{t('statusBreakdown')}</h2>
           <div className="space-y-3">
             {statusOrder
               .filter((s) => byStatus[s] != null)
@@ -105,7 +105,7 @@ export default function AdminHome() {
 
         {/* Aylık gelir */}
         <div className="bg-white rounded-2xl border border-slate-100 p-5">
-          <h2 className="font-bold text-navy mb-4">{t('monthlyRevenue')}</h2>
+          <h2 className="font-semibold text-navy mb-4">{t('monthlyRevenue')}</h2>
           <div className="flex items-end gap-3 h-40">
             {rev.length === 0 ? (
               <div className="text-slate-400 text-sm m-auto">—</div>
@@ -128,7 +128,7 @@ export default function AdminHome() {
       {/* Son siparişler */}
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h2 className="font-bold text-navy">{t('recentOrders')}</h2>
+          <h2 className="font-semibold text-navy">{t('recentOrders')}</h2>
           <Link href="/admin/orders" className="text-sm text-primary hover:underline flex items-center gap-1">
             {t('viewAll')} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -150,7 +150,7 @@ export default function AdminHome() {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-bold text-navy text-sm">{money(o.total)}</span>
+                <span className="font-semibold text-navy text-sm">{money(o.total)}</span>
                 <OrderStatusBadge status={o.status} />
               </div>
             </Link>

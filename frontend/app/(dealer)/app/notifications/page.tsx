@@ -101,7 +101,7 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+          <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
         </div>
         <Button
@@ -132,7 +132,7 @@ export default function NotificationsPage() {
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-base font-bold text-navy">{t('listTitle')}</h2>
+          <h2 className="text-base font-semibold text-navy">{t('listTitle')}</h2>
         </div>
         {listQ.isLoading ? (
           <div className="p-4">
@@ -163,7 +163,7 @@ export default function NotificationsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-bold text-navy">{n.title}</span>
+                      <span className="text-sm font-semibold text-navy">{n.title}</span>
                       {isUnread && (
                         <Badge className="bg-primary/10 text-primary border-transparent">
                           {t('new')}
@@ -194,7 +194,7 @@ export default function NotificationsPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 p-5">
-        <h2 className="text-base font-bold text-navy">{t('prefsTitle')}</h2>
+        <h2 className="text-base font-semibold text-navy">{t('prefsTitle')}</h2>
         <p className="text-xs text-slate-500 mt-1">{t('prefsHint')}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {PREF_META.map(({ key, icon: Icon, accent }) => {

@@ -60,7 +60,7 @@ export default function StoresPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 
@@ -70,7 +70,7 @@ export default function StoresPage() {
           <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
             <Plus className="h-5 w-5" />
           </div>
-          <div className="font-bold text-navy">{t('newStore')}</div>
+          <div className="font-semibold text-navy">{t('newStore')}</div>
         </div>
         <form
           className="grid sm:grid-cols-[1fr_1fr_auto] gap-3 sm:items-end"
@@ -116,7 +116,7 @@ export default function StoresPage() {
           <div className="h-12 w-12 rounded-2xl bg-slate-100 text-navy flex items-center justify-center mx-auto">
             <Store className="h-6 w-6" />
           </div>
-          <div className="font-bold text-navy mt-4">{t('emptyTitle')}</div>
+          <div className="font-semibold text-navy mt-4">{t('emptyTitle')}</div>
           <div className="text-sm text-slate-500 mt-1">{t('emptyDesc')}</div>
         </div>
       ) : (
@@ -129,7 +129,7 @@ export default function StoresPage() {
                     <Store className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-navy truncate">
+                    <div className="font-semibold text-navy truncate">
                       {s.storeName ?? s.name ?? t('untitled')}
                     </div>
                     <Badge variant="secondary" className="mt-1 gap-1 font-mono">

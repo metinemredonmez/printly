@@ -119,7 +119,7 @@ export default function NewOrderWizard() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+      <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
 
       {/* Progress */}
       <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default function NewOrderWizard() {
                   category === c.key ? c.color + ' bg-slate-50' : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
-                <div className="font-bold text-navy">{t(c.tk)}</div>
+                <div className="font-semibold text-navy">{t(c.tk)}</div>
                 <div className="text-xs text-slate-500 mt-1">{t(c.dk)}</div>
               </button>
             ))}
@@ -234,7 +234,7 @@ export default function NewOrderWizard() {
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl font-extrabold mt-1">{money(quote.data?.total)}</div>
+                  <div className="text-4xl font-semibold mt-1">{money(quote.data?.total)}</div>
                   <div className="text-xs text-slate-400 mt-2">
                     {t('area')}: {(quote.data?.totalSqm ?? 0).toFixed(3)} m²
                   </div>
@@ -260,7 +260,7 @@ export default function NewOrderWizard() {
                   paymentMethod === 'BALANCE' ? 'border-primary bg-blue-50' : 'border-slate-200'
                 }`}
               >
-                <div className="font-bold text-navy">{t('balance')}</div>
+                <div className="font-semibold text-navy">{t('balance')}</div>
                 <div className="text-xs text-slate-500 mt-1">
                   {t('balanceAvailable')}: {money(credits.data?.balance)}
                 </div>
@@ -271,12 +271,12 @@ export default function NewOrderWizard() {
                   paymentMethod === 'CARD' ? 'border-primary bg-blue-50' : 'border-slate-200'
                 }`}
               >
-                <div className="font-bold text-navy">{t('card')}</div>
+                <div className="font-semibold text-navy">{t('card')}</div>
               </button>
             </div>
             <div className="rounded-xl bg-slate-50 p-4 flex justify-between items-center">
               <span className="text-sm text-slate-500">{t('livePrice')}</span>
-              <span className="text-2xl font-extrabold text-navy">{money(quote.data?.total)}</span>
+              <span className="text-2xl font-semibold text-navy">{money(quote.data?.total)}</span>
             </div>
           </div>
         )}
@@ -317,7 +317,7 @@ export default function NewOrderWizard() {
             <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
               <PartyPopper className="h-6 w-6 text-emerald-600 shrink-0" />
               <div>
-                <div className="font-bold text-emerald-800">{t('orderCreatedTitle')}</div>
+                <div className="font-semibold text-emerald-800">{t('orderCreatedTitle')}</div>
                 <div className="text-sm text-emerald-700">{t('orderCreatedDesc')}</div>
               </div>
             </div>

@@ -75,7 +75,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
       </div>
 
@@ -85,7 +85,7 @@ export default function ProfilePage() {
           <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
             <User className="h-5 w-5" />
           </div>
-          <div className="font-bold text-navy">{t('accountTitle')}</div>
+          <div className="font-semibold text-navy">{t('accountTitle')}</div>
         </div>
 
         {me.isLoading ? (
@@ -121,7 +121,7 @@ export default function ProfilePage() {
             <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Building2 className="h-5 w-5" />
             </div>
-            <div className="font-bold text-navy">{t('orgTitle')}</div>
+            <div className="font-semibold text-navy">{t('orgTitle')}</div>
           </div>
 
           {org.isLoading ? (

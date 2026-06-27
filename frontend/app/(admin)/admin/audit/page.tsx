@@ -40,13 +40,13 @@ export default function AdminAudit() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
         <p className="text-slate-500">{t('subtitle')}</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h2 className="font-bold text-navy">{t('timeline')}</h2>
+          <h2 className="font-semibold text-navy">{t('timeline')}</h2>
           <span className="text-xs text-slate-400">
             {logs.isLoading ? '…' : t('count', { n: items.length })}
           </span>

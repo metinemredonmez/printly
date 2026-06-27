@@ -92,7 +92,7 @@ export default function CatalogPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-extrabold text-navy">{t('title')}</h1>
+          <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
           <p className="text-slate-500">{t('subtitle')}</p>
         </div>
         {isAdmin && (
@@ -260,7 +260,7 @@ function ProductTable({
               {t.has(`cat_${p.category}`) ? t(`cat_${p.category}`) : p.category}
             </td>
             <td className="px-5 py-3.5 text-sm text-slate-500">{p.material?.name ?? '—'}</td>
-            <td className="px-5 py-3.5 text-right font-bold text-navy text-sm">
+            <td className="px-5 py-3.5 text-right font-semibold text-navy text-sm">
               {p.unit === 'M2' ? `${money(p.basePricePerM2)}/m²` : money(p.flatPrice)}
             </td>
             <td className="px-5 py-3.5 text-right">
@@ -356,7 +356,7 @@ function ExtraTable({
             <td className="px-5 py-3.5 text-sm text-slate-500 font-mono text-xs">
               {e.code ?? '—'}
             </td>
-            <td className="px-5 py-3.5 text-right font-bold text-navy text-sm">
+            <td className="px-5 py-3.5 text-right font-semibold text-navy text-sm">
               {money(e.price)}
             </td>
             <td className="px-5 py-3.5 text-right">

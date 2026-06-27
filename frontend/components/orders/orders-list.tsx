@@ -40,7 +40,7 @@ export function OrdersList({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-extrabold text-navy">
+        <h1 className="text-2xl font-semibold text-navy">
           {staff ? t('title') : t('myTitle')}
         </h1>
         {!staff && (
@@ -108,7 +108,7 @@ export function OrdersList({
                 <div className="md:col-span-3 text-sm text-slate-600 truncate">
                   {o.clientName ?? o.user?.email ?? '—'}
                 </div>
-                <div className="md:col-span-2 text-right font-bold text-navy text-sm">
+                <div className="md:col-span-2 text-right font-semibold text-navy text-sm">
                   {money(o.total)}
                 </div>
                 <div className="md:col-span-2 flex md:justify-end">

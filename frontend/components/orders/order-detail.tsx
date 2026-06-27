@@ -80,7 +80,7 @@ export function OrderDetail({
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-navy">{o.orderNumber}</h1>
+          <h1 className="text-2xl font-semibold text-navy">{o.orderNumber}</h1>
           <div className="text-sm text-slate-400">
             {o.category} · {shortDate(o.createdAt)}
           </div>
@@ -131,7 +131,7 @@ export function OrderDetail({
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-4">
           <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h2 className="font-bold text-navy mb-3">{t('items')}</h2>
+            <h2 className="font-semibold text-navy mb-3">{t('items')}</h2>
             <div className="space-y-2">
               {(o.items ?? []).map((it) => (
                 <div key={it.id} className="flex items-center justify-between text-sm border-b border-slate-50 pb-2">
@@ -157,7 +157,7 @@ export function OrderDetail({
 
           {o.clientName && (
             <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h2 className="font-bold text-navy mb-3">{t('delivery')}</h2>
+              <h2 className="font-semibold text-navy mb-3">{t('delivery')}</h2>
               <div className="text-sm text-slate-600 space-y-0.5">
                 <div className="font-medium text-navy">{o.clientName}</div>
                 {o.clientAddress && <div>{o.clientAddress}</div>}
@@ -171,14 +171,14 @@ export function OrderDetail({
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-100 p-5 h-fit">
-          <h2 className="font-bold text-navy mb-3">{t('summary')}</h2>
+          <h2 className="font-semibold text-navy mb-3">{t('summary')}</h2>
           <div className="space-y-2 text-sm">
             <Row label={t('subtotal')} value={money(o.subtotal)} />
             <Row label={t('extrasTotal')} value={money(o.extrasTotal)} />
             {o.discount40 > 0 && (
               <Row label={t('discount')} value={`- ${money(o.discount40)}`} accent />
             )}
-            <div className="border-t border-slate-100 pt-2 flex justify-between font-extrabold text-navy">
+            <div className="border-t border-slate-100 pt-2 flex justify-between font-semibold text-navy">
               <span>{t('grandTotal')}</span>
               <span>{money(o.total)}</span>
             </div>

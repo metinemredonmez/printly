@@ -73,7 +73,7 @@ export function OrderProofs({ orderId, staff = false }: { orderId: string; staff
     <div className="bg-white rounded-2xl border border-slate-100 p-5">
       <div className="flex items-center gap-2 mb-3">
         <FileCheck2 className="h-4 w-4 text-primary" />
-        <h2 className="font-bold text-navy">{t('title')}</h2>
+        <h2 className="font-semibold text-navy">{t('title')}</h2>
       </div>
 
       {isLoading ? (
