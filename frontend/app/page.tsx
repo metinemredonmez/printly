@@ -18,6 +18,15 @@ import { Logo } from '@/components/logo';
 import { HeroSlider } from '@/components/hero-slider';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
+// her kapasite kartı için ilgili blurlu arka görsel
+const CARD_BG = [
+  '/banners/hero-1.jpg', // Üretim Ağı (duvar kağıdı)
+  '/banners/blog.jpg', // Sipariş Yönetimi (masa)
+  '/banners/pricing.jpg', // Operasyonel Sistemler
+  '/banners/careers.jpg', // Fulfillment
+  '/banners/about.jpg', // Teknoloji
+  '/banners/etsy.jpg', // İş Ortaklıkları
+];
 const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
 
 type Cap = { title: string; desc: string };
@@ -149,14 +158,24 @@ export default async function Home() {
               return (
                 <div
                   key={c.title}
-                  className="od-fade-up bg-white p-7 rounded-3xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all space-y-4"
+                  className="od-fade-up group relative overflow-hidden bg-white p-7 rounded-3xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all"
                   style={{ animationDelay: `${0.08 + i * 0.07}s` }}
                 >
-                  <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
-                    <Icon className="h-6 w-6" />
+                  {/* ilgili blurlu arka görsel (faint) */}
+                  <div className="pointer-events-none absolute inset-0">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center blur-md scale-110 opacity-[0.14] group-hover:opacity-25 transition-opacity"
+                      style={{ backgroundImage: `url(${CARD_BG[i % CARD_BG.length]})` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/85 to-white/55" />
                   </div>
-                  <h3 className="text-lg font-semibold text-navy">{c.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{c.desc}</p>
+                  <div className="relative space-y-4">
+                    <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-navy">{c.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{c.desc}</p>
+                  </div>
                 </div>
               );
             })}
