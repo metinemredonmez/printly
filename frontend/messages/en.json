@@ -410,7 +410,28 @@
         ]
       }
     ],
-    "footer": "© 2026 Ortak Doku — B2B Print-on-Demand Platform"
+    "footer": "© 2026 Ortak Doku — B2B Print-on-Demand Platform",
+    "stats": [
+      { "value": "3", "label": "Product categories (paper · decal · wood)" },
+      { "value": "US", "label": "Target market (Etsy)" },
+      { "value": "24/7", "label": "Production & order tracking" },
+      { "value": "m²", "label": "Transparent size-based pricing" }
+    ],
+    "howTitle": "How It Works",
+    "howSubtitle": "Four simple steps from application to delivery.",
+    "steps": [
+      { "title": "Apply", "desc": "Pick one of three membership plans and create your account in minutes." },
+      { "title": "Connect Store", "desc": "Connect your Etsy store and define your products and sizes." },
+      { "title": "Receive Orders", "desc": "Orders land in your panel; approve with live m² pricing." },
+      { "title": "Produce & Ship", "desc": "Routed to the production network, delivered with white-label tracking." }
+    ],
+    "testiTitle": "What our dealers say",
+    "testiSubtitle": "From sellers growing with Ortak Doku.",
+    "testimonials": [
+      { "quote": "Bringing order and production tracking into one panel made my work dramatically easier.", "name": "Ayşe K.", "role": "Etsy seller" },
+      { "quote": "Live m² pricing and white-label shipping made my profit margins crystal clear.", "name": "Mehmet T.", "role": "Team Leader" },
+      { "quote": "Everything moved fast and smoothly from application to my first order.", "name": "Zeynep A.", "role": "New dealer" }
+    ]
   },
   "adminUsers": {
     "title": "User Management",

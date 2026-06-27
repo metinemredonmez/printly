@@ -410,7 +410,28 @@
         ]
       }
     ],
-    "footer": "© 2026 Ortak Doku — B2B Print-on-Demand Platformu"
+    "footer": "© 2026 Ortak Doku — B2B Print-on-Demand Platformu",
+    "stats": [
+      { "value": "3", "label": "Ürün kategorisi (kağıt · decal · ahşap)" },
+      { "value": "ABD", "label": "Hedef pazar (Etsy)" },
+      { "value": "7/24", "label": "Üretim & sipariş takibi" },
+      { "value": "m²", "label": "Şeffaf ölçü-bazlı fiyat" }
+    ],
+    "howTitle": "Nasıl Çalışır?",
+    "howSubtitle": "Başvurudan teslimata dört basit adım.",
+    "steps": [
+      { "title": "Başvur", "desc": "Üç üyelik planından birini seç, dakikalar içinde hesabını oluştur." },
+      { "title": "Mağazanı Bağla", "desc": "Etsy mağazanı bağla, ürün ve ölçülerini tanımla." },
+      { "title": "Sipariş Gelsin", "desc": "Siparişler panele düşer; canlı m² fiyatıyla onayla." },
+      { "title": "Üret & Kargola", "desc": "Üretim ağına yönlenir, white-label kargo takibiyle teslim edilir." }
+    ],
+    "testiTitle": "Bayilerimiz ne diyor?",
+    "testiSubtitle": "Ortak Doku ile büyüyen satıcılardan.",
+    "testimonials": [
+      { "quote": "Sipariş ve üretim takibini tek panelde toplamak işimi kökten kolaylaştırdı.", "name": "Ayşe K.", "role": "Etsy satıcısı" },
+      { "quote": "Canlı m² fiyatlandırma ve white-label kargo ile kâr marjlarım netleşti.", "name": "Mehmet T.", "role": "Ekip Lideri" },
+      { "quote": "Başvurudan ilk siparişe kadar her şey çok hızlı ve sorunsuz ilerledi.", "name": "Zeynep A.", "role": "Yeni bayi" }
+    ]
   },
   "adminUsers": {
     "title": "Kullanıcı Yönetimi",

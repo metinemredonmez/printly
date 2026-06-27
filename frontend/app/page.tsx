@@ -37,6 +37,9 @@ export default async function Home() {
   const tc = await getTranslations('common');
   const caps = t.raw('caps') as Cap[];
   const plans = t.raw('plans') as Plan[];
+  const stats = t.raw('stats') as { value: string; label: string }[];
+  const steps = t.raw('steps') as { title: string; desc: string }[];
+  const testimonials = t.raw('testimonials') as { quote: string; name: string; role: string }[];
 
   const nav = [
     { href: '#ecosystem', label: t('navEcosystem') },
@@ -146,6 +149,18 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* İSTATİSTİK BANDI */}
+        <section className="border-y border-slate-100 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-3xl font-semibold text-primary">{s.value}</div>
+                <div className="text-xs text-slate-500 mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* 6 KAPASİTE */}
         <section id="operations" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
@@ -179,6 +194,28 @@ export default async function Home() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* NASIL ÇALIŞIR */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center space-y-3 mb-12">
+            <h2 className="text-3xl font-semibold text-navy">{t('howTitle')}</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">{t('howSubtitle')}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((s, i) => (
+              <div key={s.title} className="relative rounded-3xl border border-slate-100 bg-white p-6">
+                <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center font-semibold mb-4">
+                  {i + 1}
+                </div>
+                <h3 className="font-semibold text-navy">{s.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed mt-1">{s.desc}</p>
+                {i < steps.length - 1 && (
+                  <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 h-5 w-5 text-slate-300" />
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
@@ -220,6 +257,31 @@ export default async function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* MÜŞTERİ YORUMLARI */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center space-y-3 mb-10">
+            <h2 className="text-3xl font-semibold text-navy">{t('testiTitle')}</h2>
+            <p className="text-slate-500">{t('testiSubtitle')}</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((tt) => (
+              <figure key={tt.name} className="rounded-3xl border border-slate-100 bg-white p-7 flex flex-col">
+                <div className="text-primary text-3xl leading-none font-serif">&ldquo;</div>
+                <blockquote className="text-sm text-slate-600 leading-relaxed flex-1 -mt-2">{tt.quote}</blockquote>
+                <figcaption className="mt-4 flex items-center gap-3">
+                  <span className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                    {tt.name.slice(0, 1)}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-navy">{tt.name}</span>
+                    <span className="block text-xs text-slate-400">{tt.role}</span>
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </section>
 
