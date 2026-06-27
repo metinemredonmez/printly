@@ -25,14 +25,14 @@ export function GooglePlayLogo({ className = 'h-6 w-6' }: { className?: string }
 /** Sadece amblem (kare alanlarda + koyu zeminde metinle yan yana) */
 export function LogoMark({ className = 'h-9 w-9' }: { className?: string }) {
   return (
-    <svg viewBox="100 8 195 164" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="100 8 195 164" className={`text-navy dark:text-white ${className}`} fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="180" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
       <rect x="220" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
       <rect x="260" y="20" width="24" height="140" rx="12" fill="#6B8E23" />
-      <path d="M120 50 C 160 50, 160 130, 120 130" stroke="#0B1F3A" strokeWidth="24" strokeLinecap="round" fill="none" />
-      <path d="M110 90 L 190 90" stroke="#0B1F3A" strokeWidth="24" strokeLinecap="round" />
+      <path d="M120 50 C 160 50, 160 130, 120 130" stroke="currentColor" strokeWidth="24" strokeLinecap="round" fill="none" />
+      <path d="M110 90 L 190 90" stroke="currentColor" strokeWidth="24" strokeLinecap="round" />
       <path d="M180 90 C 210 60, 230 60, 260 90" stroke="#6B8E23" strokeWidth="12" strokeLinecap="round" fill="none" />
-      <path d="M180 90 C 210 120, 230 120, 260 90" stroke="#0B1F3A" strokeWidth="12" strokeLinecap="round" fill="none" />
+      <path d="M180 90 C 210 120, 230 120, 260 90" stroke="currentColor" strokeWidth="12" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -42,7 +42,7 @@ export function Logo({ className = 'h-10' }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark className="h-full w-auto shrink-0" />
-      <span className="font-semibold text-navy tracking-tight text-lg whitespace-nowrap">Ortak Doku</span>
+      <span className="font-semibold text-navy dark:text-white tracking-tight text-lg whitespace-nowrap">Ortak Doku</span>
     </span>
   );
 }
