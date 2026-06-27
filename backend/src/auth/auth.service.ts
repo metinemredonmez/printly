@@ -43,6 +43,7 @@ export class AuthService {
         email,
         passwordHash,
         fullName: dto.fullName,
+        phone: dto.phone,
         role: Role.USER,
         priceMultiplier: multiplierForRole(Role.USER),
         isEmailVerified: false,
