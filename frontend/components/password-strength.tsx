@@ -32,7 +32,7 @@ export function PasswordStrength({ value }: { value: string }) {
           />
         ))}
       </div>
-      <p className="text-[11px] text-slate-400">
+      <p className="text-[11px] text-slate-400 dark:text-slate-500">
         {t('pwStrength')}: <span className="font-medium">{labels[score]}</span>
       </p>
     </div>

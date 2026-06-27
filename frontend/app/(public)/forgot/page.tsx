@@ -78,7 +78,7 @@ export default function ForgotPage() {
             ))}
           </ul>
         </div>
-        <div className="relative z-10 text-xs text-slate-500">© 2026 Ortak Doku — B2B Print-on-Demand</div>
+        <div className="relative z-10 text-xs text-slate-500 dark:text-slate-400">© 2026 Ortak Doku — B2B Print-on-Demand</div>
         <svg className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] opacity-30" viewBox="0 0 400 400" fill="none">
           <circle cx="200" cy="200" r="160" stroke="#1F5EFF" strokeWidth="2" strokeDasharray="8 8" />
           <circle cx="200" cy="200" r="100" stroke="#6B8E23" strokeWidth="2" strokeDasharray="4 4" />
@@ -90,7 +90,7 @@ export default function ForgotPage() {
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-8">
-            <Link href="/login" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary">
+            <Link href="/login" className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-primary">
               <ArrowLeft className="h-4 w-4" /> {t('backToLogin')}
             </Link>
             <LangSwitcher />
@@ -100,8 +100,8 @@ export default function ForgotPage() {
             <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center mb-3">
               <KeyRound className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-semibold text-navy">{t('forgotTitle')}</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('forgotTitle')}</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {step === 1 ? t('forgotHint1') : t('forgotHint2')}
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function ForgotPage() {
                 disabled={step === 2}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 bg-slate-50"
+                className="h-11 bg-slate-50 dark:bg-slate-800"
               />
             </div>
             {step === 2 && (
@@ -129,7 +129,7 @@ export default function ForgotPage() {
                     required
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="h-11 bg-slate-50"
+                    className="h-11 bg-slate-50 dark:bg-slate-800"
                   />
                 </div>
                 <div className="space-y-2">
@@ -141,7 +141,7 @@ export default function ForgotPage() {
                     minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="h-11 bg-slate-50"
+                    className="h-11 bg-slate-50 dark:bg-slate-800"
                   />
                   <PasswordStrength value={newPassword} />
                 </div>

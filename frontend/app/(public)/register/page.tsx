@@ -37,7 +37,7 @@ const VOLUMES = ['v1', 'v2', 'v3', 'v4'] as const;
 
 const STEPS = ['stepPlan', 'stepAccount', 'stepBusiness', 'stepContact', 'stepConfirm'] as const;
 
-const field = 'h-11 bg-slate-50';
+const field = 'h-11 bg-slate-50 dark:bg-slate-800';
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             ))}
           </ul>
         </div>
-        <div className="relative z-10 text-xs text-slate-500">© 2026 Ortak Doku — B2B Print-on-Demand</div>
+        <div className="relative z-10 text-xs text-slate-500 dark:text-slate-400">© 2026 Ortak Doku — B2B Print-on-Demand</div>
         <svg className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] opacity-30" viewBox="0 0 400 400" fill="none">
           <circle cx="200" cy="200" r="160" stroke="#1F5EFF" strokeWidth="2" strokeDasharray="8 8" />
           <circle cx="200" cy="200" r="100" stroke="#6B8E23" strokeWidth="2" strokeDasharray="4 4" />
@@ -151,7 +151,7 @@ export default function RegisterPage() {
       {/* Sağ form */}
       <div className="flex flex-col p-6 sm:p-10 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <Link href="/login" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary">
+          <Link href="/login" className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-primary">
             <ArrowLeft className="h-4 w-4" /> {t('backToLogin')}
           </Link>
           <LangSwitcher />
@@ -159,8 +159,8 @@ export default function RegisterPage() {
 
         <div className="w-full max-w-lg mx-auto flex-1">
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-navy">{tw('title')}</h1>
-            <p className="text-sm text-slate-500">{tw('subtitle')}</p>
+            <h1 className="text-2xl font-semibold text-navy dark:text-white">{tw('title')}</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{tw('subtitle')}</p>
           </div>
 
           {/* Adım göstergesi */}
@@ -169,7 +169,7 @@ export default function RegisterPage() {
               {STEPS.map((s, i) => (
                 <div key={s} className="flex-1">
                   <div className={`h-1.5 rounded-full ${i <= step ? 'bg-primary' : 'bg-slate-200'}`} />
-                  <div className={`text-[10px] mt-1.5 font-semibold ${i === step ? 'text-primary' : 'text-slate-400'}`}>
+                  <div className={`text-[10px] mt-1.5 font-semibold ${i === step ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
                     {tw(s)}
                   </div>
                 </div>
@@ -189,15 +189,15 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => set('plan', p.key)}
                     className={`w-full text-left rounded-2xl border-2 p-4 flex items-start gap-4 transition-all ${
-                      on ? 'border-primary bg-blue-50' : 'border-slate-200 hover:border-slate-300'
+                      on ? 'border-primary bg-blue-50' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${on ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
+                    <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${on ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-navy">{tw(`plan_${p.key}`)}</span>
+                        <span className="font-semibold text-navy dark:text-white">{tw(`plan_${p.key}`)}</span>
                         {p.recommended && (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-accent/15 text-brand-accent">
                             {tw('recommended')}
@@ -205,7 +205,7 @@ export default function RegisterPage() {
                         )}
                         <span className="ml-auto text-sm font-semibold text-primary">{tw(`plan_${p.key}_price`)}</span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">{tw(`plan_${p.key}_desc`)}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{tw(`plan_${p.key}_desc`)}</p>
                     </div>
                     {on && <CircleCheck className="h-5 w-5 text-primary shrink-0" />}
                   </button>
@@ -241,7 +241,7 @@ export default function RegisterPage() {
                 <Input className={field} value={f.organizationName} onChange={(e) => set('organizationName', e.target.value)} placeholder={tw('companyPlaceholder')} />
               </div>
               <div className="space-y-2">
-                <Label>{tw('etsyStore')} <span className="text-slate-400 font-normal">({tc('optional')})</span></Label>
+                <Label>{tw('etsyStore')} <span className="text-slate-400 dark:text-slate-500 font-normal">({tc('optional')})</span></Label>
                 <Input className={field} value={f.etsyStoreName} onChange={(e) => set('etsyStoreName', e.target.value)} placeholder={tw('etsyPlaceholder')} />
               </div>
               <div className="space-y-2">
@@ -255,7 +255,7 @@ export default function RegisterPage() {
                         type="button"
                         onClick={() => toggleCat(c)}
                         className={`px-3.5 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
-                          on ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                          on ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                         }`}
                       >
                         {tw(`cat_${c}`)}
@@ -275,7 +275,7 @@ export default function RegisterPage() {
                         type="button"
                         onClick={() => set('monthlyVolume', v)}
                         className={`px-2 py-2 rounded-xl text-xs font-semibold border-2 transition-all ${
-                          on ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                          on ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                         }`}
                       >
                         {tw(`vol_${v}`)}
@@ -304,14 +304,14 @@ export default function RegisterPage() {
                   <Input className={field} value={f.city} onChange={(e) => set('city', e.target.value)} />
                 </div>
               </div>
-              <p className="text-xs text-slate-400">{tw('contactHint')}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{tw('contactHint')}</p>
             </div>
           )}
 
           {/* ADIM 5 — Onay */}
           {step === 4 && (
             <div className="space-y-4">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-2 text-sm">
+              <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 space-y-2 text-sm">
                 <SummaryRow label={tw('sumPlan')} value={f.plan ? tw(`plan_${f.plan}`) : '—'} />
                 <SummaryRow label={t('fullName')} value={f.fullName || '—'} />
                 <SummaryRow label={t('email')} value={f.email || '—'} />
@@ -328,7 +328,7 @@ export default function RegisterPage() {
                   checked={f.acceptedTerms}
                   onChange={(e) => set('acceptedTerms', e.target.checked)}
                 />
-                <span className="text-slate-600">
+                <span className="text-slate-600 dark:text-slate-300">
                   {tw('acceptPre')}{' '}
                   <Link href="/terms" target="_blank" className="text-primary hover:underline">{tw('termsLink')}</Link>
                   {' '}{tw('and')}{' '}
@@ -336,7 +336,7 @@ export default function RegisterPage() {
                   {' '}{tw('acceptPost')}
                 </span>
               </label>
-              <div className="flex items-center gap-2 text-[11px] text-slate-400">
+              <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500">
                 <ShieldCheck className="h-4 w-4 text-brand-accent" /> {tw('secureNote')}
               </div>
             </div>
@@ -345,13 +345,13 @@ export default function RegisterPage() {
           {/* ADIM 6 — OTP doğrulama */}
           {step === 5 && (
             <form onSubmit={verify} className="space-y-5">
-              <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 text-sm text-slate-600">
-                <span className="font-semibold text-navy">{f.email}</span> {t('enterOtp')}
+              <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 text-sm text-slate-600 dark:text-slate-300">
+                <span className="font-semibold text-navy dark:text-white">{f.email}</span> {t('enterOtp')}
               </div>
               <div className="space-y-2">
                 <Label>{t('verifyCode')}</Label>
                 <Input
-                  className="h-12 text-center text-lg tracking-[0.4em] font-semibold bg-slate-50"
+                  className="h-12 text-center text-lg tracking-[0.4em] font-semibold bg-slate-50 dark:bg-slate-800"
                   inputMode="numeric"
                   maxLength={6}
                   value={code}
@@ -386,7 +386,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
             {t('haveAccount')}{' '}
             <Link href="/login" className="text-primary hover:underline font-medium">{tc('login')}</Link>
           </p>
@@ -399,8 +399,8 @@ export default function RegisterPage() {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-slate-500">{label}</span>
-      <span className="font-medium text-navy text-right">{value}</span>
+      <span className="text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="font-medium text-navy dark:text-white text-right">{value}</span>
     </div>
   );
 }

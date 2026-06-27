@@ -56,7 +56,7 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="ornek@ortakdoku.com"
-          className="h-11 bg-slate-50"
+          className="h-11 bg-slate-50 dark:bg-slate-800"
         />
       </div>
       <div className="space-y-2">
@@ -67,7 +67,7 @@ function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="h-11 bg-slate-50"
+          className="h-11 bg-slate-50 dark:bg-slate-800"
         />
       </div>
       {need2fa && (
@@ -79,7 +79,7 @@ function LoginForm() {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder={t('code2faPlaceholder')}
-            className="h-11 bg-slate-50"
+            className="h-11 bg-slate-50 dark:bg-slate-800"
             autoFocus
           />
         </div>
@@ -94,16 +94,16 @@ function LoginForm() {
 
       <div className="relative py-1">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-slate-200" />
+          <span className="w-full border-t border-slate-200 dark:border-slate-700" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2 text-slate-400">{t('or')}</span>
+          <span className="bg-white dark:bg-slate-900 px-2 text-slate-400 dark:text-slate-500">{t('or')}</span>
         </div>
       </div>
       <button
         type="button"
         onClick={() => toast.info(t('googleSoon'))}
-        className="w-full h-11 flex items-center justify-center gap-2 rounded-md border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+        className="w-full h-11 flex items-center justify-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z" />
@@ -118,12 +118,12 @@ function LoginForm() {
         <Link href="/forgot" className="text-primary hover:underline font-medium">
           {t('forgotPassword')}
         </Link>
-        <Link href="/register" className="text-slate-500 hover:underline">
+        <Link href="/register" className="text-slate-500 dark:text-slate-400 hover:underline">
           {t('createAccount')}
         </Link>
       </div>
 
-      <p className="text-center text-[11px] text-slate-400 border-t border-slate-100 pt-3">
+      <p className="text-center text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-700 pt-3">
         {t('testHint')}: <span className="font-mono">admin@ortakdoku.com / admin</span>
       </p>
     </form>
@@ -184,10 +184,10 @@ export default function LoginPage() {
             <LangSwitcher className="ml-auto" />
           </div>
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-navy">{t('loginTitle')}</h1>
-            <p className="text-sm text-slate-500">{tc('tagline')}</p>
+            <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('loginTitle')}</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{tc('tagline')}</p>
           </div>
-          <Suspense fallback={<div className="text-center text-slate-400">{tc('loading')}</div>}>
+          <Suspense fallback={<div className="text-center text-slate-400 dark:text-slate-500">{tc('loading')}</div>}>
             <LoginForm />
           </Suspense>
         </div>
