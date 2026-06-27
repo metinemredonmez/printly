@@ -17,6 +17,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { Logo } from '@/components/logo';
 import { HeroSlider } from '@/components/hero-slider';
 import { ProfitCalculator } from '@/components/profit-calculator';
+import { PlanComparison } from '@/components/plan-comparison';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 // her kapasite kartı için ilgili blurlu arka görsel
@@ -261,6 +262,9 @@ export default async function Home() {
                 </div>
               ))}
             </div>
+
+            {/* Plan karşılaştırma matrisi */}
+            <PlanComparison />
           </div>
         </section>
 
