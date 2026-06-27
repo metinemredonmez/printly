@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Square, Sticker, TreePine, ArrowRight, type LucideIcon } from 'lucide-react';
 import type { LandingCategory, LandingProduct } from '@/lib/public';
 
-type Meta = { tr: string; en: string; descTr: string; descEn: string; unitTr: string; unitEn: string; icon: LucideIcon; grad: string; chip: string };
+type Meta = { tr: string; en: string; descTr: string; descEn: string; unitTr: string; unitEn: string; icon: LucideIcon; grad: string; chip: string; fallback: string };
 
 const CAT_META: Record<string, Meta> = {
   WALLPAPER: {
@@ -11,6 +11,7 @@ const CAT_META: Record<string, Meta> = {
     descEn: 'Large-format wallpapers produced to size, priced per m².',
     unitTr: '/m²', unitEn: '/m²', icon: Square,
     grad: 'from-blue-500/90 to-blue-700/90', chip: 'bg-blue-50 text-blue-700',
+    fallback: '/banners/product-wallpaper.jpg',
   },
   WALL_DECAL: {
     tr: 'Wall Decal', en: 'Wall Decal',
@@ -18,6 +19,7 @@ const CAT_META: Record<string, Meta> = {
     descEn: 'Easy-apply, removable wall stickers.',
     unitTr: 'sabit', unitEn: 'flat', icon: Sticker,
     grad: 'from-emerald-500/90 to-emerald-700/90', chip: 'bg-emerald-50 text-emerald-700',
+    fallback: '/banners/product-decal.jpg',
   },
   WOOD: {
     tr: 'Ahşap / CNC', en: 'Wood / CNC',
@@ -25,6 +27,7 @@ const CAT_META: Record<string, Meta> = {
     descEn: 'CNC-carved decorative wood panels and signs.',
     unitTr: 'sabit', unitEn: 'flat', icon: TreePine,
     grad: 'from-amber-500/90 to-amber-700/90', chip: 'bg-amber-50 text-amber-700',
+    fallback: '/banners/product-wood.jpg',
   },
 };
 
@@ -57,7 +60,7 @@ export function ProductShowcase({
           const Icon = meta.icon;
           const cat = categories?.find((c) => c.key === key);
           const items = (products ?? []).filter((p) => p.category === key);
-          const img = items.find((p) => p.imageUrl)?.imageUrl ?? null;
+          const img = items.find((p) => p.imageUrl)?.imageUrl ?? meta.fallback;
           const names = items.slice(0, 3).map((p) => p.name);
           const minPrice = cat?.minPrice ?? null;
           const unit = tr ? meta.unitTr : meta.unitEn;
@@ -69,13 +72,11 @@ export function ProductShowcase({
             >
               {/* Görsel başlık: admin ürün görseli set ettiyse foto, yoksa markalı gradient */}
               <div className="relative h-40 overflow-hidden">
-                {img ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={img} alt={meta.tr} className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${meta.grad}`} />
-                )}
-                <div className="absolute inset-0 bg-black/10" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img} alt={tr ? meta.tr : meta.en} className="absolute inset-0 w-full h-full object-cover" />
+                {/* markalı renk tonu (foto üstünde kategori kimliği) + okunabilirlik */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${meta.grad} mix-blend-multiply opacity-60`} />
+                <div className="absolute inset-0 bg-black/15" />
                 <div className="absolute top-4 left-4 h-11 w-11 rounded-2xl bg-white/90 backdrop-blur flex items-center justify-center text-navy">
                   <Icon className="h-5 w-5" />
                 </div>

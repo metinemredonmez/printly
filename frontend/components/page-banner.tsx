@@ -4,8 +4,8 @@
 export function PageBanner({
   title,
   subtitle,
-  image,
-  blur = false,
+  image = '/banners/banner-wallpaper.jpg',
+  blur = true,
 }: {
   title: string;
   subtitle?: string;
@@ -22,7 +22,7 @@ export function PageBanner({
         />
       )}
       {/* koyu overlay (metin okunsun + minimal his) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-navy/90 via-navy/75 to-navy/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-navy/92 via-navy/70 to-navy/45" />
       {/* dekoratif marka mesh */}
       <div
         className="pointer-events-none absolute inset-0 opacity-60"
