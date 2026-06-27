@@ -187,17 +187,10 @@ export function SiteFooter() {
             <ShieldCheck className="h-4 w-4 text-brand-accent" />
             {tr ? 'Güvenli ödeme altyapısı' : 'Secure payment infrastructure'}
           </div>
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            <PayChip><span className="font-semibold italic text-[#1A1F71] text-sm tracking-tight">VISA</span></PayChip>
-            <PayChip>
-              <span className="flex items-center">
-                <span className="h-4 w-4 rounded-full bg-[#EB001B]" />
-                <span className="h-4 w-4 rounded-full bg-[#F79E1B] -ml-2 mix-blend-multiply" />
-              </span>
-            </PayChip>
-            <PayChip><span className="font-semibold text-[#006FCF] text-xs">AMEX</span></PayChip>
-            <PayChip><span className="font-semibold text-[#635BFF] text-sm">stripe</span></PayChip>
-            <PayChip><span className="font-semibold text-[#2CA01C] text-sm">QuickBooks</span></PayChip>
+          <div className="flex items-center gap-x-5 gap-y-1 flex-wrap justify-center text-slate-500">
+            {['Visa', 'Mastercard', 'Amex', 'Stripe', 'QuickBooks'].map((m) => (
+              <span key={m} className="text-sm">{m}</span>
+            ))}
           </div>
         </div>
       </div>
@@ -209,14 +202,6 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function PayChip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="h-8 min-w-[3rem] px-3 rounded-lg bg-white flex items-center justify-center shadow-sm">
-      {children}
-    </span>
   );
 }
 
