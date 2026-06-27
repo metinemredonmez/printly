@@ -20,7 +20,7 @@ export function LangSwitcher({ className = '' }: { className?: string }) {
 
   return (
     <div
-      className={`inline-flex items-center rounded-lg border border-slate-200 overflow-hidden text-xs font-semibold ${className}`}
+      className={`inline-flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs font-semibold ${className}`}
       aria-busy={pending}
     >
       {(['tr', 'en'] as const).map((l) => (
@@ -29,7 +29,9 @@ export function LangSwitcher({ className = '' }: { className?: string }) {
           type="button"
           onClick={() => change(l)}
           className={`px-2.5 py-1 transition-colors ${
-            locale === l ? 'bg-primary text-white' : 'bg-white text-slate-500 hover:bg-slate-50'
+            locale === l
+              ? 'bg-primary text-white'
+              : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
           {l.toUpperCase()}
