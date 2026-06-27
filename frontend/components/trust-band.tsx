@@ -10,7 +10,7 @@ const DEFAULT_BADGES: Bilingual[] = [
 ];
 
 export function TrustBand({ tr, badges }: { tr: boolean; badges?: Bilingual[] }) {
-  const list = badges && badges.length ? badges : DEFAULT_BADGES;
+  const list = Array.isArray(badges) && badges.length ? badges : DEFAULT_BADGES;
 
   return (
     <div className="border-y border-slate-100 bg-white">

@@ -23,7 +23,7 @@ const DEFAULT_FAQS: Faq[] = [
 ];
 
 export function LandingFaq({ tr, faqs }: { tr: boolean; faqs?: Faq[] }) {
-  const list = faqs && faqs.length ? faqs : DEFAULT_FAQS;
+  const list = Array.isArray(faqs) && faqs.length ? faqs : DEFAULT_FAQS;
 
   return (
     <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

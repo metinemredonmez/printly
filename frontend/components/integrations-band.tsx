@@ -8,7 +8,7 @@ const DEFAULT_INTEGRATIONS: Integration[] = [
 ];
 
 export function IntegrationsBand({ tr, integrations }: { tr: boolean; integrations?: Integration[] }) {
-  const list = integrations && integrations.length ? integrations : DEFAULT_INTEGRATIONS;
+  const list = Array.isArray(integrations) && integrations.length ? integrations : DEFAULT_INTEGRATIONS;
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

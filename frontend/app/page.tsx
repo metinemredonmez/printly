@@ -25,14 +25,14 @@ import { IntegrationsBand } from '@/components/integrations-band';
 import { getLandingData } from '@/lib/public';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
-// her kapasite kartı için ilgili blurlu arka görsel
-const CARD_BG = [
-  '/banners/hero-1.jpg', // Üretim Ağı (duvar kağıdı)
-  '/banners/blog.jpg', // Sipariş Yönetimi (masa)
-  '/banners/pricing.jpg', // Operasyonel Sistemler
-  '/banners/careers.jpg', // Fulfillment
-  '/banners/about.jpg', // Teknoloji
-  '/banners/etsy.jpg', // İş Ortaklıkları
+// her kapasite kartı için başlığa uygun renk vurgusu (ikon + ince blob)
+const CAP_ACCENT = [
+  { tile: 'bg-blue-50 text-blue-600', blob: 'bg-blue-200' },
+  { tile: 'bg-emerald-50 text-emerald-600', blob: 'bg-emerald-200' },
+  { tile: 'bg-violet-50 text-violet-600', blob: 'bg-violet-200' },
+  { tile: 'bg-amber-50 text-amber-600', blob: 'bg-amber-200' },
+  { tile: 'bg-sky-50 text-sky-600', blob: 'bg-sky-200' },
+  { tile: 'bg-rose-50 text-rose-600', blob: 'bg-rose-200' },
 ];
 const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
 
@@ -44,13 +44,19 @@ export default async function Home() {
   const tc = await getTranslations('common');
   const caps = t.raw('caps') as Cap[];
   const plans = t.raw('plans') as Plan[];
-  const stats = t.raw('stats') as { value: string; label: string }[];
+  const i18nStats = t.raw('stats') as { value: string; label: string }[];
   const steps = t.raw('steps') as { title: string; desc: string }[];
   const testimonials = t.raw('testimonials') as { quote: string; name: string; role: string }[];
   const locale = await getLocale();
   const tr = locale === 'tr';
   // Canlı landing verisi (backend kapalıysa null → bileşenler varsayılana düşer)
   const landing = await getLandingData();
+  // İstatistik bandı: admin landing.stats varsa canlı, yoksa i18n varsayılan
+  const liveStats = landing?.content?.stats;
+  const stats =
+    Array.isArray(liveStats) && liveStats.length
+      ? liveStats.map((s) => ({ value: s.value, label: tr ? s.label : s.labelEn }))
+      : i18nStats;
 
   const nav = [
     { href: '#ecosystem', label: t('navEcosystem') },
@@ -102,24 +108,24 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-7">
               <span
-                className="od-fade-up inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-primary"
+                className="od-fade-up inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-sm"
                 style={{ animationDelay: '0.05s' }}
               >
                 <Rocket className="h-3.5 w-3.5" /> {t('badge')}
               </span>
               <h1
-                className="od-fade-up text-4xl sm:text-5xl lg:text-6xl font-semibold text-navy leading-tight tracking-tight"
+                className="od-fade-up text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight tracking-tight"
                 style={{ animationDelay: '0.15s' }}
               >
                 {t('heroTitle')}
               </h1>
               <p
-                className="od-fade-up text-lg text-slate-600 font-medium leading-relaxed"
+                className="od-fade-up text-lg text-slate-100 font-medium leading-relaxed"
                 style={{ animationDelay: '0.25s' }}
               >
                 {t('heroDesc1')}
               </p>
-              <p className="od-fade-up text-slate-500 leading-relaxed" style={{ animationDelay: '0.32s' }}>
+              <p className="od-fade-up text-slate-200 leading-relaxed" style={{ animationDelay: '0.32s' }}>
                 {t('heroDesc2')}
               </p>
               <div className="od-fade-up pt-2" style={{ animationDelay: '0.4s' }}>
@@ -139,19 +145,19 @@ export default async function Home() {
                 <svg className="relative w-full h-auto" viewBox="0 0 400 400" fill="none">
                   <circle cx="200" cy="200" r="160" stroke="#1F5EFF" strokeWidth="2" strokeDasharray="8 8" className="od-spin-slow" style={{ transformOrigin: '200px 200px' }} />
                   <circle cx="200" cy="200" r="100" stroke="#6B8E23" strokeWidth="2" strokeDasharray="4 4" />
-                  <line x1="200" y1="40" x2="40" y2="200" stroke="#0B1F3A" strokeWidth="2" opacity="0.3" />
-                  <line x1="200" y1="40" x2="360" y2="200" stroke="#0B1F3A" strokeWidth="2" opacity="0.3" />
+                  <line x1="200" y1="40" x2="40" y2="200" stroke="#CBD5E1" strokeWidth="2" opacity="0.3" />
+                  <line x1="200" y1="40" x2="360" y2="200" stroke="#CBD5E1" strokeWidth="2" opacity="0.3" />
                   <line x1="40" y1="200" x2="200" y2="360" stroke="#1F5EFF" strokeWidth="2" opacity="0.3" />
                   <line x1="360" y1="200" x2="200" y2="360" stroke="#6B8E23" strokeWidth="2" opacity="0.3" />
-                  <circle cx="200" cy="40" r="12" fill="#0B1F3A" />
-                  <circle cx="200" cy="360" r="12" fill="#0B1F3A" />
+                  <circle cx="200" cy="40" r="12" fill="#CBD5E1" />
+                  <circle cx="200" cy="360" r="12" fill="#CBD5E1" />
                   <circle cx="40" cy="200" r="12" fill="#1F5EFF" />
                   <circle cx="360" cy="200" r="12" fill="#6B8E23" />
                   <circle cx="100" cy="100" r="8" fill="#1F5EFF" />
                   <circle cx="300" cy="300" r="8" fill="#1F5EFF" />
                   <circle cx="300" cy="100" r="8" fill="#6B8E23" />
-                  <circle cx="100" cy="300" r="8" fill="#0B1F3A" />
-                  <circle cx="200" cy="200" r="40" fill="#0B1F3A" />
+                  <circle cx="100" cy="300" r="8" fill="#CBD5E1" />
+                  <circle cx="200" cy="200" r="40" fill="#CBD5E1" />
                   <circle cx="200" cy="200" r="30" fill="#1F5EFF" />
                   <circle cx="200" cy="200" r="15" fill="#6B8E23" />
                 </svg>
@@ -183,22 +189,19 @@ export default async function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {caps.map((c, i) => {
               const Icon = CAP_ICONS[i] ?? Factory;
+              const a = CAP_ACCENT[i % CAP_ACCENT.length];
               return (
                 <div
                   key={c.title}
                   className="od-fade-up group relative overflow-hidden bg-white p-7 rounded-3xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all"
                   style={{ animationDelay: `${0.08 + i * 0.07}s` }}
                 >
-                  {/* ilgili blurlu arka görsel (faint) */}
-                  <div className="pointer-events-none absolute inset-0">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center blur-[2px] scale-110 opacity-45 group-hover:opacity-70 transition-opacity duration-300"
-                      style={{ backgroundImage: `url(${CARD_BG[i % CARD_BG.length]})` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-white/25" />
-                  </div>
+                  {/* başlık konusuna uygun ince renk vurgusu */}
+                  <div
+                    className={`pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity ${a.blob}`}
+                  />
                   <div className="relative space-y-4">
-                    <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
+                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${a.tile}`}>
                       <Icon className="h-6 w-6" />
                     </div>
                     <h3 className="text-lg font-semibold text-navy">{c.title}</h3>

@@ -54,8 +54,8 @@ export function PlanComparison({
   featureMatrix?: Row[];
 }) {
   const tr = useLocale() === 'tr';
-  const cols = tiers && tiers.length === 3 ? tiers : DEFAULT_TIERS;
-  const rows = featureMatrix && featureMatrix.length ? featureMatrix : DEFAULT_ROWS;
+  const cols = Array.isArray(tiers) && tiers.length === 3 ? tiers : DEFAULT_TIERS;
+  const rows = Array.isArray(featureMatrix) && featureMatrix.length ? featureMatrix : DEFAULT_ROWS;
 
   const sub = (t: Tier) =>
     t.monthlyFee > 0 ? `$${t.monthlyFee}/${tr ? 'ay' : 'mo'}` : tr ? t.badge : t.badgeEn;
