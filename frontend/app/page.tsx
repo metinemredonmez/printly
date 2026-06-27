@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { LangSwitcher } from '@/components/lang-switcher';
 import { SiteFooter } from '@/components/site-footer';
+import { Logo } from '@/components/logo';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
@@ -39,11 +40,8 @@ export default async function Home() {
       {/* NAV */}
       <header className="h-20 bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-2xl bg-primary text-white flex items-center justify-center font-extrabold text-lg">
-              OD
-            </div>
-            <span className="font-extrabold text-navy text-lg tracking-tight">{tc('appName')}</span>
+          <Link href="/" className="flex items-center">
+            <Logo className="h-11 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
             {nav.map((n) => (
