@@ -59,12 +59,12 @@ export default function ForgotPage() {
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Sol marka paneli */}
       <div className="relative hidden lg:flex flex-col justify-between bg-navy text-white p-12 overflow-hidden">
-        <div className="relative z-10 flex items-center gap-3">
+        <Link href="/" className="relative z-10 flex items-center gap-3 w-fit">
           <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center font-extrabold text-lg">
             OD
           </div>
           <span className="font-extrabold text-xl">{tc('appName')}</span>
-        </div>
+        </Link>
         <div className="relative z-10 space-y-6">
           <h2 className="text-4xl font-extrabold leading-tight">{t('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{t('brandSub')}</p>

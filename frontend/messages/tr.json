@@ -333,38 +333,49 @@
     "comingNext": "Detaylı raporlar, Kanban ve üretim ekranları sıradaki fazda eklenecek."
   },
   "landing": {
-    "badge": "B2B Print-on-Demand",
-    "heroTitle": "Tek ekosistem. Çoklu yetenek.",
-    "heroDesc": "Duvar kağıdı (m²), wall decal ve CNC ahşap üretiminizi; canlı fiyat, dosya yönetimi, üretim takibi ve bayi yönetimiyle baştan sona yönetin.",
+    "badge": "Yeni Nesil E-Ticaret Standartları",
+    "heroTitle": "Birlikte Üreten, Birlikte Büyüyen Bir Ekosistem",
+    "heroDesc1": "Sürdürülebilir büyüme hedefleyen girişimciler için tasarlanmış; rakipsiz ürün fırsatlarını, güçlü üretim altyapısını, operasyonel sistemleri ve ölçeklenebilir iş süreçlerini tek ekosistemde bir araya getiriyoruz.",
+    "heroDesc2": "Ortak Doku, e-ticarete yeni başlayanlardan markasını büyütmek isteyen girişimcilere kadar herkesin daha hızlı, daha verimli ve daha güvenli ilerleyebilmesi için üretim, teknoloji, iş birlikleri ve operasyonel destek sunan bütünleşik bir yapıdır.",
     "applyNow": "Şimdi Başvur",
+    "navEcosystem": "Ekosistem",
+    "navOperations": "Operasyonlar",
+    "navProduction": "Üretim",
+    "navTechnology": "Teknoloji",
+    "navTerms": "Şartlar",
+    "navPrivacy": "Gizlilik",
+    "navCookies": "Çerezler",
     "capsTitle": "Tek Ekosistem. Çoklu Yetenek.",
+    "capsSubtitle": "Maksimum operasyonel verimlilik için senkronize edilmiş altı temel modül.",
+    "ctaTitle": "Daha Güçlü Bir Ticaret Ekosistemi İnşa Ediyoruz",
+    "ctaDesc": "Ortak Doku, işletmelerin daha verimli çalışabilmesi ve güvenle büyüyebilmesi için altyapı, operasyonlar ve iş birliklerini bir araya getirmektedir.",
     "plansTitle": "Üyelik Modelleri",
     "plansSubtitle": "Size en uygun planla başlayın.",
     "startWithPlan": "Bu planla başla",
     "caps": [
       {
         "title": "Üretim Ağı",
-        "desc": "m² duvar kağıdı, decal ve CNC ahşap — tek üretim hattında."
+        "desc": "Ahşap, sticker (decal) ve duvar kağıdı üretimi için özel entegre tesislere anında yönlendirme."
       },
       {
         "title": "Sipariş Yönetimi",
-        "desc": "Canlı fiyat, durum makinesi, onay ve iade akışları."
+        "desc": "İlk sipariş girişinden küresel kargo teslimatına kadar tüm aşamaları izleyen entegre arayüz."
       },
       {
         "title": "Operasyonel Sistemler",
-        "desc": "Kanban, QR istasyon takibi, üretim kuyrukları."
+        "desc": "Üretim detaylarını manuel ölçekleme hatalarına karşı koruyan standartlaştırılmış parametreler."
       },
       {
-        "title": "Fulfillment",
-        "desc": "Etiket, packing slip, kargo takibi ve white-label."
+        "title": "Fulfillment (Sipariş Karşılama) Altyapısı",
+        "desc": "Küresel lojistik hatları ve kargo çıkışında otomatik oluşturulan kargo takip kodları."
       },
       {
-        "title": "Teknoloji",
-        "desc": "R2 büyük dosya yönetimi, webhook, partner API."
+        "title": "Teknoloji Platformu",
+        "desc": "Tüm sipariş ve üretim verilerini güvenli ve her an erişilebilir tutan güçlü veritabanı altyapısı."
       },
       {
         "title": "İş Ortaklıkları",
-        "desc": "Etsy entegrasyonu, bayi kredi/üyelik sistemi."
+        "desc": "Hammadde sağlayıcılarını, zanaatkarları ve satıcı ekiplerini birleştiren özenle yönetilen iş ortaklığı ağı."
       }
     ],
     "plans": [

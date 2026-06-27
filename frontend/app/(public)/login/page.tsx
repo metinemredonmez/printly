@@ -139,12 +139,12 @@ export default function LoginPage() {
       {/* Sol marka paneli */}
       <div className="relative hidden lg:flex flex-col justify-between bg-navy text-white p-12 overflow-hidden">
         <div className="relative z-10">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 w-fit">
             <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center font-extrabold text-lg">
               OD
             </div>
             <span className="font-extrabold text-xl">{tc('appName')}</span>
-          </div>
+          </Link>
         </div>
         <div className="relative z-10 space-y-6">
           <h2 className="text-4xl font-extrabold leading-tight">{t('brandHeadline')}</h2>
@@ -177,12 +177,12 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-8">
-            <div className="lg:hidden flex items-center gap-2">
+            <Link href="/" className="lg:hidden flex items-center gap-2">
               <div className="h-9 w-9 rounded-xl bg-primary text-white flex items-center justify-center font-extrabold">
                 OD
               </div>
               <span className="font-extrabold text-navy">{tc('appName')}</span>
-            </div>
+            </Link>
             <LangSwitcher className="ml-auto" />
           </div>
           <div className="mb-6">
