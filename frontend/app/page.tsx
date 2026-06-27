@@ -15,6 +15,7 @@ import {
 import { LangSwitcher } from '@/components/lang-switcher';
 import { SiteFooter } from '@/components/site-footer';
 import { Logo } from '@/components/logo';
+import { HeroSlider } from '@/components/hero-slider';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
@@ -66,14 +67,8 @@ export default async function Home() {
       <main className="flex-1">
         {/* HERO */}
         <section id="ecosystem" className="relative overflow-hidden">
-          {/* blurlu arka görsel */}
-          <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
-            <div
-              className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-40"
-              style={{ backgroundImage: 'url(/banners/hero.jpg)' }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA]/95 via-[#F8F9FA]/80 to-[#F8F9FA]/55" />
-          </div>
+          {/* arka plan slaytı (otomatik geçiş) */}
+          <HeroSlider />
           <div
             className="pointer-events-none absolute inset-0 -z-10"
             style={{
