@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
+// hero-2.jpg = hero.jpg'in birebir kopyasıydı → 3 farklı slayt
 const SLIDES = [
   '/banners/hero-1.jpg',
-  '/banners/hero-2.jpg',
   '/banners/hero-3.jpg',
   '/banners/hero-4.jpg',
 ];
@@ -28,7 +28,9 @@ export function HeroSlider() {
         />
       ))}
       {/* sol opak → sağ görsel NET görünür (yazı okunur, görsel belirgin) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA]/95 from-20% via-[#F8F9FA]/55 to-[#F8F9FA]/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#F8F9FA]/85 from-5% via-[#F8F9FA]/40 via-45% to-[#F8F9FA]/0" />
+      {/* alt yumuşak geçiş (bir sonraki bölüme) */}
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[#F8F9FA]" />
 
       {/* slayt göstergeleri */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">

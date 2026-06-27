@@ -80,7 +80,7 @@ export default async function Home() {
 
       <main className="flex-1">
         {/* HERO */}
-        <section id="ecosystem" className="relative overflow-hidden">
+        <section id="ecosystem" className="relative isolate overflow-hidden">
           {/* arka plan slaytı (otomatik geçiş) */}
           <HeroSlider />
           <div
@@ -181,10 +181,10 @@ export default async function Home() {
                   {/* ilgili blurlu arka görsel (faint) */}
                   <div className="pointer-events-none absolute inset-0">
                     <div
-                      className="absolute inset-0 bg-cover bg-center blur-[3px] scale-110 opacity-30 group-hover:opacity-50 transition-opacity duration-300"
+                      className="absolute inset-0 bg-cover bg-center blur-[2px] scale-110 opacity-45 group-hover:opacity-70 transition-opacity duration-300"
                       style={{ backgroundImage: `url(${CARD_BG[i % CARD_BG.length]})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/70 to-white/45" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-white/25" />
                   </div>
                   <div className="relative space-y-4">
                     <div className="h-12 w-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center">
