@@ -58,12 +58,15 @@ export class PricingController {
       select: { priceMultiplier: true, hasDiscount40: true, role: true },
     });
     const multiplier = dbUser?.priceMultiplier ?? multiplierForRole(user.role);
-    const hasDiscount40 = dbUser?.hasDiscount40 ?? false;
+    const discountRate = await this.pricing.effectiveDiscountRate(
+      user.userId,
+      dbUser?.hasDiscount40 ?? false,
+    );
     return this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],
       multiplier,
-      hasDiscount40,
+      discountRate,
     );
   }
 }

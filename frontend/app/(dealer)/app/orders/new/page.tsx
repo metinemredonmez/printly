@@ -30,6 +30,7 @@ interface Quote {
   subtotal: number;
   extrasTotal: number;
   discount40: number;
+  discountRate?: number;
   total: number;
   totalSqm: number;
 }
@@ -240,7 +241,11 @@ export default function NewOrderWizard() {
                   </div>
                   {(quote.data?.discount40 ?? 0) > 0 && (
                     <div className="text-xs text-brand-accent mt-1">
-                      {t('discount')}: -{money(quote.data?.discount40)}
+                      {t('discount')}
+                      {quote.data?.discountRate
+                        ? ` (%${Math.round(quote.data.discountRate * 100)})`
+                        : ''}
+                      : -{money(quote.data?.discount40)}
                     </div>
                   )}
                 </>

@@ -85,11 +85,15 @@ export class OrdersService {
       }
     }
 
+    const discountRate = await this.pricing.effectiveDiscountRate(
+      authUser.userId,
+      user.hasDiscount40,
+    );
     let quote = await this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],
       user.priceMultiplier,
-      user.hasDiscount40,
+      discountRate,
     );
 
     // Numune sipariş (D2/#41): sabit düşük ücret, indirim yok

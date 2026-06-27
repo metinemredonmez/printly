@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Prisma, ProductUnit } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { MembershipsService } from '../memberships/memberships.module';
 
 const SQFT_PER_SQIN = 1 / 144; // inch² → ft²
 const SQM_PER_SQFT = 0.092903; // ft² → m²
@@ -49,11 +50,23 @@ export interface OrderQuote {
   totalSqm: number;
   multiplier: number;
   hasDiscount40: boolean;
+  discountRate: number;
 }
 
 @Injectable()
 export class PricingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private memberships: MembershipsService,
+  ) {}
+
+  // $250 kapısı (hasDiscount40) açıksa indirim oranı = kümülatif yükleme kademesi
+  // (Standart .40 / Pro .45 / Elit .50). Kapı kapalıysa indirim yok.
+  async effectiveDiscountRate(userId: string, hasDiscount40: boolean): Promise<number> {
+    if (!hasDiscount40) return 0;
+    const { tier } = await this.memberships.myTier(userId);
+    return tier?.discountRate ?? DISCOUNT_RATE;
+  }
 
   // Tek kalem fiyatı. multiplier: USER=2, TEAM_*=1.
   async computeItem(input: ItemInput, multiplier: number): Promise<ItemPrice> {
@@ -102,7 +115,7 @@ export class PricingService {
     items: ItemInput[],
     extras: ExtraInput[],
     multiplier: number,
-    hasDiscount40: boolean,
+    discountRate: number,
   ): Promise<OrderQuote> {
     if (!items.length) throw new BadRequestException('En az bir kalem gerekli');
 
@@ -139,7 +152,8 @@ export class PricingService {
       2,
     );
     const base = round(subtotal + extrasTotal, 2);
-    const discount40 = hasDiscount40 ? round(base * DISCOUNT_RATE, 2) : 0;
+    // İndirim oranı: 0 (yok) veya kademe oranı (Standart .40 / Pro .45 / Elit .50)
+    const discount40 = discountRate > 0 ? round(base * discountRate, 2) : 0;
     const total = round(base - discount40, 2);
     const totalSqm = round(
       pricedItems.reduce((s, i) => s + i.sqm * i.quantity, 0),
@@ -155,7 +169,8 @@ export class PricingService {
       total,
       totalSqm,
       multiplier,
-      hasDiscount40,
+      hasDiscount40: discountRate > 0,
+      discountRate,
     };
   }
 }

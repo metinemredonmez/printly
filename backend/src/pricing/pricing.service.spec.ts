@@ -12,7 +12,7 @@ describe('PricingService — fiyat motoru', () => {
         findUnique: ({ where }: any) => Promise.resolve(extras[where.id] ?? null),
       },
     };
-    return new PricingService(prisma);
+    return new PricingService(prisma, {} as any);
   };
 
   it('M2 ürün: 12×12 inç → 1 sqft → 0.0929 m² × $23 × USER(2×) ≈ $4.27', async () => {
@@ -81,7 +81,7 @@ describe('PricingService — fiyat motoru', () => {
       [{ productId: 'p5', widthInch: 1, heightInch: 1, quantity: 1 }],
       [{ extraOptionId: 'e1', quantity: 2 }],
       1,
-      true, // %40 indirim açık
+      0.4, // %40 indirim oranı
     );
     expect(q.subtotal).toBe(100);
     expect(q.extrasTotal).toBe(5); // 2.5 × 2
@@ -95,7 +95,7 @@ describe('PricingService — fiyat motoru', () => {
       [{ productId: 'p6', widthInch: 1, heightInch: 1, quantity: 3 }],
       [],
       2, // USER
-      false,
+      0, // indirim yok
     );
     expect(q.subtotal).toBe(210); // 35*2*3
     expect(q.discount40).toBe(0);
@@ -104,6 +104,29 @@ describe('PricingService — fiyat motoru', () => {
 
   it('quoteOrder: boş kalem listesi hata', async () => {
     const svc = make({});
-    await expect(svc.quoteOrder([], [], 1, false)).rejects.toThrow();
+    await expect(svc.quoteOrder([], [], 1, 0)).rejects.toThrow();
+  });
+
+  it('quoteOrder: kademe oranı (Pro %45) base üzerinden uygulanır', async () => {
+    const svc = make({ p7: { id: 'p7', active: true, unit: 'FLAT', flatPrice: 100 } });
+    const q = await svc.quoteOrder(
+      [{ productId: 'p7', widthInch: 1, heightInch: 1, quantity: 1 }],
+      [],
+      1,
+      0.45,
+    );
+    expect(q.discount40).toBeCloseTo(45, 2);
+    expect(q.total).toBeCloseTo(55, 2);
+    expect(q.discountRate).toBe(0.45);
+    expect(q.hasDiscount40).toBe(true);
+  });
+
+  it('effectiveDiscountRate: kapı kapalı→0, açık→kademe oranı', async () => {
+    const memberships: any = {
+      myTier: () => Promise.resolve({ tier: { discountRate: 0.5 } }),
+    };
+    const svc = new PricingService({} as any, memberships);
+    expect(await svc.effectiveDiscountRate('u1', false)).toBe(0);
+    expect(await svc.effectiveDiscountRate('u1', true)).toBe(0.5);
   });
 });
