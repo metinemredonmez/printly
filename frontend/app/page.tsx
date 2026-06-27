@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { LangSwitcher } from '@/components/lang-switcher';
+import { SiteFooter } from '@/components/site-footer';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
@@ -221,15 +222,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-wrap items-center gap-4 text-sm text-slate-400">
-          <span className="font-bold text-navy">Ortak Doku</span>
-          <Link href="/terms" className="hover:text-primary">{t('navTerms')}</Link>
-          <Link href="/privacy" className="hover:text-primary">{t('navPrivacy')}</Link>
-          <Link href="/cookies" className="hover:text-primary">{t('navCookies')}</Link>
-          <span className="ml-auto">{t('footer')}</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

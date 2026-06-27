@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
 import { LangSwitcher } from '@/components/lang-switcher';
+import { SiteFooter } from '@/components/site-footer';
 
 export function useTr() {
   return useLocale() === 'tr';
@@ -40,12 +41,7 @@ export function LegalShell({
         <p className="text-sm text-slate-400 mt-1">{updated}</p>
         <div className="mt-8 space-y-7">{children}</div>
       </main>
-      <footer className="max-w-3xl mx-auto px-6 py-8 text-xs text-slate-400 border-t border-slate-100 mt-8 flex flex-wrap gap-4">
-        <Link href="/terms" className="hover:text-primary">{tr ? 'Kullanım Şartları' : 'Terms'}</Link>
-        <Link href="/privacy" className="hover:text-primary">{tr ? 'Gizlilik' : 'Privacy'}</Link>
-        <Link href="/cookies" className="hover:text-primary">{tr ? 'Çerezler' : 'Cookies'}</Link>
-        <span className="ml-auto">© 2026 Ortak Doku</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
