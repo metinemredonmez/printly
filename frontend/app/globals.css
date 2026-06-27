@@ -174,10 +174,37 @@
   animation: od-spin-slow 22s linear infinite;
 }
 
+/* Scroll-reveal — bölümler viewport'a girince yumuşak kademeli giriş */
+.od-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.7s cubic-bezier(0.21, 0.6, 0.35, 1),
+    transform 0.7s cubic-bezier(0.21, 0.6, 0.35, 1);
+  will-change: opacity, transform;
+}
+.od-reveal.od-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Nav çapa bağlantıları için yumuşak kaydırma */
+html {
+  scroll-behavior: smooth;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .od-fade-up,
   .od-float,
   .od-spin-slow {
     animation: none;
+  }
+  .od-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

@@ -25,6 +25,7 @@ import { IntegrationsBand } from '@/components/integrations-band';
 import { getLandingData } from '@/lib/public';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { HeaderTicker } from '@/components/header-ticker';
+import { ScrollReveal } from '@/components/scroll-reveal';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 // her kapasite kartı için başlığa uygun renk vurgusu (ikon + ince blob)
@@ -107,6 +108,7 @@ export default async function Home() {
       </header>
 
       <main className="flex-1">
+        <ScrollReveal />
         {/* HERO */}
         <section id="ecosystem" className="relative isolate overflow-hidden">
           {/* arka plan slaytı (otomatik geçiş) */}
@@ -211,10 +213,10 @@ export default async function Home() {
                 >
                   {/* başlığa uygun blurlu arka görsel (hafif) */}
                   <div
-                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.14] dark:opacity-[0.22] blur-[2px] scale-110 group-hover:opacity-25 transition-opacity duration-300"
+                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.38] dark:opacity-[0.45] blur-[1.5px] scale-110 group-hover:opacity-60 transition-opacity duration-300"
                     style={{ backgroundImage: `url(${CARD_IMG[i % CARD_IMG.length]})` }}
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white via-white/85 to-white/55 dark:from-slate-900 dark:via-slate-900/85 dark:to-slate-900/55" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/82 via-white/68 to-white/55 dark:from-slate-900/82 dark:via-slate-900/68 dark:to-slate-900/55" />
                   {/* başlık konusuna uygun ince renk vurgusu */}
                   <div
                     className={`pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity ${a.blob}`}

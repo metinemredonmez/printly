@@ -20,6 +20,18 @@ const DEFAULT_FAQS: Faq[] = [
     qEn: 'How does pricing work?',
     aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $250 unlocks a 40% discount.',
   },
+  {
+    q: 'Teslimat ne kadar sürer?',
+    a: 'Üretim genellikle 2–5 iş günüdür; ABD içi kargo taşıyıcıya göre 3–7 iş günü sürer. Her aşamada durum güncellemesi alırsın.',
+    qEn: 'How long does delivery take?',
+    aEn: 'Production is typically 2–5 business days; domestic US shipping takes 3–7 business days depending on the carrier. You get status updates at every stage.',
+  },
+  {
+    q: 'Sipariş iptal veya iade nasıl olur?',
+    a: 'Üretime girmeden iptal edilen bakiye siparişlerinde tutar otomatik cüzdana iade edilir. Üretim sonrası kusurlu işlerde yeniden baskı veya iade değerlendirilir.',
+    qEn: 'How do cancellations and refunds work?',
+    aEn: 'Balance orders cancelled before production are auto-refunded to your wallet. For defective items after production, a reprint or refund is evaluated.',
+  },
 ];
 
 export function LandingFaq({ tr, faqs }: { tr: boolean; faqs?: Faq[] }) {
