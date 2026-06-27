@@ -24,6 +24,7 @@ import { LandingFaq } from '@/components/landing-faq';
 import { IntegrationsBand } from '@/components/integrations-band';
 import { getLandingData } from '@/lib/public';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { HeaderTicker } from '@/components/header-ticker';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 // her kapasite kartı için başlığa uygun renk vurgusu (ikon + ince blob)
@@ -91,6 +92,7 @@ export default async function Home() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <HeaderTicker />
             <ThemeToggle />
             <LangSwitcher />
             <Link

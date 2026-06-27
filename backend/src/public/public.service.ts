@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Prisma, Role, ProductCategory, ProductUnit } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettingsService } from '../settings/settings.module';
@@ -17,7 +19,36 @@ export class PublicService {
   constructor(
     private prisma: PrismaService,
     private settings: SettingsService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
+
+  // Canlı döviz kuru (USD bazlı) — ücretsiz/key'siz ECB (frankfurter), 1 saat cache, hata→boş.
+  async ticker() {
+    const KEY = 'public:ticker';
+    const hit = await this.cache.get(KEY);
+    if (hit) return hit;
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP', {
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) throw new Error('fx');
+      const data = (await res.json()) as { date?: string; rates?: Record<string, number> };
+      const r = data.rates ?? {};
+      const out = {
+        base: 'USD',
+        date: data.date ?? null,
+        rates: [
+          { pair: 'USD/TRY', value: r.TRY ?? null },
+          { pair: 'USD/EUR', value: r.EUR ?? null },
+          { pair: 'USD/GBP', value: r.GBP ?? null },
+        ].filter((x) => x.value != null),
+      };
+      await this.cache.set(KEY, out, 3_600_000); // 1 saat
+      return out;
+    } catch {
+      return { base: 'USD', date: null, rates: [] as { pair: string; value: number }[] };
+    }
+  }
 
   async landing() {
     const [rawProducts, discountRate, featureMatrix, stats, trustBadges, faqs, integrations] =

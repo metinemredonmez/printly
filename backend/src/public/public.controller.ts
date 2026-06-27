@@ -12,4 +12,11 @@ export class PublicController {
   landing() {
     return this.publicSvc.landing();
   }
+
+  // Canlı döviz kuru (header ticker) — auth gerektirmez, 1 saat cache.
+  @Public()
+  @Get('ticker')
+  ticker() {
+    return this.publicSvc.ticker();
+  }
 }
