@@ -23,18 +23,28 @@ import { TrustBand } from '@/components/trust-band';
 import { LandingFaq } from '@/components/landing-faq';
 import { IntegrationsBand } from '@/components/integrations-band';
 import { getLandingData } from '@/lib/public';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const CAP_ICONS: LucideIcon[] = [Factory, LineChart, Settings2, Truck, Code2, Handshake];
 // her kapasite kartı için başlığa uygun renk vurgusu (ikon + ince blob)
 const CAP_ACCENT = [
-  { tile: 'bg-blue-50 text-blue-600', blob: 'bg-blue-200' },
-  { tile: 'bg-emerald-50 text-emerald-600', blob: 'bg-emerald-200' },
-  { tile: 'bg-violet-50 text-violet-600', blob: 'bg-violet-200' },
-  { tile: 'bg-amber-50 text-amber-600', blob: 'bg-amber-200' },
-  { tile: 'bg-sky-50 text-sky-600', blob: 'bg-sky-200' },
-  { tile: 'bg-rose-50 text-rose-600', blob: 'bg-rose-200' },
+  { tile: 'bg-blue-50 text-blue-600 dark:bg-blue-500/15', blob: 'bg-blue-200 dark:bg-blue-500/25' },
+  { tile: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15', blob: 'bg-emerald-200 dark:bg-emerald-500/25' },
+  { tile: 'bg-violet-50 text-violet-600 dark:bg-violet-500/15', blob: 'bg-violet-200 dark:bg-violet-500/25' },
+  { tile: 'bg-amber-50 text-amber-600 dark:bg-amber-500/15', blob: 'bg-amber-200 dark:bg-amber-500/25' },
+  { tile: 'bg-sky-50 text-sky-600 dark:bg-sky-500/15', blob: 'bg-sky-200 dark:bg-sky-500/25' },
+  { tile: 'bg-rose-50 text-rose-600 dark:bg-rose-500/15', blob: 'bg-rose-200 dark:bg-rose-500/25' },
 ];
-const PLAN_COLORS = ['border-slate-200', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
+// başlıkla alakalı blurlu arka görseller (sırayla kartlarla eşleşir)
+const CARD_IMG = [
+  '/banners/card-uretim.jpg', // Üretim Ağı
+  '/banners/card-siparis.jpg', // Sipariş Yönetimi
+  '/banners/card-operasyon.jpg', // Operasyonel Sistemler
+  '/banners/card-fulfillment.jpg', // Fulfillment
+  '/banners/card-teknoloji.jpg', // Teknoloji
+  '/banners/card-ortaklik.jpg', // İş Ortaklıkları
+];
+const PLAN_COLORS = ['border-slate-200 dark:border-slate-800', 'border-primary ring-2 ring-primary/20', 'border-amber-200'];
 
 type Cap = { title: string; desc: string };
 type Plan = { name: string; badge: string; price: string; features: string[] };
@@ -66,14 +76,14 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-slate-950">
       {/* NAV */}
-      <header className="h-20 bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+      <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Logo className="h-11 w-auto" />
           </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
             {nav.map((n) => (
               <a key={n.href} href={n.href} className="hover:text-primary transition-colors">
                 {n.label}
@@ -81,6 +91,7 @@ export default async function Home() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <LangSwitcher />
             <Link
               href="/login"
@@ -169,12 +180,12 @@ export default async function Home() {
         <TrustBand tr={tr} badges={landing?.content.trustBadges} />
 
         {/* İSTATİSTİK BANDI */}
-        <section className="border-y border-slate-100 bg-white">
+        <section className="border-y border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-3xl font-semibold text-primary">{s.value}</div>
-                <div className="text-xs text-slate-500 mt-1">{s.label}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -183,8 +194,8 @@ export default async function Home() {
         {/* 6 KAPASİTE */}
         <section id="operations" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-semibold text-navy">{t('capsTitle')}</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">{t('capsSubtitle')}</p>
+            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('capsTitle')}</h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{t('capsSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {caps.map((c, i) => {
@@ -193,9 +204,15 @@ export default async function Home() {
               return (
                 <div
                   key={c.title}
-                  className="od-fade-up group relative overflow-hidden bg-white p-7 rounded-3xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all"
+                  className="od-fade-up group relative overflow-hidden bg-white dark:bg-slate-900 p-7 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all"
                   style={{ animationDelay: `${0.08 + i * 0.07}s` }}
                 >
+                  {/* başlığa uygun blurlu arka görsel (hafif) */}
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.14] dark:opacity-[0.22] blur-[2px] scale-110 group-hover:opacity-25 transition-opacity duration-300"
+                    style={{ backgroundImage: `url(${CARD_IMG[i % CARD_IMG.length]})` }}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white via-white/85 to-white/55 dark:from-slate-900 dark:via-slate-900/85 dark:to-slate-900/55" />
                   {/* başlık konusuna uygun ince renk vurgusu */}
                   <div
                     className={`pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity ${a.blob}`}
@@ -204,8 +221,8 @@ export default async function Home() {
                     <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${a.tile}`}>
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="text-lg font-semibold text-navy">{c.title}</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed">{c.desc}</p>
+                    <h3 className="text-lg font-semibold text-navy dark:text-white">{c.title}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{c.desc}</p>
                   </div>
                 </div>
               );
@@ -219,19 +236,19 @@ export default async function Home() {
         {/* NASIL ÇALIŞIR */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-semibold text-navy">{t('howTitle')}</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">{t('howSubtitle')}</p>
+            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('howTitle')}</h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{t('howSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {steps.map((s, i) => (
-              <div key={s.title} className="relative rounded-3xl border border-slate-100 bg-white p-6">
+              <div key={s.title} className="relative rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
                 <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center font-semibold mb-4">
                   {i + 1}
                 </div>
-                <h3 className="font-semibold text-navy">{s.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed mt-1">{s.desc}</p>
+                <h3 className="font-semibold text-navy dark:text-white">{s.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">{s.desc}</p>
                 {i < steps.length - 1 && (
-                  <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 h-5 w-5 text-slate-300" />
+                  <ArrowRight className="hidden lg:block absolute top-1/2 -right-3 h-5 w-5 text-slate-300 dark:text-slate-600" />
                 )}
               </div>
             ))}
@@ -242,29 +259,29 @@ export default async function Home() {
         <ProfitCalculator categories={landing?.categories} />
 
         {/* ÜYELİK PLANLARI */}
-        <section id="production" className="bg-white border-y border-slate-100 py-14">
+        <section id="production" className="bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-semibold text-navy mb-2">{t('plansTitle')}</h2>
-              <p className="text-slate-500">{t('plansSubtitle')}</p>
+              <h2 className="text-3xl font-semibold text-navy dark:text-white mb-2">{t('plansTitle')}</h2>
+              <p className="text-slate-500 dark:text-slate-400">{t('plansSubtitle')}</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {plans.map((p, i) => (
                 <div
                   key={p.name}
-                  className={`od-fade-up rounded-3xl border-2 ${PLAN_COLORS[i]} p-7 bg-white hover:-translate-y-1 transition-transform`}
+                  className={`od-fade-up rounded-3xl border-2 ${PLAN_COLORS[i]} p-7 bg-white dark:bg-slate-900 hover:-translate-y-1 transition-transform`}
                   style={{ animationDelay: `${0.1 + i * 0.1}s` }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl font-semibold text-navy">{p.name}</h3>
-                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                    <h3 className="text-xl font-semibold text-navy dark:text-white">{p.name}</h3>
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 dark:text-slate-300">
                       {p.badge}
                     </span>
                   </div>
                   <div className="text-2xl font-semibold text-primary mb-4">{p.price}</div>
                   <ul className="space-y-2 mb-6">
                     {p.features.map((ft) => (
-                      <li key={ft} className="flex items-center gap-2 text-sm text-slate-600">
+                      <li key={ft} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                         <span className="h-1.5 w-1.5 rounded-full bg-brand-accent shrink-0" />
                         {ft}
                       </li>
@@ -291,21 +308,21 @@ export default async function Home() {
         {/* MÜŞTERİ YORUMLARI */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-10">
-            <h2 className="text-3xl font-semibold text-navy">{t('testiTitle')}</h2>
-            <p className="text-slate-500">{t('testiSubtitle')}</p>
+            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('testiTitle')}</h2>
+            <p className="text-slate-500 dark:text-slate-400">{t('testiSubtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((tt) => (
-              <figure key={tt.name} className="rounded-3xl border border-slate-100 bg-white p-7 flex flex-col">
+              <figure key={tt.name} className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col">
                 <div className="text-primary text-3xl leading-none font-serif">&ldquo;</div>
-                <blockquote className="text-sm text-slate-600 leading-relaxed flex-1 -mt-2">{tt.quote}</blockquote>
+                <blockquote className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex-1 -mt-2">{tt.quote}</blockquote>
                 <figcaption className="mt-4 flex items-center gap-3">
                   <span className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
                     {tt.name.slice(0, 1)}
                   </span>
                   <span>
-                    <span className="block text-sm font-semibold text-navy">{tt.name}</span>
-                    <span className="block text-xs text-slate-400">{tt.role}</span>
+                    <span className="block text-sm font-semibold text-navy dark:text-white">{tt.name}</span>
+                    <span className="block text-xs text-slate-400 dark:text-slate-500">{tt.role}</span>
                   </span>
                 </figcaption>
               </figure>

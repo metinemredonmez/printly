@@ -28,8 +28,8 @@ export function LandingFaq({ tr, faqs }: { tr: boolean; faqs?: Faq[] }) {
   return (
     <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy">{tr ? 'Sıkça Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
-        <p className="text-slate-500">
+        <h2 className="text-3xl font-semibold text-navy dark:text-white">{tr ? 'Sıkça Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
+        <p className="text-slate-500 dark:text-slate-400">
           {tr ? 'Aklındaki ilk sorular — gerisi için ' : 'The first questions — for more see the '}
           <a href="/faq" className="text-primary hover:underline">{tr ? 'tüm SSS' : 'full FAQ'}</a>.
         </p>
@@ -39,13 +39,13 @@ export function LandingFaq({ tr, faqs }: { tr: boolean; faqs?: Faq[] }) {
         {list.map((f) => (
           <details
             key={f.q}
-            className="group rounded-2xl border border-slate-100 bg-white px-5 [&_summary]:list-none open:shadow-sm"
+            className="group rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 [&_summary]:list-none open:shadow-sm"
           >
-            <summary className="flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-medium text-navy">
+            <summary className="flex items-center justify-between gap-4 py-4 cursor-pointer text-sm font-medium text-navy dark:text-white">
               {tr ? f.q : f.qEn}
-              <ChevronDown className="h-4 w-4 text-slate-400 shrink-0 transition-transform group-open:rotate-180" />
+              <ChevronDown className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0 transition-transform group-open:rotate-180" />
             </summary>
-            <p className="pb-4 -mt-1 text-sm text-slate-500 leading-relaxed">{tr ? f.a : f.aEn}</p>
+            <p className="pb-4 -mt-1 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{tr ? f.a : f.aEn}</p>
           </details>
         ))}
       </div>

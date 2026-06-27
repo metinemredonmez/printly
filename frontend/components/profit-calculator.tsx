@@ -39,21 +39,21 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy">
+        <h2 className="text-3xl font-semibold text-navy dark:text-white">
           {tr ? 'Ne kadar kazanırsın?' : 'How much can you earn?'}
         </h2>
-        <p className="text-slate-500 max-w-2xl mx-auto">
+        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {tr
             ? 'Üye (1×) maliyetin ile Etsy satış fiyatın arasındaki kârı anında gör.'
             : 'See the profit between your member (1×) cost and your Etsy selling price instantly.'}
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+      <div className="grid lg:grid-cols-2 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
         {/* Sol: girdiler */}
-        <div className="bg-white p-7 sm:p-9 space-y-6">
+        <div className="bg-white dark:bg-slate-900 p-7 sm:p-9 space-y-6">
           <div>
-            <label className="text-xs font-semibold text-slate-500">{tr ? 'Ürün' : 'Product'}</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">{tr ? 'Ürün' : 'Product'}</label>
             <div className="grid grid-cols-3 gap-2 mt-2">
               {PRODUCTS.map((pr, i) => (
                 <button
@@ -61,7 +61,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
                   type="button"
                   onClick={() => setPi(i)}
                   className={`px-2 py-2 rounded-xl text-xs font-medium border-2 transition-all ${
-                    pi === i ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    pi === i ? 'border-primary bg-blue-50 dark:bg-blue-500/10 text-primary' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                   }`}
                 >
                   {tr ? pr.tr : pr.en}
@@ -74,7 +74,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
             <div className="grid grid-cols-2 gap-3">
               <Range label={tr ? 'Genişlik (inç)' : 'Width (in)'} value={w} min={6} max={120} onChange={setW} />
               <Range label={tr ? 'Yükseklik (inç)' : 'Height (in)'} value={h} min={6} max={120} onChange={setH} />
-              <p className="col-span-2 text-xs text-slate-400">
+              <p className="col-span-2 text-xs text-slate-400 dark:text-slate-500">
                 {tr ? 'Alan' : 'Area'}: {sqm.toFixed(2)} m²
               </p>
             </div>
@@ -105,7 +105,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
             <Row label={tr ? 'Etsy satış fiyatın' : 'Your Etsy price'} value={money(sell)} />
             <Row label={tr ? 'Birim kâr' : 'Profit per unit'} value={money(unitProfit)} accent />
             <div className="border-t border-white/10 pt-4">
-              <div className="text-xs text-slate-400 flex items-center gap-1.5">
+              <div className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
                 <TrendingUp className="h-4 w-4 text-brand-accent" />
                 {tr ? 'Yaklaşık yıllık kârın' : 'Approx. annual profit'}
               </div>
@@ -118,7 +118,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
           >
             {tr ? 'Şimdi Başvur' : 'Apply Now'} <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-[11px] text-slate-500 mt-3">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-3">
             {tr
               ? '* Tahmini. Etsy komisyonu, kargo ve vergiler hariç. Üye (1×) fiyat baz alınmıştır.'
               : '* Estimate. Excludes Etsy fees, shipping and taxes. Based on member (1×) price.'}
@@ -149,8 +149,8 @@ function Range({
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-xs">
-        <span className="font-semibold text-slate-500">{label}</span>
-        <span className="font-semibold text-navy">
+        <span className="font-semibold text-slate-500 dark:text-slate-400">{label}</span>
+        <span className="font-semibold text-navy dark:text-white">
           {value}
           {suffix}
         </span>

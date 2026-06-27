@@ -43,8 +43,8 @@ export function ProductShowcase({
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy">{tr ? 'Ürün Kategorileri' : 'Product Categories'}</h2>
-        <p className="text-slate-500 max-w-2xl mx-auto">
+        <h2 className="text-3xl font-semibold text-navy dark:text-white">{tr ? 'Ürün Kategorileri' : 'Product Categories'}</h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {tr
             ? 'Üç çekirdek üretim hattı — her biri Etsy’de satışa hazır.'
             : 'Three core production lines — each ready to sell on Etsy.'}
@@ -65,7 +65,7 @@ export function ProductShowcase({
           return (
             <div
               key={key}
-              className="group rounded-3xl border border-slate-100 bg-white overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col"
+              className="group rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col"
             >
               {/* Görsel başlık: admin ürün görseli set ettiyse foto, yoksa markalı gradient */}
               <div className="relative h-40 overflow-hidden">
@@ -88,16 +88,16 @@ export function ProductShowcase({
 
               <div className="p-6 space-y-3 flex-1 flex flex-col">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-navy">{tr ? meta.tr : meta.en}</h3>
+                  <h3 className="text-lg font-semibold text-navy dark:text-white">{tr ? meta.tr : meta.en}</h3>
                   {cat && cat.count > 0 && (
                     <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${meta.chip}`}>
                       {cat.count} {tr ? 'ürün' : 'products'}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-slate-500 leading-relaxed">{tr ? meta.descTr : meta.descEn}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{tr ? meta.descTr : meta.descEn}</p>
                 {names.length > 0 && (
-                  <ul className="text-xs text-slate-400 space-y-1">
+                  <ul className="text-xs text-slate-400 dark:text-slate-500 space-y-1">
                     {names.map((n) => (
                       <li key={n} className="flex items-center gap-1.5">
                         <span className="h-1 w-1 rounded-full bg-brand-accent" />

@@ -91,7 +91,7 @@ export function SiteFooter() {
             <h3 className="text-white font-semibold text-lg">
               {tr ? 'Bültenimize kayıt olun' : 'Subscribe to our newsletter'}
             </h3>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               {tr
                 ? 'Üretim, e-ticaret ve operasyon üzerine güncellemeleri ilk siz öğrenin.'
                 : 'Be the first to get updates on production, e-commerce and operations.'}
@@ -118,7 +118,7 @@ export function SiteFooter() {
             <h3 className="text-white font-semibold text-lg">
               {tr ? 'Mobil uygulama çok yakında' : 'Mobile app coming soon'}
             </h3>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-400 dark:text-slate-500">
               {tr
                 ? 'Üretim takibi ve QR okutma cebinizde. App Store ve Google Play’de yakında.'
                 : 'Production tracking and QR scanning in your pocket. Soon on the App Store and Google Play.'}
@@ -135,7 +135,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-1 space-y-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="h-11 w-11 rounded-2xl bg-white flex items-center justify-center">
+            <span className="h-11 w-11 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center">
               <LogoMark className="h-7 w-7" />
             </span>
             <span className="font-semibold text-white text-lg">Ortak Doku</span>
@@ -170,7 +170,7 @@ export function SiteFooter() {
             <ul className="space-y-2">
               {col.items.map((it) => (
                 <li key={it.href + it.en}>
-                  <Link href={it.href} className="text-sm text-slate-400 hover:text-white transition-colors">
+                  <Link href={it.href} className="text-sm text-slate-400 dark:text-slate-500 hover:text-white transition-colors">
                     {tr ? it.tr : it.en}
                   </Link>
                 </li>
@@ -187,7 +187,7 @@ export function SiteFooter() {
             <ShieldCheck className="h-4 w-4 text-brand-accent" />
             {tr ? 'Güvenli ödeme altyapısı' : 'Secure payment infrastructure'}
           </div>
-          <div className="flex items-center gap-x-5 gap-y-1 flex-wrap justify-center text-slate-500">
+          <div className="flex items-center gap-x-5 gap-y-1 flex-wrap justify-center text-slate-500 dark:text-slate-400">
             {['Visa', 'Mastercard', 'Amex', 'Stripe', 'QuickBooks'].map((m) => (
               <span key={m} className="text-sm">{m}</span>
             ))}
@@ -196,7 +196,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
           <span>© 2026 Ortak Doku — B2B Print-on-Demand</span>
           <span>{tr ? 'Tüm hakları saklıdır.' : 'All rights reserved.'}</span>
         </div>

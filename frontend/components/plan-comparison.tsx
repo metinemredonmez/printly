@@ -43,7 +43,7 @@ function Cell({ value, highlight }: { value: boolean | string; highlight?: boole
   if (value === true)
     return <Check className={`h-4 w-4 mx-auto ${highlight ? 'text-primary' : 'text-brand-accent'}`} />;
   if (value === false) return <Minus className="h-4 w-4 mx-auto text-slate-300" />;
-  return <span className={`text-sm font-medium ${highlight ? 'text-primary' : 'text-navy'}`}>{value}</span>;
+  return <span className={`text-sm font-medium ${highlight ? 'text-primary' : 'text-navy dark:text-white'}`}>{value}</span>;
 }
 
 export function PlanComparison({
@@ -65,15 +65,15 @@ export function PlanComparison({
       <table className="w-full min-w-[640px] border-separate border-spacing-0">
         <thead>
           <tr>
-            <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide pb-4 pl-1">
+            <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide pb-4 pl-1">
               {tr ? 'Özellik' : 'Feature'}
             </th>
             {cols.map((c) => (
               <th key={c.name} className="pb-4 px-3 text-center">
-                <div className={`text-sm font-semibold ${c.highlight ? 'text-primary' : 'text-navy'}`}>
+                <div className={`text-sm font-semibold ${c.highlight ? 'text-primary' : 'text-navy dark:text-white'}`}>
                   {tr ? c.name : c.nameEn}
                 </div>
-                <div className="text-[11px] text-slate-400">{sub(c)}</div>
+                <div className="text-[11px] text-slate-400 dark:text-slate-500">{sub(c)}</div>
               </th>
             ))}
           </tr>
@@ -82,15 +82,15 @@ export function PlanComparison({
           {rows.map((r, ri) => {
             const vals: (boolean | string)[] = [r.user, r.member, r.leader];
             return (
-              <tr key={r.label} className={ri % 2 ? 'bg-slate-50/60' : ''}>
-                <td className="py-3 pl-3 pr-4 text-sm text-slate-600 rounded-l-lg">
+              <tr key={r.label} className={ri % 2 ? 'bg-slate-50/60 dark:bg-slate-800/40' : ''}>
+                <td className="py-3 pl-3 pr-4 text-sm text-slate-600 dark:text-slate-300 rounded-l-lg">
                   {tr ? r.label : r.labelEn}
                 </td>
                 {vals.map((val, ci) => (
                   <td
                     key={ci}
                     className={`py-3 px-3 text-center ${ci === cols.length - 1 ? 'rounded-r-lg' : ''} ${
-                      cols[ci]?.highlight ? 'bg-blue-50/50' : ''
+                      cols[ci]?.highlight ? 'bg-blue-50/50 dark:bg-blue-500/10' : ''
                     }`}
                   >
                     <Cell value={val} highlight={cols[ci]?.highlight} />
@@ -101,7 +101,7 @@ export function PlanComparison({
           })}
         </tbody>
       </table>
-      <p className="text-[11px] text-slate-400 mt-3 pl-1">
+      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-3 pl-1">
         {tr
           ? 'Tüm planlar $250 yükleme sonrası %40 indirim ve canlı fiyatlandırmadan yararlanır.'
           : 'All plans benefit from the 40% discount after a $250 load and live pricing.'}

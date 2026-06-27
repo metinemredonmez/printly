@@ -13,10 +13,10 @@ export function TrustBand({ tr, badges }: { tr: boolean; badges?: Bilingual[] })
   const list = Array.isArray(badges) && badges.length ? badges : DEFAULT_BADGES;
 
   return (
-    <div className="border-y border-slate-100 bg-white">
+    <div className="border-y border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
         {list.map((b) => (
-          <span key={b.label} className="inline-flex items-center gap-2 text-sm text-slate-500">
+          <span key={b.label} className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
             <ShieldCheck className="h-4 w-4 text-brand-accent shrink-0" />
             {tr ? b.label : b.labelEn}
           </span>
