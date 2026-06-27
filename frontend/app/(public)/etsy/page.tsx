@@ -8,6 +8,7 @@ export default function EtsyPage() {
     <LegalShell
       title={tr ? 'Etsy Entegrasyonu' : 'Etsy Integration'}
       updated={tr ? 'Son güncelleme: 27 Haziran 2026' : 'Last updated: June 27, 2026'}
+      banner="/banners/etsy.jpg"
     >
       <Section heading={tr ? '1. Etsy Entegrasyonu Nedir?' : '1. What Is the Etsy Integration?'}>
         <p>

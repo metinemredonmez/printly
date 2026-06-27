@@ -8,6 +8,7 @@ export default function PricingPage() {
     <LegalShell
       title={tr ? 'Fiyatlandırma' : 'Pricing'}
       updated={tr ? 'Son güncelleme: 27 Haziran 2026' : 'Last updated: June 27, 2026'}
+      banner="/banners/pricing.jpg"
     >
       <Section heading={tr ? '1. Şeffaf Fiyat' : '1. Transparent Pricing'}>
         <p>

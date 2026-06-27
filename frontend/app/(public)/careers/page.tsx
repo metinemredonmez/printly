@@ -8,6 +8,7 @@ export default function CareersPage() {
     <LegalShell
       title={tr ? 'Kariyer' : 'Careers'}
       updated={tr ? 'Son güncelleme: 27 Haziran 2026' : 'Last updated: June 27, 2026'}
+      banner="/banners/careers.jpg"
     >
       <Section heading={tr ? 'Neden Ortak Doku?' : 'Why Ortak Doku?'}>
         <p>

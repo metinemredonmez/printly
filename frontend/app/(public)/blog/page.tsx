@@ -8,6 +8,7 @@ export default function BlogPage() {
     <LegalShell
       title={tr ? 'Blog' : 'Blog'}
       updated={tr ? 'Son güncelleme: 27 Haziran 2026' : 'Last updated: June 27, 2026'}
+      banner="/banners/blog.jpg"
     >
       <Section heading={tr ? 'Yakında' : 'Coming Soon'}>
         <p>

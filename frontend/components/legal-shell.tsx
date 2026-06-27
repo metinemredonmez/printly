@@ -5,6 +5,8 @@ import { useLocale } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
 import { LangSwitcher } from '@/components/lang-switcher';
 import { SiteFooter } from '@/components/site-footer';
+import { PageBanner } from '@/components/page-banner';
+import { Logo } from '@/components/logo';
 
 export function useTr() {
   return useLocale() === 'tr';
@@ -13,21 +15,22 @@ export function useTr() {
 export function LegalShell({
   title,
   updated,
+  subtitle,
+  banner,
   children,
 }: {
   title: string;
   updated: string;
+  subtitle?: string;
+  banner?: string;
   children: React.ReactNode;
 }) {
   const tr = useTr();
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       <header className="h-16 bg-white border-b border-slate-100 sticky top-0 z-20 flex items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-xl bg-primary text-white flex items-center justify-center font-extrabold">
-            OD
-          </div>
-          <span className="font-extrabold text-navy">Ortak Doku</span>
+        <Link href="/" className="flex items-center">
+          <Logo className="h-9 w-auto" />
         </Link>
         <div className="flex items-center gap-4">
           <LangSwitcher />
@@ -36,10 +39,10 @@ export function LegalShell({
           </Link>
         </div>
       </header>
+      <PageBanner title={title} subtitle={subtitle} image={banner} blur />
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-extrabold text-navy">{title}</h1>
-        <p className="text-sm text-slate-400 mt-1">{updated}</p>
-        <div className="mt-8 space-y-7">{children}</div>
+        <p className="text-sm text-slate-400">{updated}</p>
+        <div className="mt-6 space-y-7">{children}</div>
       </main>
       <SiteFooter />
     </div>
