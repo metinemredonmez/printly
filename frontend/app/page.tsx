@@ -208,23 +208,25 @@ export default async function Home() {
               return (
                 <div
                   key={c.title}
-                  className="od-fade-up group relative overflow-hidden bg-white dark:bg-slate-900 p-7 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all"
+                  className="od-fade-up group relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col"
                   style={{ animationDelay: `${0.08 + i * 0.07}s` }}
                 >
-                  {/* başlığa uygun blurlu arka görsel (hafif) */}
+                  {/* başlığa uygun görsel başlık — tam net (hover'da hafif zoom) */}
+                  <div className="relative h-36 overflow-hidden">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center scale-105 group-hover:scale-110 transition-transform duration-500"
+                      style={{ backgroundImage: `url(${CARD_IMG[i % CARD_IMG.length]})` }}
+                    />
+                    {/* alta yumuşak geçiş → kart gövdesine bağlanır */}
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white dark:from-slate-900 to-transparent" />
+                  </div>
+                  {/* ikon rozeti — görselin köşesinde, gövdeye taşar */}
                   <div
-                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.55] dark:opacity-[0.6] blur-[1px] scale-110 group-hover:opacity-75 transition-opacity duration-300"
-                    style={{ backgroundImage: `url(${CARD_IMG[i % CARD_IMG.length]})` }}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/92 via-white/72 to-white/30 dark:from-slate-900/92 dark:via-slate-900/72 dark:to-slate-900/30" />
-                  {/* başlık konusuna uygun ince renk vurgusu */}
-                  <div
-                    className={`pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity ${a.blob}`}
-                  />
-                  <div className="relative space-y-4">
-                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${a.tile}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
+                    className={`relative -mt-7 ml-6 h-14 w-14 rounded-2xl flex items-center justify-center shadow-sm ring-4 ring-white dark:ring-slate-900 ${a.tile}`}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div className="p-6 pt-3 space-y-2">
                     <h3 className="text-lg font-semibold text-navy dark:text-white">{c.title}</h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{c.desc}</p>
                   </div>
