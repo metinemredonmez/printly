@@ -86,6 +86,19 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
     { name: 'Cloudflare R2', status: 'connected' },
   ],
   requireProductionApproval: true, // H2/#33
+  // Kargo: taşıyıcı listesi + standart süre + takip URL şablonları (admin düzenler).
+  // Gerçek carrier API (anlık rate/etiket) anahtarla gelir; şimdilik manuel takip no.
+  shipping: {
+    carriers: ['UPS', 'FedEx', 'USPS', 'DHL'],
+    estimatedShippingDays: 5,
+    defaultFlatCost: 0,
+    trackingUrlTemplates: {
+      UPS: 'https://www.ups.com/track?tracknum={n}',
+      FedEx: 'https://www.fedex.com/fedextrack/?trknbr={n}',
+      USPS: 'https://tools.usps.com/go/TrackConfirmAction?tLabels={n}',
+      DHL: 'https://www.dhl.com/us-en/home/tracking.html?tracking-id={n}',
+    },
+  },
 };
 
 @Injectable()

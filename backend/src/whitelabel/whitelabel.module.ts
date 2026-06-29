@@ -58,6 +58,12 @@ export class WhitelabelService {
       status: order.status,
       placedAt: order.createdAt,
       brand: brand.brandName ?? 'Ortak Doku',
+      // Kargo/takip (manuel atanmışsa müşteriye gösterilir)
+      carrier: order.carrier,
+      trackingNumber: order.trackingNumber,
+      shippedAt: order.shippedAt,
+      estimatedDelivery: order.estimatedDeliveryAt,
+      deliveredAt: order.deliveredAt,
       timeline: order.statusEvents.map((e) => ({
         status: e.toStatus,
         at: e.createdAt,

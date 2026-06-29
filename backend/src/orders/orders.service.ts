@@ -27,7 +27,8 @@ const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   IN_PRODUCTION: [OrderStatus.AWAITING_APPROVAL, OrderStatus.READY, OrderStatus.CANCELLED],
   AWAITING_APPROVAL: [OrderStatus.IN_PRODUCTION, OrderStatus.READY, OrderStatus.CANCELLED],
   READY: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-  SHIPPED: [],
+  SHIPPED: [OrderStatus.DELIVERED], // kargolandı → teslim edildi
+  DELIVERED: [], // son durum
   CANCELLED: [],
 };
 
@@ -323,6 +324,13 @@ export class OrdersService {
         data: {
           status: newStatus,
           ...(didRefund ? { paymentStatus: PaymentStatus.REFUNDED } : {}),
+          // Kargo damgaları (manuel veya scan ile SHIPPED/DELIVERED'a geçişte)
+          ...(newStatus === OrderStatus.SHIPPED && !order.shippedAt
+            ? { shippedAt: new Date() }
+            : {}),
+          ...(newStatus === OrderStatus.DELIVERED && !order.deliveredAt
+            ? { deliveredAt: new Date() }
+            : {}),
           statusEvents: {
             create: {
               fromStatus: order.status,
@@ -356,6 +364,55 @@ export class OrdersService {
       },
     );
     return updated;
+  }
+
+  // Staff: kargo bilgisi ata (carrier + takip no + ETA + ücret); markShipped ile READY→SHIPPED.
+  async setShipment(
+    authUser: AuthUser,
+    id: string,
+    dto: {
+      carrier?: string;
+      trackingNumber?: string;
+      estimatedDeliveryAt?: string | null;
+      shippingCost?: number;
+      markShipped?: boolean;
+    },
+  ) {
+    if (authUser.role !== Role.ADMIN && authUser.role !== Role.PRODUCTION) {
+      throw new ForbiddenException('Yalnız personel kargo bilgisi atayabilir');
+    }
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException('Sipariş bulunamadı');
+
+    const data: Prisma.OrderUpdateInput = {};
+    if (dto.carrier !== undefined) data.carrier = dto.carrier || null;
+    if (dto.trackingNumber !== undefined) data.trackingNumber = dto.trackingNumber || null;
+    if (dto.estimatedDeliveryAt !== undefined)
+      data.estimatedDeliveryAt = dto.estimatedDeliveryAt
+        ? new Date(dto.estimatedDeliveryAt)
+        : null;
+    if (dto.shippingCost !== undefined)
+      data.shippingCost = new Prisma.Decimal(dto.shippingCost);
+
+    // Kargo verisini yaz
+    await this.prisma.order.update({ where: { id }, data });
+    await this.audit.log({
+      actorUserId: authUser.userId,
+      actorRole: authUser.role,
+      action: 'ORDER_SHIPMENT',
+      entityType: 'Order',
+      entityId: id,
+      meta: { ...dto },
+    });
+
+    // markShipped: READY ise durum makinesinden SHIPPED'a geçir (shippedAt + event + webhook)
+    if (dto.markShipped && order.status === OrderStatus.READY) {
+      return this.updateStatus(authUser, id, OrderStatus.SHIPPED, 'Kargoya verildi');
+    }
+    return this.prisma.order.findUnique({
+      where: { id },
+      include: { statusEvents: { orderBy: { createdAt: 'asc' } } },
+    });
   }
 
   // Bayi sadece kendi siparişlerini; ADMIN/PRODUCTION hepsini görür.

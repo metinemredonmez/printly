@@ -38,6 +38,13 @@ export interface Order {
   clientCountry?: string;
   clientZip?: string;
   clientPhone?: string;
+  // Kargo / takip
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  shippedAt?: string | null;
+  estimatedDeliveryAt?: string | null;
+  deliveredAt?: string | null;
+  shippingCost?: number;
   createdAt: string;
   items?: OrderItem[];
   extras?: OrderExtra[];
@@ -50,5 +57,6 @@ export const ORDER_STATUSES = [
   'AWAITING_APPROVAL',
   'READY',
   'SHIPPED',
+  'DELIVERED',
   'CANCELLED',
 ] as const;

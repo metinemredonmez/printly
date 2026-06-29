@@ -124,6 +124,7 @@
     "AWAITING_APPROVAL": "Awaiting Approval",
     "READY": "Ready",
     "SHIPPED": "Shipped",
+    "DELIVERED": "Delivered",
     "CANCELLED": "Cancelled"
   },
   "dash": {

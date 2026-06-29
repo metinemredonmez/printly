@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateStatusDto } from './dto';
+import { CreateOrderDto, UpdateStatusDto, ShipmentDto } from './dto';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
@@ -65,5 +65,16 @@ export class OrdersController {
     @Body() dto: UpdateStatusDto,
   ) {
     return this.orders.updateStatus(user, id, dto.status, dto.note);
+  }
+
+  // Kargo bilgisi ata (carrier + takip no + ETA + ücret); markShipped → READY'den SHIPPED'a
+  @RequirePermission('order:updateStatus')
+  @Patch(':id/shipment')
+  setShipment(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: ShipmentDto,
+  ) {
+    return this.orders.setShipment(user, id, dto);
   }
 }

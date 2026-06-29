@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
-import { ArrowLeft, Check, Archive, ArchiveRestore, FileText, Printer, Package } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { ArrowLeft, Check, Archive, ArchiveRestore, FileText, Printer, Package, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { money, shortDate } from '@/lib/format';
@@ -24,6 +25,7 @@ export function OrderDetail({
 }) {
   const t = useTranslations('orders');
   const tos = useTranslations('orderStatus');
+  const tr = useLocale() === 'tr';
   const qc = useQueryClient();
 
   const { data: o, isLoading } = useQuery({
@@ -181,6 +183,8 @@ export function OrderDetail({
               </div>
             </div>
           )}
+
+          <ShipmentCard order={o} staff={staff} id={id} />
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 h-fit">
@@ -209,6 +213,220 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
       <span className={accent ? 'text-emerald-600 dark:text-emerald-300 font-medium' : 'text-navy dark:text-white font-medium'}>
         {value}
       </span>
+    </div>
+  );
+}
+
+const CARRIERS = ['', 'UPS', 'FedEx', 'USPS', 'DHL'] as const;
+
+function fmtDate(d: string | null | undefined, tr: boolean) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return '—';
+  return dt.toLocaleDateString(tr ? 'tr-TR' : 'en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+// ISO → 'YYYY-MM-DD' (date input pre-fill)
+function isoToDateInput(d: string | null | undefined) {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return '';
+  return dt.toISOString().slice(0, 10);
+}
+
+function ShipmentCard({
+  order,
+  staff,
+  id,
+}: {
+  order: Order;
+  staff: boolean;
+  id: string;
+}) {
+  const tr = useLocale() === 'tr';
+  const qc = useQueryClient();
+
+  const [carrier, setCarrier] = useState(order.carrier ?? '');
+  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber ?? '');
+  const [estimatedDeliveryAt, setEstimatedDeliveryAt] = useState(
+    isoToDateInput(order.estimatedDeliveryAt),
+  );
+  const [shippingCost, setShippingCost] = useState(
+    order.shippingCost != null ? String(order.shippingCost) : '',
+  );
+
+  const shipment = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      api(`/orders/${id}/shipment`, { method: 'PATCH', json: payload }),
+    onSuccess: () => {
+      toast.success(tr ? 'Kargo bilgileri kaydedildi' : 'Shipping info saved');
+      qc.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : tr ? 'Hata' : 'Error'),
+  });
+
+  const baseFields = () => ({
+    carrier,
+    trackingNumber,
+    estimatedDeliveryAt: estimatedDeliveryAt
+      ? new Date(estimatedDeliveryAt).toISOString()
+      : '',
+    shippingCost: shippingCost === '' ? undefined : Number(shippingCost),
+  });
+
+  const title = tr ? 'Kargo Bilgileri' : 'Shipping';
+  const inputCls =
+    'h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 text-sm px-2 bg-white dark:bg-slate-950 dark:text-white';
+  const labelCls = 'block text-[11px] mb-1 text-slate-500 dark:text-slate-400';
+
+  // ── STAFF: düzenlenebilir form ──────────────────────────────
+  if (staff) {
+    return (
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+        <h2 className="font-semibold text-navy dark:text-white mb-3 flex items-center gap-2">
+          <Truck className="h-4 w-4 text-slate-400 dark:text-slate-500" /> {title}
+        </h2>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className={labelCls}>{tr ? 'Kargo Firması' : 'Carrier'}</label>
+            <select
+              className={inputCls}
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
+            >
+              {CARRIERS.map((c) => (
+                <option key={c || 'none'} value={c}>
+                  {c || '—'}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>{tr ? 'Takip No' : 'Tracking number'}</label>
+            <input
+              className={inputCls}
+              value={trackingNumber}
+              onChange={(e) => setTrackingNumber(e.target.value)}
+              placeholder={tr ? 'Takip numarası' : 'Tracking number'}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>
+              {tr ? 'Tahmini Teslim' : 'Estimated delivery'}
+            </label>
+            <input
+              type="date"
+              className={inputCls}
+              value={estimatedDeliveryAt}
+              onChange={(e) => setEstimatedDeliveryAt(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>
+              {tr ? 'Kargo Ücreti (USD)' : 'Shipping cost (USD)'}
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              className={inputCls}
+              value={shippingCost}
+              onChange={(e) => setShippingCost(e.target.value)}
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        {(order.shippedAt || order.deliveredAt) && (
+          <div className="mt-3 text-[12px] text-slate-500 dark:text-slate-400 space-y-0.5">
+            {order.shippedAt && (
+              <div>
+                {tr ? 'Kargolandı' : 'Shipped'}: {fmtDate(order.shippedAt, tr)}
+              </div>
+            )}
+            {order.deliveredAt && (
+              <div>
+                {tr ? 'Teslim' : 'Delivered'}: {fmtDate(order.deliveredAt, tr)}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center gap-2 flex-wrap">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-9 rounded-xl"
+            onClick={() => shipment.mutate(baseFields())}
+            disabled={shipment.isPending}
+          >
+            {tr ? 'Kaydet' : 'Save'}
+          </Button>
+          {order.status === 'READY' && (
+            <Button
+              size="sm"
+              className="h-9 rounded-xl"
+              onClick={() =>
+                shipment.mutate({ markShipped: true, carrier, trackingNumber })
+              }
+              disabled={shipment.isPending}
+            >
+              <Truck className="h-4 w-4 mr-1.5" /> {tr ? 'Kargoya Ver' : 'Mark Shipped'}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── BAYİ: salt-okunur ───────────────────────────────────────
+  const hasInfo =
+    order.carrier ||
+    order.trackingNumber ||
+    order.shippedAt ||
+    order.estimatedDeliveryAt ||
+    order.deliveredAt;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <h2 className="font-semibold text-navy dark:text-white mb-3 flex items-center gap-2">
+        <Package className="h-4 w-4 text-slate-400 dark:text-slate-500" /> {title}
+      </h2>
+
+      {!hasInfo ? (
+        <div className="text-sm text-slate-500 dark:text-slate-400">
+          {tr ? 'Henüz kargo bilgisi yok' : 'No shipping info yet'}
+        </div>
+      ) : (
+        <div className="space-y-2 text-sm">
+          <Row label={tr ? 'Kargo Firması' : 'Carrier'} value={order.carrier || '—'} />
+          {order.trackingNumber && (
+            <Row label={tr ? 'Takip No' : 'Tracking number'} value={order.trackingNumber} />
+          )}
+          <Row
+            label={tr ? 'Kargolandı' : 'Shipped'}
+            value={fmtDate(order.shippedAt, tr)}
+          />
+          <Row
+            label={tr ? 'Tahmini Teslim' : 'Estimated delivery'}
+            value={fmtDate(order.estimatedDeliveryAt, tr)}
+          />
+          <Row label={tr ? 'Teslim' : 'Delivered'} value={fmtDate(order.deliveredAt, tr)} />
+          <div className="pt-1">
+            <Link
+              href={`/track/${order.orderNumber}`}
+              className="text-[13px] text-primary hover:underline"
+            >
+              {tr ? 'Takip sayfasını aç' : 'Open tracking page'}
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

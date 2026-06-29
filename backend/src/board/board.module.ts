@@ -30,7 +30,8 @@ const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   IN_PRODUCTION: [OrderStatus.AWAITING_APPROVAL, OrderStatus.READY, OrderStatus.CANCELLED],
   AWAITING_APPROVAL: [OrderStatus.IN_PRODUCTION, OrderStatus.READY, OrderStatus.CANCELLED],
   READY: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-  SHIPPED: [],
+  SHIPPED: [OrderStatus.DELIVERED],
+  DELIVERED: [],
   CANCELLED: [],
 };
 

@@ -69,3 +69,11 @@ export class UpdateStatusDto {
   @IsEnum(OrderStatus) status: OrderStatus;
   @IsOptional() @IsString() note?: string;
 }
+
+export class ShipmentDto {
+  @IsOptional() @IsString() carrier?: string;
+  @IsOptional() @IsString() trackingNumber?: string;
+  @IsOptional() @IsString() estimatedDeliveryAt?: string; // ISO tarih
+  @IsOptional() @IsNumber() shippingCost?: number;
+  @IsOptional() @IsBoolean() markShipped?: boolean; // READY ise SHIPPED'a geçir
+}

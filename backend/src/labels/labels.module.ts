@@ -84,6 +84,11 @@ export class LabelsService {
     text(`Bayi: ${order.user?.fullName || order.user?.email || '-'}`, 9);
     text(`Kategori: ${order.category}  •  Kalem: ${order._count.items}  •  ${Number(order.totalSqm)} m2`, 9);
     text(`Durum: ${order.status}`, 9);
+    if (order.carrier || order.trackingNumber) {
+      line();
+      text(`Kargo: ${order.carrier || '-'}`, 10, bold);
+      if (order.trackingNumber) text(`Takip: ${order.trackingNumber}`, 9);
+    }
 
     const bytes = await doc.save();
     return Buffer.from(bytes);

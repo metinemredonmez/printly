@@ -124,6 +124,7 @@
     "AWAITING_APPROVAL": "Onay Bekliyor",
     "READY": "Hazır",
     "SHIPPED": "Kargoda",
+    "DELIVERED": "Teslim Edildi",
     "CANCELLED": "İptal"
   },
   "dash": {

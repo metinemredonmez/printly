@@ -40,6 +40,7 @@ enum OrderStatus {
   AWAITING_APPROVAL
   READY
   SHIPPED
+  DELIVERED
   CANCELLED
 }
 
@@ -383,6 +384,14 @@ model Order {
   clientNote    String?
   clientLat     Float? // harita/canlı aktivite (#15)
   clientLng     Float?
+
+  // Kargo / takip (operasyon — carrier API hazır; manuel takip no ile çalışır)
+  carrier             String? // UPS | FedEx | USPS | DHL ...
+  trackingNumber      String?
+  shippedAt           DateTime?
+  estimatedDeliveryAt DateTime?
+  deliveredAt         DateTime?
+  shippingCost        Decimal   @default(0) @db.Decimal(12, 2)
 
   archivedAt DateTime? // arşiv (#13) — null değilse arşivlenmiş
 
