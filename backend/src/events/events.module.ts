@@ -22,6 +22,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
@@ -48,6 +49,9 @@ class UpsertEventDto {
   @IsOptional() @IsString() imageUrl?: string;
   @IsOptional() @IsBoolean() active?: boolean;
 }
+
+// Güncellemede tüm alanlar opsiyonel (partial PATCH; title/startsAt zorunlu olmasın)
+class UpdateEventDto extends PartialType(UpsertEventDto) {}
 
 @Injectable()
 export class EventsService {
@@ -115,6 +119,9 @@ export class EventsService {
 
   async register(user: AuthUser, eventId: string) {
     const result = await this.prisma.$transaction(async (tx) => {
+      // Etkinlik satırını kilitle → aynı etkinliğe eşzamanlı kayıtlar serileşir
+      // (kontenjan TOCTOU / overbooking yarış durumu kapanır).
+      await tx.$queryRaw`SELECT id FROM "Event" WHERE id = ${eventId} FOR UPDATE`;
       const event = await tx.event.findUnique({
         where: { id: eventId },
         include: { _count: { select: { registrations: true } } },
@@ -135,20 +142,24 @@ export class EventsService {
       const price = Number((Number(event.price) * (member ? MEMBER_RATE : 1)).toFixed(2));
 
       if (price > 0) {
-        const u = await tx.user.findUnique({
-          where: { id: user.userId },
-          select: { balance: true },
+        // Atomik koşullu düşüm (race/lost-update yok)
+        const upd = await tx.user.updateMany({
+          where: { id: user.userId, balance: { gte: new Prisma.Decimal(price) } },
+          data: { balance: { decrement: new Prisma.Decimal(price) } },
         });
-        const bal = Number(u?.balance ?? 0);
-        if (bal < price)
-          throw new BadRequestException(
-            `Yetersiz bakiye. Gerekli: $${price.toFixed(2)}, mevcut: $${bal.toFixed(2)}`,
+        if (upd.count === 0) {
+          const cur = Number(
+            (await tx.user.findUnique({ where: { id: user.userId }, select: { balance: true } }))
+              ?.balance ?? 0,
           );
-        const next = Number((bal - price).toFixed(2));
-        await tx.user.update({
-          where: { id: user.userId },
-          data: { balance: new Prisma.Decimal(next) },
-        });
+          throw new BadRequestException(
+            `Yetersiz bakiye. Gerekli: $${price.toFixed(2)}, mevcut: $${cur.toFixed(2)}`,
+          );
+        }
+        const next = Number(
+          (await tx.user.findUnique({ where: { id: user.userId }, select: { balance: true } }))
+            ?.balance ?? 0,
+        );
         await tx.creditLedger.create({
           data: {
             userId: user.userId,
@@ -217,7 +228,7 @@ export class EventsService {
     return e;
   }
 
-  async update(actor: AuthUser, id: string, dto: UpsertEventDto) {
+  async update(actor: AuthUser, id: string, dto: UpdateEventDto) {
     const data: Prisma.EventUpdateInput = { ...dto } as any;
     if (dto.price !== undefined) data.price = new Prisma.Decimal(dto.price);
     if (dto.startsAt) data.startsAt = new Date(dto.startsAt);
@@ -292,7 +303,7 @@ export class EventsController {
   update(
     @CurrentUser() user: AuthUser,
     @Param('id') id: string,
-    @Body() dto: UpsertEventDto,
+    @Body() dto: UpdateEventDto,
   ) {
     return this.svc.update(user, id, dto);
   }

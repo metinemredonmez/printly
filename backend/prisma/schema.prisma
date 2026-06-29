@@ -873,6 +873,7 @@ model ReturnRequest {
   status       ReturnStatus @default(REQUESTED)
   resolution   String? // reprint | refund | note
   refundAmount Decimal?     @db.Decimal(12, 2)
+  refundedAt   DateTime? // para iadesi yapıldığı an — idempotency kilidi (bir kez kredilenir)
   adminNote    String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt

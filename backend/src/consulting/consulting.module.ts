@@ -68,29 +68,35 @@ export class ConsultingService {
     return req;
   }
 
-  list(user: AuthUser, status?: ConsultingStatus) {
-    return this.prisma.consultingRequest.findMany({
+  async list(user: AuthUser, status?: ConsultingStatus) {
+    const staff = isStaff(user.role);
+    const rows = await this.prisma.consultingRequest.findMany({
       where: {
         status,
-        ...(isStaff(user.role) ? {} : { userId: user.userId }),
+        ...(staff ? {} : { userId: user.userId }),
       },
       orderBy: { createdAt: 'desc' },
       take: 200,
-      include: isStaff(user.role)
+      include: staff
         ? { user: { select: { id: true, fullName: true, email: true, role: true } } }
         : undefined,
     });
+    // İç admin notunu bayiye sızdırma
+    if (!staff) for (const r of rows) delete (r as Partial<typeof r>).adminNote;
+    return rows;
   }
 
   async get(user: AuthUser, id: string) {
+    const staff = isStaff(user.role);
     const req = await this.prisma.consultingRequest.findUnique({
       where: { id },
       include: { user: { select: { id: true, fullName: true, email: true, role: true } } },
     });
     if (!req) throw new NotFoundException('Talep bulunamadı');
-    if (!isStaff(user.role) && req.userId !== user.userId) {
+    if (!staff && req.userId !== user.userId) {
       throw new ForbiddenException('Bu talebe erişiminiz yok');
     }
+    if (!staff) delete (req as Partial<typeof req>).adminNote;
     return req;
   }
 

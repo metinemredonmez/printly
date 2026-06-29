@@ -89,24 +89,32 @@ export class ReturnsService {
     return rr;
   }
 
-  list(user: AuthUser, status?: ReturnStatus) {
-    return this.prisma.returnRequest.findMany({
+  async list(user: AuthUser, status?: ReturnStatus) {
+    const staff = isStaff(user.role);
+    const rows = await this.prisma.returnRequest.findMany({
       where: {
         status,
-        ...(isStaff(user.role) ? {} : { userId: user.userId }),
+        ...(staff ? {} : { userId: user.userId }),
       },
       orderBy: { createdAt: 'desc' },
       take: 200,
       include: {
         order: { select: { id: true, orderNumber: true, total: true, category: true } },
-        ...(isStaff(user.role)
+        ...(staff
           ? { user: { select: { id: true, fullName: true, email: true } } }
           : {}),
       },
     });
+    // İç alanları (admin notu / çözüm) bayiye sızdırma
+    if (!staff) for (const r of rows) {
+      delete (r as Partial<typeof r>).adminNote;
+      delete (r as Partial<typeof r>).resolution;
+    }
+    return rows;
   }
 
   async get(user: AuthUser, id: string) {
+    const staff = isStaff(user.role);
     const rr = await this.prisma.returnRequest.findUnique({
       where: { id },
       include: {
@@ -115,8 +123,12 @@ export class ReturnsService {
       },
     });
     if (!rr) throw new NotFoundException('İade talebi bulunamadı');
-    if (!isStaff(user.role) && rr.userId !== user.userId) {
+    if (!staff && rr.userId !== user.userId) {
       throw new ForbiddenException('Bu talebe erişiminiz yok');
+    }
+    if (!staff) {
+      delete (rr as Partial<typeof rr>).adminNote;
+      delete (rr as Partial<typeof rr>).resolution;
     }
     return rr;
   }
@@ -126,14 +138,24 @@ export class ReturnsService {
     if (!isStaff(user.role)) throw new ForbiddenException('Yalnız personel güncelleyebilir');
 
     const result = await this.prisma.$transaction(async (tx) => {
-      const rr = await tx.returnRequest.findUnique({ where: { id } });
+      const rr = await tx.returnRequest.findUnique({
+        where: { id },
+        include: { order: { select: { total: true } } },
+      });
       if (!rr) throw new NotFoundException('İade talebi bulunamadı');
 
-      // Para iadesi: REFUNDED'a geçerken ve daha önce iade edilmemişse cüzdana ekle
+      // Para iadesi YALNIZCA bir kez: refundedAt null ise (terminal idempotency kilidi).
+      // Böylece REFUNDED→başka→REFUNDED döngüsüyle cüzdana tekrar para yatırılamaz.
       const becomingRefunded =
-        dto.status === ReturnStatus.REFUNDED && rr.status !== ReturnStatus.REFUNDED;
-      const amount = dto.refundAmount ?? Number(rr.refundAmount ?? 0);
+        dto.status === ReturnStatus.REFUNDED && rr.refundedAt == null;
 
+      // Tutar sipariş bedeline clamp'lenir (sipariş tutarından fazla iade edilemez).
+      const orderTotal = Number(rr.order?.total ?? 0);
+      let amount = dto.refundAmount ?? Number(rr.refundAmount ?? 0);
+      if (amount < 0) amount = 0;
+      if (amount > orderTotal) amount = orderTotal;
+
+      let refundedAt: Date | undefined;
       if (becomingRefunded && amount > 0) {
         const u = await tx.user.findUnique({
           where: { id: rr.userId },
@@ -152,6 +174,7 @@ export class ReturnsService {
             reason: `İade (cüzdan): ${rr.orderId}`,
           },
         });
+        refundedAt = new Date(); // iade yapıldı → bir daha kredilenmez
       }
 
       return tx.returnRequest.update({
@@ -162,8 +185,9 @@ export class ReturnsService {
           adminNote: dto.adminNote,
           refundAmount:
             dto.refundAmount !== undefined
-              ? new Prisma.Decimal(dto.refundAmount)
+              ? new Prisma.Decimal(amount)
               : undefined,
+          refundedAt,
         },
       });
     });

@@ -22,6 +22,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
 import { Prisma, Role, CourseCategory } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
@@ -49,6 +50,9 @@ class UpsertCourseDto {
   @IsOptional() @IsBoolean() active?: boolean;
   @IsOptional() @IsInt() sortOrder?: number;
 }
+
+// Güncellemede tüm alanlar opsiyonel (partial PATCH; title vb. zorunlu olmasın)
+class UpdateCourseDto extends PartialType(UpsertCourseDto) {}
 
 @Injectable()
 export class EducationService {
@@ -130,20 +134,24 @@ export class EducationService {
       const price = Number((Number(course.price) * (member ? MEMBER_RATE : 1)).toFixed(2));
 
       if (price > 0) {
-        const u = await tx.user.findUnique({
-          where: { id: user.userId },
-          select: { balance: true },
+        // Atomik koşullu düşüm: tek SQL UPDATE ... WHERE balance >= price (race/lost-update yok)
+        const upd = await tx.user.updateMany({
+          where: { id: user.userId, balance: { gte: new Prisma.Decimal(price) } },
+          data: { balance: { decrement: new Prisma.Decimal(price) } },
         });
-        const bal = Number(u?.balance ?? 0);
-        if (bal < price)
-          throw new BadRequestException(
-            `Yetersiz bakiye. Gerekli: $${price.toFixed(2)}, mevcut: $${bal.toFixed(2)}`,
+        if (upd.count === 0) {
+          const cur = Number(
+            (await tx.user.findUnique({ where: { id: user.userId }, select: { balance: true } }))
+              ?.balance ?? 0,
           );
-        const next = Number((bal - price).toFixed(2));
-        await tx.user.update({
-          where: { id: user.userId },
-          data: { balance: new Prisma.Decimal(next) },
-        });
+          throw new BadRequestException(
+            `Yetersiz bakiye. Gerekli: $${price.toFixed(2)}, mevcut: $${cur.toFixed(2)}`,
+          );
+        }
+        const next = Number(
+          (await tx.user.findUnique({ where: { id: user.userId }, select: { balance: true } }))
+            ?.balance ?? 0,
+        );
         await tx.creditLedger.create({
           data: {
             userId: user.userId,
@@ -213,7 +221,7 @@ export class EducationService {
     return c;
   }
 
-  async update(actor: AuthUser, id: string, dto: UpsertCourseDto) {
+  async update(actor: AuthUser, id: string, dto: UpdateCourseDto) {
     const data: Prisma.CourseUpdateInput = { ...dto } as any;
     if (dto.price !== undefined) data.price = new Prisma.Decimal(dto.price);
     const c = await this.prisma.course.update({ where: { id }, data });
@@ -287,7 +295,7 @@ export class EducationController {
   update(
     @CurrentUser() user: AuthUser,
     @Param('id') id: string,
-    @Body() dto: UpsertCourseDto,
+    @Body() dto: UpdateCourseDto,
   ) {
     return this.svc.update(user, id, dto);
   }
