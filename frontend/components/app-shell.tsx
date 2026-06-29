@@ -33,6 +33,7 @@ import {
   Bell,
   Search,
   TrendingUp,
+  KeyRound,
   LogOut,
   Menu,
   X,
@@ -83,6 +84,7 @@ const ADMIN_NAV: NavItem[] = [
   { href: '/admin/consulting', key: 'adminConsulting', icon: Headset },
   { href: '/admin/map', key: 'map', icon: MapIcon },
   { href: '/admin/audit', key: 'audit', icon: ScrollText },
+  { href: '/admin/integrations', key: 'adminIntegrations', icon: KeyRound },
   { href: '/admin/settings', key: 'settings', icon: Settings },
   { href: '/admin/profile', key: 'profile', icon: UserIcon },
 ];

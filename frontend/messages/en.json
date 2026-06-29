@@ -338,6 +338,7 @@
     "adminEvents": "Events",
     "adminConsulting": "Consulting",
     "adminReturns": "Returns",
+    "adminIntegrations": "Integration Keys",
     "settings": "Settings"
   },
   "dealerHome": {

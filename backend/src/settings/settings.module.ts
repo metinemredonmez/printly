@@ -12,6 +12,7 @@ import { IsDefined } from 'class-validator';
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
+import { encrypt, isEncrypted, safeDecrypt } from '../common/crypto.util';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
@@ -35,8 +36,21 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   ],
   discountRate: 0.4,
   demoOtpCode: '123456', // SMTP/e-posta yokken sabit demo doğrulama kodu; gerçek mail gelince admin boşaltır (kapanır)
-  // Google girişi (anahtar admin panelden girilir; clientId boşken/kapalıyken giriş butonu pasif)
-  googleOAuth: { enabled: false, clientId: '' },
+  // ── Entegrasyon anahtarları (HEPSİ admin panelinden girilir; secret'lar DB'de şifreli) ──
+  // Google girişi (clientId boşken/kapalıyken giriş butonu pasif)
+  googleOAuth: { enabled: false, clientId: '', clientSecret: '' },
+  // E-posta (SMTP) — girilince gerçek mail gider; o zaman demoOtpCode boşaltılır
+  smtp: { enabled: false, host: '', port: 587, secure: false, user: '', pass: '', from: '' },
+  // Etsy API
+  etsy: { enabled: false, apiKey: '', sharedSecret: '' },
+  // QuickBooks
+  quickbooks: { enabled: false, clientId: '', clientSecret: '', realmId: '' },
+  // Stripe
+  stripe: { enabled: false, publishableKey: '', secretKey: '', webhookSecret: '' },
+  // OneSignal (push)
+  onesignal: { enabled: false, appId: '', apiKey: '' },
+  // Twilio (SMS)
+  twilio: { enabled: false, accountSid: '', authToken: '', fromNumber: '' },
   sampleFee: 5, // numune sipariş sabit ücreti (D2/#41)
   // Kademeli bayi planı (D1/#40): kümülatif yüklemeye göre indirim + öncelikli üretim
   membershipTiers: [
@@ -103,6 +117,57 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   },
 };
 
+// Secret alt-alan adları (entegrasyon objelerinde) — bunlar şifrelenir/maskelenir.
+const SECRET_RE =
+  /secret|password|pass|token|apikey|api_key|sharedsecret|webhooksecret|authtoken|privatekey/i;
+// Admin UI'da set secret bu şekilde gösterilir; geri kaydedilince önceki değer korunur.
+const SECRET_MASK = '••••••••';
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === 'object' && !Array.isArray(v);
+}
+
+// Servise düz metin: şifreli secret alt-alanları çöz.
+function decryptSecrets(value: unknown): unknown {
+  if (!isPlainObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    out[k] =
+      SECRET_RE.test(k) && typeof v === 'string' && isEncrypted(v)
+        ? (safeDecrypt(v) ?? '')
+        : v;
+  }
+  return out;
+}
+
+// Admin UI'a maskeli: dolu secret → maske, boş → ''.
+function maskSecrets(value: unknown): unknown {
+  if (!isPlainObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    out[k] = SECRET_RE.test(k) && typeof v === 'string' ? (v ? SECRET_MASK : '') : v;
+  }
+  return out;
+}
+
+// Saklama: secret alt-alanları şifrele; MASK gelen (değişmemiş) önceki değeri koru; '' temizle.
+function encryptSecretsForStore(value: unknown, prev: unknown): unknown {
+  if (!isPlainObject(value)) return value;
+  const prevObj = isPlainObject(prev) ? prev : {};
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    if (SECRET_RE.test(k) && typeof v === 'string') {
+      if (v === SECRET_MASK) out[k] = prevObj[k] ?? '';
+      else if (v === '') out[k] = '';
+      else if (isEncrypted(v)) out[k] = v;
+      else out[k] = encrypt(v);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
 @Injectable()
 export class SettingsService {
   constructor(
@@ -110,34 +175,48 @@ export class SettingsService {
     private audit: AuditService,
   ) {}
 
+  // Servisler için: secret alt-alanları DÜZ METİN olarak çözülür.
   async get<T = unknown>(key: string, fallback?: T): Promise<T> {
     const row = await this.prisma.setting.findUnique({ where: { key } });
-    if (row) return row.value as T;
+    if (row) return decryptSecrets(row.value) as T;
     return (fallback ?? (DEFAULT_SETTINGS[key] as T));
   }
 
+  // Admin UI için tek anahtar — secret maskeli (düz metin sızmaz).
+  async getMasked(key: string): Promise<unknown> {
+    const row = await this.prisma.setting.findUnique({ where: { key } });
+    return maskSecrets(row ? row.value : DEFAULT_SETTINGS[key]);
+  }
+
+  // Admin UI için: secret alt-alanları MASKELENİR (düz metin sızmaz).
   async getAll(): Promise<Record<string, unknown>> {
     const rows = await this.prisma.setting.findMany();
     const merged: Record<string, unknown> = { ...DEFAULT_SETTINGS };
     for (const r of rows) merged[r.key] = r.value;
+    for (const k of Object.keys(merged)) merged[k] = maskSecrets(merged[k]);
     return merged;
   }
 
   async set(key: string, value: unknown, actor?: AuthUser) {
+    // Secret alt-alanlar şifrelenerek saklanır; MASK gelen (değişmemiş) alan korunur.
+    const prev = await this.prisma.setting.findUnique({ where: { key } });
+    const stored = encryptSecretsForStore(
+      value,
+      prev?.value ?? DEFAULT_SETTINGS[key],
+    );
     const row = await this.prisma.setting.upsert({
       where: { key },
-      create: { key, value: value as Prisma.InputJsonValue },
-      update: { value: value as Prisma.InputJsonValue },
+      create: { key, value: stored as Prisma.InputJsonValue },
+      update: { value: stored as Prisma.InputJsonValue },
     });
-    // Hassas anahtar değerlerini audit meta'sına ham yazma (secret/key/token/pass...)
-    const isSensitive = /secret|key|token|password|pass|credential/i.test(key);
+    // Audit'e ham secret yazma — maskeli kaydet
     await this.audit.log({
       actorUserId: actor?.userId,
       actorRole: actor?.role,
       action: 'SETTING_UPDATE',
       entityType: 'Setting',
       entityId: key,
-      meta: { value: isSensitive ? '***' : value },
+      meta: { value: maskSecrets(value) },
     });
     return row;
   }
@@ -156,7 +235,7 @@ export class SettingsController {
   @Roles(Role.ADMIN)
   @Get(':key')
   async getOne(@Param('key') key: string) {
-    return { key, value: await this.settings.get(key) };
+    return { key, value: await this.settings.getMasked(key) };
   }
 
   @Roles(Role.ADMIN)
