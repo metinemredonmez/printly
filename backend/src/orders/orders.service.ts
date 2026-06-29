@@ -95,9 +95,19 @@ export class OrdersService {
       discountRate,
     );
 
-    // Numune sipariş (D2/#41): sabit düşük ücret, indirim yok
+    // Numune sipariş (D2/#41): sabit düşük ücret, indirim yok.
+    // GÜVENLİK: client isSample bayrağıyla PAHALI siparişi $5'a alamamalı (fiyat motoru baypası).
     if (dto.isSample) {
-      const sampleFee = await this.settings.get<number>('sampleFee', 5);
+      if (dto.items.length !== 1 || (dto.items[0]?.quantity ?? 1) !== 1) {
+        throw new BadRequestException('Numune yalnız tek kalem ve 1 adet olabilir');
+      }
+      const sIt = dto.items[0];
+      const SAMPLE_MAX_SQIN = 600; // ~20"x30" — numune küçük örnek olmalı
+      if (Number(sIt.widthInch) * Number(sIt.heightInch) > SAMPLE_MAX_SQIN) {
+        throw new BadRequestException('Numune ölçüsü çok büyük (örnek boyut sınırı aşıldı)');
+      }
+      const rawFee = Number(await this.settings.get('sampleFee', 5));
+      const sampleFee = Number.isFinite(rawFee) && rawFee >= 0 ? rawFee : 5;
       quote = {
         ...quote,
         subtotal: sampleFee,
@@ -105,6 +115,13 @@ export class OrdersService {
         discount40: 0,
         shipping: 0,
         total: sampleFee,
+        // Kalem fiyatını da numuneye sabitle (tam fiyat ledger/raporda kalmasın)
+        items: quote.items.map((qi, i) =>
+          i === 0
+            ? { ...qi, unitPrice: sampleFee, lineTotal: sampleFee }
+            : { ...qi, unitPrice: 0, lineTotal: 0 },
+        ),
+        extras: [],
       };
     }
 

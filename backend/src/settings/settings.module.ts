@@ -145,7 +145,14 @@ function maskSecrets(value: unknown): unknown {
   if (!isPlainObject(value)) return value;
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
-    out[k] = SECRET_RE.test(k) && typeof v === 'string' ? (v ? SECRET_MASK : '') : v;
+    // Secret alan: string ise dolu→maske/boş→''; string değilse (legacy/bozuk) yine maskele
+    out[k] = SECRET_RE.test(k)
+      ? typeof v === 'string'
+        ? v
+          ? SECRET_MASK
+          : ''
+        : SECRET_MASK
+      : v;
   }
   return out;
 }
@@ -156,8 +163,11 @@ function encryptSecretsForStore(value: unknown, prev: unknown): unknown {
   const prevObj = isPlainObject(prev) ? prev : {};
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
-    if (SECRET_RE.test(k) && typeof v === 'string') {
-      if (v === SECRET_MASK) out[k] = prevObj[k] ?? '';
+    if (SECRET_RE.test(k)) {
+      // Secret alan string DEĞİLSE düz metin saklama — boşalt (şifreleme baypası engeli)
+      if (typeof v !== 'string') {
+        out[k] = '';
+      } else if (v === SECRET_MASK) out[k] = prevObj[k] ?? '';
       else if (v === '') out[k] = '';
       else if (isEncrypted(v)) out[k] = v;
       else out[k] = encrypt(v);
@@ -200,10 +210,13 @@ export class SettingsService {
   async set(key: string, value: unknown, actor?: AuthUser) {
     // Secret alt-alanlar şifrelenerek saklanır; MASK gelen (değişmemiş) alan korunur.
     const prev = await this.prisma.setting.findUnique({ where: { key } });
-    const stored = encryptSecretsForStore(
-      value,
-      prev?.value ?? DEFAULT_SETTINGS[key],
-    );
+    const prevVal = prev?.value ?? DEFAULT_SETTINGS[key];
+    // Eksik anahtarları DÜŞÜRME: gelen obje önceki ile sığ birleştirilir (kısmi PUT secret kaybetmesin)
+    const base =
+      isPlainObject(value) && isPlainObject(prevVal)
+        ? { ...prevVal, ...value }
+        : value;
+    const stored = encryptSecretsForStore(base, prevVal);
     const row = await this.prisma.setting.upsert({
       where: { key },
       create: { key, value: stored as Prisma.InputJsonValue },

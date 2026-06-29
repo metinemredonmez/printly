@@ -165,7 +165,8 @@ export class PricingService {
     const discount40 = discountRate > 0 ? round(base * discountRate, 2) : 0;
     // Kargo: admin'in belirlediği sabit ücret (indirim SONRASI eklenir, indirimsiz)
     const shipCfg = await this.settings.get<{ defaultFlatCost?: number }>('shipping');
-    const shipping = round(Number(shipCfg?.defaultFlatCost ?? 0), 2);
+    const rawShip = Number(shipCfg?.defaultFlatCost);
+    const shipping = round(Number.isFinite(rawShip) && rawShip > 0 ? rawShip : 0, 2);
     const total = round(base - discount40 + shipping, 2);
     const totalSqm = round(
       pricedItems.reduce((s, i) => s + i.sqm * i.quantity, 0),

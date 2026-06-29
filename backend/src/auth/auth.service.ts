@@ -63,9 +63,11 @@ export class AuthService {
   async verifyEmail(dto: VerifyEmailDto) {
     const email = dto.email.toLowerCase();
 
-    // Demo modu (SMTP/e-posta yokken): admin'in belirlediği sabit kod (varsayılan 123456)
-    // her zaman geçer. Gerçek e-posta bağlanınca admin settings'ten demoOtpCode'u boşaltır → kapanır.
-    const demo = await this.settings.get<string>('demoOtpCode'); // fallback YOK → DEFAULT '123456' gelir (admin '' yaparsa kapanır)
+    // Demo modu YALNIZ gerçek e-posta (SMTP) yokken aktiftir — güvenlik:
+    // admin SMTP girince demoOtpCode otomatik DEVRE DIŞI kalır (123456 backdoor kapanır).
+    const smtp = await this.settings.get<{ enabled?: boolean; host?: string }>('smtp');
+    const smtpReady = !!(smtp?.enabled && smtp?.host) || !!process.env.SMTP_HOST;
+    const demo = smtpReady ? '' : await this.settings.get<string>('demoOtpCode');
     if (demo && dto.code === demo) {
       const u = await this.prisma.user.update({
         where: { email },
@@ -350,6 +352,12 @@ export class AuthService {
       });
     }
     if (!user.active) throw new UnauthorizedException('Hesap pasif');
+    // 2FA baypası engeli: 2FA açık hesap Google ile 2FA'sız giremez (şifre yolundaki gateyi atlamasın)
+    if (user.twoFactorEnabled) {
+      throw new UnauthorizedException(
+        'Bu hesapta iki adımlı doğrulama açık — lütfen e-posta + şifre ile giriş yapın',
+      );
+    }
     return this.issueToken(user);
   }
 
