@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   }
   (await cookies()).set('od_token', data.accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.COOKIE_SECURE === 'true', // SSL gelince COOKIE_SECURE=true; HTTP'de secure cookie tarayıcıda düşer
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24, // 1 gün (JWT ile aynı)
