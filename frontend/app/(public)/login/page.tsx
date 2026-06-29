@@ -23,12 +23,13 @@ function LoginForm() {
   const [code, setCode] = useState('');
   const [need2fa, setNeed2fa] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const user: User = await login(email, password, need2fa ? code : undefined);
+      const user: User = await login(email, password, need2fa ? code : undefined, remember);
       toast.success(t('loginSuccess'));
       router.replace(params.get('next') ?? homeFor(user.role));
       router.refresh();
@@ -84,6 +85,15 @@ function LoginForm() {
           />
         </div>
       )}
+      <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 accent-primary"
+        />
+        {t('rememberMe')}
+      </label>
       <Button
         type="submit"
         className="w-full h-11 bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20"

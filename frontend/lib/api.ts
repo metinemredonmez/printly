@@ -38,11 +38,11 @@ export async function api<T = unknown>(path: string, opts: Opts = {}): Promise<T
 }
 
 // Auth (cookie set/clear → ayrı route handler'lar)
-export async function login(email: string, password: string, code?: string) {
+export async function login(email: string, password: string, code?: string, rememberMe?: boolean) {
   const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email, password, ...(code ? { code } : {}) }),
+    body: JSON.stringify({ email, password, ...(code ? { code } : {}), ...(rememberMe ? { rememberMe: true } : {}) }),
   });
   const data = await res.json();
   if (!res.ok) {

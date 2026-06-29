@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional } from 'class-validator';
+import { IsEmail, IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
@@ -11,4 +11,9 @@ export class LoginDto {
   @IsOptional()
   @IsString()
   code?: string;
+
+  // Beni hatırla → JWT + cookie 30 gün (yoksa 1 gün / oturum)
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

@@ -23,6 +23,7 @@
     "googleLogin": "Google ile Giriş",
     "googleSoon": "Google ile giriş yakında (yetkilendirme bekleniyor)",
     "forgotPassword": "Şifremi unuttum",
+    "rememberMe": "Beni hatırla",
     "createAccount": "Hesap oluştur",
     "loginSuccess": "Giriş başarılı",
     "need2fa": "2FA kodu gerekli",

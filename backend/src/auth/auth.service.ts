@@ -126,7 +126,7 @@ export class AuthService {
       const valid = await this.verifyTwoFactor(user, dto.code);
       if (!valid) throw new UnauthorizedException('2FA kodu hatalı');
     }
-    return this.issueToken(user);
+    return this.issueToken(user, dto.rememberMe);
   }
 
   // ── 2FA (TOTP / authenticator QR) ───────────────
@@ -284,7 +284,7 @@ export class AuthService {
     return { message: 'Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz' };
   }
 
-  private issueToken(user: User) {
+  private issueToken(user: User, rememberMe = false) {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -292,7 +292,7 @@ export class AuthService {
       organizationId: user.organizationId,
     };
     return {
-      accessToken: this.jwt.sign(payload),
+      accessToken: this.jwt.sign(payload, rememberMe ? { expiresIn: '30d' } : {}),
       user: {
         id: user.id,
         email: user.email,

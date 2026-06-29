@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     secure: process.env.COOKIE_SECURE === 'true', // SSL gelince COOKIE_SECURE=true; HTTP'de secure cookie tarayıcıda düşer
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24, // 1 gün (JWT ile aynı)
+    maxAge: body?.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24, // beni hatırla 30g, yoksa 1g (JWT ile aynı)
   });
   return NextResponse.json({ user: data.user });
 }
