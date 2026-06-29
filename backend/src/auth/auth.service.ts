@@ -65,7 +65,7 @@ export class AuthService {
 
     // Demo modu (SMTP/e-posta yokken): admin'in belirlediği sabit kod (varsayılan 123456)
     // her zaman geçer. Gerçek e-posta bağlanınca admin settings'ten demoOtpCode'u boşaltır → kapanır.
-    const demo = await this.settings.get<string>('demoOtpCode', '');
+    const demo = await this.settings.get<string>('demoOtpCode'); // fallback YOK → DEFAULT '123456' gelir (admin '' yaparsa kapanır)
     if (demo && dto.code === demo) {
       const u = await this.prisma.user.update({
         where: { email },
