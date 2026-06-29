@@ -312,6 +312,11 @@
     "organizations": "Organizations",
     "billing": "Billing",
     "support": "Support",
+    "returns": "Returns",
+    "education": "Education",
+    "consulting": "Consulting",
+    "events": "Events",
+    "network": "Networking",
     "profile": "Profile",
     "dashboard": "Dashboard",
     "orders": "Orders",
@@ -322,6 +327,10 @@
     "reports": "Reports",
     "map": "Map",
     "audit": "Audit",
+    "adminEducation": "Education",
+    "adminEvents": "Events",
+    "adminConsulting": "Consulting",
+    "adminReturns": "Returns",
     "settings": "Settings"
   },
   "dealerHome": {

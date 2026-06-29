@@ -312,6 +312,11 @@
     "organizations": "Firmalar",
     "billing": "Fatura",
     "support": "Destek",
+    "returns": "İadeler",
+    "education": "Eğitim",
+    "consulting": "Danışmanlık",
+    "events": "Etkinlikler",
+    "network": "Networking",
     "profile": "Profil",
     "dashboard": "Dashboard",
     "orders": "Siparişler",
@@ -322,6 +327,10 @@
     "reports": "Raporlar",
     "map": "Harita",
     "audit": "Audit",
+    "adminEducation": "Eğitim Yönetimi",
+    "adminEvents": "Etkinlik Yönetimi",
+    "adminConsulting": "Danışmanlık",
+    "adminReturns": "İade Yönetimi",
     "settings": "Ayarlar"
   },
   "dealerHome": {

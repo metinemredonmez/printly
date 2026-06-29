@@ -49,6 +49,11 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProductionModule } from './production/production.module';
 import { WhitelabelModule } from './whitelabel/whitelabel.module';
 import { PublicModule } from './public/public.module';
+import { EducationModule } from './education/education.module';
+import { ConsultingModule } from './consulting/consulting.module';
+import { EventsModule } from './events/events.module';
+import { NetworkingModule } from './networking/networking.module';
+import { ReturnsModule } from './returns/returns.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -190,6 +195,11 @@ import { HealthController } from './health.controller';
     ProductionModule,
     WhitelabelModule,
     PublicModule,
+    EducationModule,
+    ConsultingModule,
+    EventsModule,
+    NetworkingModule,
+    ReturnsModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -16,21 +16,21 @@ datasource db {
 
 // Roller = üyelik tier'ı (mockup). USER 2× fiyat, TEAM_* 1× fiyat.
 enum Role {
-  USER         // Kullanıcı (ücretsiz, 2× fiyat)
-  TEAM_MEMBER  // Ekip Üyesi ($30/ay aidat, 1× fiyat, bir lidere bağlı)
-  TEAM_LEADER  // Ekip Lideri (aidatsız, 1× fiyat, üyelerini yönetir)
-  ADMIN        // Platform yöneticisi
-  PRODUCTION   // Üretim ekibi
+  USER // Kullanıcı (ücretsiz, 2× fiyat)
+  TEAM_MEMBER // Ekip Üyesi ($30/ay aidat, 1× fiyat, bir lidere bağlı)
+  TEAM_LEADER // Ekip Lideri (aidatsız, 1× fiyat, üyelerini yönetir)
+  ADMIN // Platform yöneticisi
+  PRODUCTION // Üretim ekibi
 }
 
 enum ProductCategory {
-  WALLPAPER  // m² bazlı
+  WALLPAPER // m² bazlı
   WALL_DECAL // flat
-  WOOD       // flat (CNC oyma)
+  WOOD // flat (CNC oyma)
 }
 
 enum ProductUnit {
-  M2   // metrekare bazlı fiyat
+  M2 // metrekare bazlı fiyat
   FLAT // sabit fiyat (adet)
 }
 
@@ -52,7 +52,7 @@ enum PaymentStatus {
 
 enum PaymentMethod {
   BALANCE // ön yüklü bakiye
-  CARD    // kredi kartı
+  CARD // kredi kartı
 }
 
 enum OrderSource {
@@ -68,8 +68,8 @@ enum AssetStatus {
 }
 
 enum AssetRole {
-  PRODUCTION     // üretim dosyası (PDF/AI/EPS/PNG, ≤500MB)
-  MOCKUP         // ölçülü kontrol görseli (JPG/PNG)
+  PRODUCTION // üretim dosyası (PDF/AI/EPS/PNG, ≤500MB)
+  MOCKUP // ölçülü kontrol görseli (JPG/PNG)
   SHIPPING_LABEL // kargo etiketi (PDF/JPG/PNG)
   OTHER
 }
@@ -81,8 +81,8 @@ enum LifecycleStage {
 }
 
 enum TransactionType {
-  BALANCE_LOAD   // bakiye yükleme
-  ORDER_PAYMENT  // sipariş ödemesi
+  BALANCE_LOAD // bakiye yükleme
+  ORDER_PAYMENT // sipariş ödemesi
   MEMBERSHIP_FEE // $30 aidat
 }
 
@@ -115,7 +115,7 @@ model Organization {
   id                   String   @id @default(cuid())
   name                 String
   slug                 String?  @unique // subdomain (bayi1.ortakdoku.com → "bayi1")
-  theme                Json?    // tenant branding (renk/logo/hero)
+  theme                Json? // tenant branding (renk/logo/hero)
   taxInfo              String?
   quickbooksCustomerId String?
   active               Boolean  @default(true)
@@ -130,23 +130,23 @@ model Organization {
 // ─────────────────────────────────────────────
 
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  passwordHash    String
-  fullName        String?
-  phone           String?
-  role            Role     @default(USER)
-  priceMultiplier Int      @default(2) // USER=2, TEAM_*=1
-  balance         Decimal  @default(0) @db.Decimal(12, 2) // USD bakiye
-  hasDiscount40   Boolean  @default(false) // $250 yükleme sonrası
-  isEmailVerified Boolean  @default(false)
+  id                     String   @id @default(cuid())
+  email                  String   @unique
+  passwordHash           String
+  fullName               String?
+  phone                  String?
+  role                   Role     @default(USER)
+  priceMultiplier        Int      @default(2) // USER=2, TEAM_*=1
+  balance                Decimal  @default(0) @db.Decimal(12, 2) // USD bakiye
+  hasDiscount40          Boolean  @default(false) // $250 yükleme sonrası
+  isEmailVerified        Boolean  @default(false)
   // 2FA (TOTP / authenticator QR)
   twoFactorEnabled       Boolean  @default(false)
-  twoFactorSecret        String?  // AES-GCM şifreli base32 secret
+  twoFactorSecret        String? // AES-GCM şifreli base32 secret
   twoFactorRecoveryCodes String[] // bcrypt-hashed yedek kodlar
-  active          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  active                 Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   // Ekip hiyerarşisi: üye → lider (self-relation)
   leaderId String?
@@ -157,14 +157,20 @@ model User {
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
 
-  etsyStores    EtsyStore[]
-  billingInfo   BillingInfo?
-  membership    Membership?
-  orders        Order[]        @relation("OrderOwner")
-  createdOrders Order[]        @relation("OrderCreatedBy")
-  transactions  Transaction[]
-  creditLedger  CreditLedger[]
-  devices       UserDevice[]
+  etsyStores         EtsyStore[]
+  billingInfo        BillingInfo?
+  membership         Membership?
+  orders             Order[]             @relation("OrderOwner")
+  createdOrders      Order[]             @relation("OrderCreatedBy")
+  transactions       Transaction[]
+  creditLedger       CreditLedger[]
+  devices            UserDevice[]
+  // Topluluk & eğitim (PDF Ekip Üyesi vaatleri)
+  courseEnrollments  CourseEnrollment[]
+  consultingRequests ConsultingRequest[]
+  eventRegistrations EventRegistration[]
+  networkProfile     NetworkProfile?
+  returnRequests     ReturnRequest[]
 }
 
 // ─────────────────────────────────────────────
@@ -174,7 +180,7 @@ model User {
 model UserDevice {
   id           String   @id @default(cuid())
   deviceToken  String   @unique // OneSignal subscription/player id
-  platform     String   // IOS | ANDROID | WEB
+  platform     String // IOS | ANDROID | WEB
   isActive     Boolean  @default(true)
   lastActiveAt DateTime @default(now())
   createdAt    DateTime @default(now())
@@ -190,7 +196,7 @@ model PushNotificationLog {
   title           String
   body            String
   data            Json?
-  targetType      String    // ALL | USER_IDS | SEGMENT
+  targetType      String // ALL | USER_IDS | SEGMENT
   targetIds       String[]
   totalRecipients Int       @default(0)
   successCount    Int       @default(0)
@@ -206,13 +212,13 @@ model PushNotificationLog {
 }
 
 model OtpCode {
-  id        String     @id @default(cuid())
-  email     String
-  codeHash  String
-  purpose   OtpPurpose @default(EMAIL_VERIFY)
-  expiresAt DateTime
+  id         String     @id @default(cuid())
+  email      String
+  codeHash   String
+  purpose    OtpPurpose @default(EMAIL_VERIFY)
+  expiresAt  DateTime
   consumedAt DateTime?
-  createdAt DateTime   @default(now())
+  createdAt  DateTime   @default(now())
 
   @@index([email, purpose])
 }
@@ -255,13 +261,13 @@ model BillingInfo {
 }
 
 model Membership {
-  id          String   @id @default(cuid())
-  tier        Role     // TEAM_MEMBER / TEAM_LEADER / USER
-  monthlyFee  Decimal  @default(0) @db.Decimal(12, 2)
-  active      Boolean  @default(true)
-  startedAt   DateTime @default(now())
+  id          String    @id @default(cuid())
+  tier        Role // TEAM_MEMBER / TEAM_LEADER / USER
+  monthlyFee  Decimal   @default(0) @db.Decimal(12, 2)
+  active      Boolean   @default(true)
+  startedAt   DateTime  @default(now())
   renewalDate DateTime?
-  leaderId    String?  // TEAM_MEMBER için bağlı lider
+  leaderId    String? // TEAM_MEMBER için bağlı lider
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -288,33 +294,33 @@ model Transaction {
 // ─────────────────────────────────────────────
 
 model Material {
-  id         String   @id @default(cuid())
-  name       String
-  widthInch  Int?
-  settings   Json?
-  active     Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  widthInch Int?
+  settings  Json?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   products Product[]
 }
 
 model Product {
-  id            String          @id @default(cuid())
-  name          String
-  category      ProductCategory
-  unit          ProductUnit     @default(M2)
-  description   String?
-  imageUrl       String?        // vitrin/landing görseli (admin yönetir)
-  basePricePerM2 Decimal?       @db.Decimal(12, 4) // M2 ürünler için (1× fiyat)
-  flatPrice      Decimal?       @db.Decimal(12, 2)  // FLAT ürünler için (1× fiyat)
-  subTypes       Json?          // wallpaper alt türleri: [{key,label}]
-  active         Boolean        @default(true)
+  id              String          @id @default(cuid())
+  name            String
+  category        ProductCategory
+  unit            ProductUnit     @default(M2)
+  description     String?
+  imageUrl        String? // vitrin/landing görseli (admin yönetir)
+  basePricePerM2  Decimal?        @db.Decimal(12, 4) // M2 ürünler için (1× fiyat)
+  flatPrice       Decimal?        @db.Decimal(12, 2) // FLAT ürünler için (1× fiyat)
+  subTypes        Json? // wallpaper alt türleri: [{key,label}]
+  active          Boolean         @default(true)
   // Baskı dosya gereksinimleri (H3/#34) — yükleme öncesi/sonrası doğrulama
-  minDpi          Int?           // gerekli minimum çözünürlük (örn. 150)
-  requiredFormats String[]       @default([]) // izinli formatlar: ['tiff','pdf']
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  minDpi          Int? // gerekli minimum çözünürlük (örn. 150)
+  requiredFormats String[]        @default([]) // izinli formatlar: ['tiff','pdf']
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   materialId String?
   material   Material? @relation(fields: [materialId], references: [id])
@@ -324,14 +330,14 @@ model Product {
 
 // Sipariş ek seçenekleri (Shipping Box, Installation Kit, Sample)
 model ExtraOption {
-  id          String   @id @default(cuid())
-  code        String   @unique // SHIPPING_BOX | INSTALLATION_KIT | SAMPLE
-  name        String
-  price       Decimal  @db.Decimal(12, 2)
+  id              String   @id @default(cuid())
+  code            String   @unique // SHIPPING_BOX | INSTALLATION_KIT | SAMPLE
+  name            String
+  price           Decimal  @db.Decimal(12, 2)
   fixedWidthInch  Decimal? @db.Decimal(10, 2) // Sample → 20
   fixedHeightInch Decimal? @db.Decimal(10, 2) // Sample → 15
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
 
   orderExtras OrderExtra[]
 }
@@ -344,7 +350,7 @@ model Order {
   id            String          @id @default(cuid())
   orderNumber   String          @unique @default(cuid())
   category      ProductCategory
-  productType   String?         // wallpaper alt türü (Peel&Stick Smooth, vb.)
+  productType   String? // wallpaper alt türü (Peel&Stick Smooth, vb.)
   status        OrderStatus     @default(RECEIVED)
   paymentStatus PaymentStatus   @default(PENDING)
   paymentMethod PaymentMethod   @default(BALANCE)
@@ -360,11 +366,11 @@ model Order {
   boardPosition Int @default(0) // Kanban kolon (status) içi sıra
 
   // Etsy / referanslar
-  etsyOrderNo String?
-  orderDate   DateTime?
+  etsyOrderNo         String?
+  orderDate           DateTime?
   quickbooksInvoiceId String?
-  paymentProvider String? // QUICKBOOKS | STRIPE (kart ödemesi)
-  paymentRef      String? // sağlayıcı referansı (invoice/checkout id)
+  paymentProvider     String? // QUICKBOOKS | STRIPE (kart ödemesi)
+  paymentRef          String? // sağlayıcı referansı (invoice/checkout id)
 
   // Teslimat
   clientName    String?
@@ -381,8 +387,8 @@ model Order {
   archivedAt DateTime? // arşiv (#13) — null değilse arşivlenmiş
 
   // Üretim-öncesi onay penceresi (H2/#33) — onaylanmadan IN_PRODUCTION'a geçemez
-  approvedAt        DateTime?
-  approvedByUserId  String?
+  approvedAt       DateTime?
+  approvedByUserId String?
 
   // Numune sipariş (D2/#41) — bayiye düşük maliyetli fiziksel örnek
   isSample Boolean @default(false)
@@ -405,6 +411,7 @@ model Order {
   extras       OrderExtra[]
   assets       Asset[]
   statusEvents OrderStatusEvent[]
+  returns      ReturnRequest[]
 
   @@index([status, boardPosition])
   @@index([userId]) // bayi siparişleri (P1 perf)
@@ -428,7 +435,7 @@ model AuditLog {
   id          String   @id @default(cuid())
   actorUserId String?
   actorRole   String?
-  action      String   // ORDER_STATUS_CHANGE | CREDIT_TOPUP | MEMBERSHIP_UPGRADE | SETTING_UPDATE | ORDER_CREATE ...
+  action      String // ORDER_STATUS_CHANGE | CREDIT_TOPUP | MEMBERSHIP_UPGRADE | SETTING_UPDATE | ORDER_CREATE ...
   entityType  String?
   entityId    String?
   meta        Json?
@@ -460,10 +467,10 @@ model OrderItem {
 }
 
 model OrderExtra {
-  id        String  @id @default(cuid())
-  name      String  // snapshot
-  price     Decimal @db.Decimal(12, 2)
-  quantity  Int     @default(1)
+  id       String  @id @default(cuid())
+  name     String // snapshot
+  price    Decimal @db.Decimal(12, 2)
+  quantity Int     @default(1)
 
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -690,4 +697,190 @@ model ProductionJob {
 
   @@index([station, status])
   @@index([orderId])
+}
+
+// ─────────────────────────────────────────────
+// EĞİTİM (PDF: Platform/Dijital Reklam/Sosyal Medya/Ticaret-Finans — Ekip Üyesi %50)
+// ─────────────────────────────────────────────
+
+enum CourseCategory {
+  PLATFORM // Platform Eğitimleri
+  DIGITAL_ADS // Dijital Reklam Yönetimi
+  SOCIAL_MEDIA // Sosyal Medya Yönetimi
+  TRADE_FINANCE // Ticaret ve Finans
+  OTHER
+}
+
+model Course {
+  id          String         @id @default(cuid())
+  title       String
+  titleEn     String?
+  summary     String? // kısa açıklama (kart)
+  description String? // uzun açıklama
+  category    CourseCategory @default(OTHER)
+  level       String? // Başlangıç / Orta / İleri
+  price       Decimal        @default(0) @db.Decimal(12, 2) // standart fiyat (USD); Ekip Üyesi %50
+  durationMin Int? // toplam süre (dk)
+  lessonCount Int? // ders sayısı
+  imageUrl    String?
+  contentUrl  String? // video/içerik erişim linki (kayıt sonrası)
+  active      Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  enrollments CourseEnrollment[]
+
+  @@index([active, category])
+}
+
+model CourseEnrollment {
+  id        String   @id @default(cuid())
+  courseId  String
+  userId    String
+  paidPrice Decimal  @db.Decimal(12, 2) // ödenen (üye indirimi uygulanmış) tutar
+  isMember  Boolean  @default(false) // kayıt anında Ekip Üyesi miydi (%50)
+  createdAt DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// DANIŞMANLIK (PDF: uzman ekip ile birebir görüşme — Ekip Üyesi ücretsiz)
+// ─────────────────────────────────────────────
+
+enum ConsultingStatus {
+  PENDING // talep alındı
+  SCHEDULED // randevu verildi
+  COMPLETED // tamamlandı
+  CANCELLED
+}
+
+model ConsultingRequest {
+  id          String           @id @default(cuid())
+  userId      String
+  topic       String // konu başlığı
+  details     String? // talep detayı
+  preferredAt DateTime? // bayinin tercih ettiği zaman
+  status      ConsultingStatus @default(PENDING)
+  scheduledAt DateTime? // admin'in verdiği randevu
+  meetingUrl  String? // görüşme linki
+  adminNote   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// ETKİNLİKLER (PDF: seminer/workshop/buluşma — Ekip Üyesi %50 indirimli)
+// ─────────────────────────────────────────────
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  titleEn     String?
+  description String?
+  type        String? // seminer | workshop | buluşma | webinar
+  startsAt    DateTime
+  endsAt      DateTime?
+  isOnline    Boolean   @default(true)
+  location    String? // online linki / fiziksel adres
+  capacity    Int? // kontenjan (null = sınırsız)
+  price       Decimal   @default(0) @db.Decimal(12, 2) // USD; Ekip Üyesi %50
+  imageUrl    String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  registrations EventRegistration[]
+
+  @@index([active, startsAt])
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  paidPrice Decimal  @default(0) @db.Decimal(12, 2)
+  isMember  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// NETWORKING (PDF: güçlü iş ağı — opt-in üye dizini)
+// ─────────────────────────────────────────────
+
+model NetworkProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  displayName String
+  headline    String? // tek satır tanıtım
+  bio         String?
+  company     String?
+  website     String?
+  location    String?
+  expertise   String[] @default([]) // uzmanlık etiketleri
+  visible     Boolean  @default(true) // dizinde görünür mü
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([visible])
+}
+
+// ─────────────────────────────────────────────
+// İADE / RMA (operasyon — kolay iade akışı)
+// ─────────────────────────────────────────────
+
+enum ReturnStatus {
+  REQUESTED // talep oluşturuldu
+  APPROVED // onaylandı
+  REJECTED // reddedildi
+  RECEIVED // ürün teslim alındı
+  REFUNDED // ücret iade edildi (cüzdan)
+  REPRINTED // yeniden baskı yapıldı
+}
+
+enum ReturnReason {
+  DEFECT // kusurlu/hatalı baskı
+  WRONG_ITEM // yanlış ürün
+  DAMAGED // kargoda hasar
+  NOT_AS_DESC // açıklamaya uymuyor
+  OTHER
+}
+
+model ReturnRequest {
+  id           String       @id @default(cuid())
+  orderId      String
+  userId       String
+  reason       ReturnReason @default(OTHER)
+  details      String?
+  status       ReturnStatus @default(REQUESTED)
+  resolution   String? // reprint | refund | note
+  refundAmount Decimal?     @db.Decimal(12, 2)
+  adminNote    String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
 }
