@@ -105,7 +105,7 @@ export default function DealerHome() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-navy dark:text-white">{td('welcome')}</h1>
+          <h1 className="text-xl font-semibold text-navy dark:text-white">{td('welcome')}</h1>
           <p className="text-slate-500 dark:text-slate-400">{td('subtitle')}</p>
         </div>
         <Link

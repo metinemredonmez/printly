@@ -105,7 +105,7 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-navy dark:text-white">{L.title}</h1>
+          <h1 className="text-xl font-semibold text-navy dark:text-white">{L.title}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{L.subtitle}</p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-navy dark:text-slate-200">

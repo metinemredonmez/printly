@@ -55,7 +55,7 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
   return (
     <div className="space-y-5 max-w-3xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <h1 className="text-xl font-semibold text-navy dark:text-white">{t('title')}</h1>
         <Button onClick={() => setOpen((o) => !o)}>
           <Plus className="h-4 w-4 mr-1" /> {t('new')}
         </Button>

@@ -157,7 +157,7 @@ export default function NetworkPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-navy dark:text-white flex items-center gap-2">
+        <h1 className="text-xl font-semibold text-navy dark:text-white flex items-center gap-2">
           <Network className="h-6 w-6 text-primary" />
           {L.title}
         </h1>

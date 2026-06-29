@@ -120,7 +120,7 @@ export default function NewOrderWizard() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+      <h1 className="text-xl font-semibold text-navy dark:text-white">{t('title')}</h1>
 
       {/* Progress */}
       <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function NewOrderWizard() {
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl font-semibold mt-1">{money(quote.data?.total)}</div>
+                  <div className="text-2xl font-semibold mt-1 tracking-tight tabular-nums">{money(quote.data?.total)}</div>
                   <div className="text-xs text-slate-400 mt-2">
                     {t('area')}: {(quote.data?.totalSqm ?? 0).toFixed(3)} m²
                   </div>
@@ -281,7 +281,7 @@ export default function NewOrderWizard() {
             </div>
             <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 flex justify-between items-center">
               <span className="text-sm text-slate-500 dark:text-slate-400">{t('livePrice')}</span>
-              <span className="text-2xl font-semibold text-navy dark:text-white">{money(quote.data?.total)}</span>
+              <span className="text-xl font-semibold text-navy dark:text-white">{money(quote.data?.total)}</span>
             </div>
           </div>
         )}

@@ -82,7 +82,7 @@ export function OrderDetail({
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-navy dark:text-white">{o.orderNumber}</h1>
+          <h1 className="text-xl font-semibold text-navy dark:text-white">{o.orderNumber}</h1>
           <div className="text-sm text-slate-400 dark:text-slate-500">
             {o.category} · {shortDate(o.createdAt)}
           </div>

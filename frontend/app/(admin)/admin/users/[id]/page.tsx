@@ -337,7 +337,7 @@ export default function AdminUserDetailPage() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-semibold text-navy dark:text-white truncate">
+              <h1 className="text-xl font-semibold text-navy dark:text-white truncate">
                 {memberName}
               </h1>
               <span
@@ -810,7 +810,7 @@ function StatCard({
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
             {label}
           </div>
-          <div className="text-2xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums truncate">
+          <div className="text-xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums truncate">
             {value}
           </div>
           {sub && (

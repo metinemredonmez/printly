@@ -40,7 +40,7 @@ export function OrdersList({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-navy dark:text-white">
+        <h1 className="text-xl font-semibold text-navy dark:text-white">
           {staff ? t('title') : t('myTitle')}
         </h1>
         {!staff && (

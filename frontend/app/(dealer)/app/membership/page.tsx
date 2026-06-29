@@ -143,7 +143,7 @@ export default function MembershipPage() {
       {/* Başlık */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-navy dark:text-white">
+          <h1 className="text-xl font-semibold text-navy dark:text-white">
             {tr ? 'Üyelik & Plan' : 'Membership & Plan'}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -278,7 +278,7 @@ export default function MembershipPage() {
                     <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                       {tr ? 'Kümülatif yükleme' : 'Cumulative load'}
                     </div>
-                    <div className="text-2xl font-semibold text-navy dark:text-white">
+                    <div className="text-xl font-semibold text-navy dark:text-white">
                       {money(cumulative)}
                     </div>
                   </div>
@@ -336,7 +336,7 @@ export default function MembershipPage() {
                           />
                         )}
                       </div>
-                      <div className="mt-1.5 text-2xl font-semibold text-navy dark:text-white">
+                      <div className="mt-1.5 text-xl font-semibold text-navy dark:text-white">
                         %{Math.round(t.discountRate * 100)}
                       </div>
                       <div className="mt-0.5 text-[11px] text-slate-400">

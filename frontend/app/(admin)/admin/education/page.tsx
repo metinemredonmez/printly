@@ -274,7 +274,7 @@ export default function AdminEducationPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-navy dark:text-white">
+          <h1 className="text-xl font-semibold text-navy dark:text-white">
             {tr ? 'Eğitim Yönetimi' : 'Course Management'}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -756,7 +756,7 @@ function MiniStat({
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
             {label}
           </div>
-          <div className="text-2xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums">
+          <div className="text-xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums">
             {value}
           </div>
         </div>

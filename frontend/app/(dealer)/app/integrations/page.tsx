@@ -200,7 +200,7 @@ export default function IntegrationsPage() {
             <Webhook className="h-5.5 w-5.5" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-navy dark:text-white">{L.title}</h1>
+            <h1 className="text-xl font-semibold text-navy dark:text-white">{L.title}</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
               {L.subtitle}
             </p>
@@ -882,7 +882,7 @@ function SummaryCard({
       <div className="flex items-start justify-between">
         <div className="min-w-0">
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</div>
-          <div className="text-2xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums">
+          <div className="text-xl font-semibold text-navy dark:text-white mt-1.5 tabular-nums">
             {value}
           </div>
           {sub && (
