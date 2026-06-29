@@ -28,6 +28,7 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   membershipFee: 30,
   bulkLoadForDiscount: 250,
   discountRate: 0.4,
+  demoOtpCode: '123456', // SMTP/e-posta yokken sabit demo doğrulama kodu; gerçek mail gelince admin boşaltır (kapanır)
   sampleFee: 5, // numune sipariş sabit ücreti (D2/#41)
   // Kademeli bayi planı (D1/#40): kümülatif yüklemeye göre indirim + öncelikli üretim
   membershipTiers: [

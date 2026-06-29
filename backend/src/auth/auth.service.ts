@@ -13,6 +13,7 @@ import * as QRCode from 'qrcode';
 import { Role, OtpPurpose, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { SettingsService } from '../settings/settings.module';
 import { encrypt, decrypt } from '../common/crypto.util';
 import { multiplierForRole } from '../common/pricing.util';
 import { RegisterDto } from './dto/register.dto';
@@ -28,6 +29,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private mail: MailService,
+    private settings: SettingsService,
   ) {}
 
   // 1) Kayıt: USER oluşturur (doğrulanmamış) + OTP gönderir.
@@ -60,6 +62,18 @@ export class AuthService {
   // 2) E-posta doğrulama: kod doğruysa hesabı aktive eder + token verir (oto giriş).
   async verifyEmail(dto: VerifyEmailDto) {
     const email = dto.email.toLowerCase();
+
+    // Demo modu (SMTP/e-posta yokken): admin'in belirlediği sabit kod (varsayılan 123456)
+    // her zaman geçer. Gerçek e-posta bağlanınca admin settings'ten demoOtpCode'u boşaltır → kapanır.
+    const demo = await this.settings.get<string>('demoOtpCode', '');
+    if (demo && dto.code === demo) {
+      const u = await this.prisma.user.update({
+        where: { email },
+        data: { isEmailVerified: true },
+      });
+      return this.issueToken(u);
+    }
+
     const otp = await this.prisma.otpCode.findFirst({
       where: { email, purpose: OtpPurpose.EMAIL_VERIFY, consumedAt: null },
       orderBy: { createdAt: 'desc' },
