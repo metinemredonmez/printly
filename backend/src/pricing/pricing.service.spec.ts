@@ -12,7 +12,7 @@ describe('PricingService — fiyat motoru', () => {
         findUnique: ({ where }: any) => Promise.resolve(extras[where.id] ?? null),
       },
     };
-    return new PricingService(prisma, {} as any);
+    return new PricingService(prisma, {} as any, {} as any);
   };
 
   it('M2 ürün: 12×12 inç → 1 sqft → 0.0929 m² × $23 × USER(2×) ≈ $4.27', async () => {
@@ -121,12 +121,18 @@ describe('PricingService — fiyat motoru', () => {
     expect(q.hasDiscount40).toBe(true);
   });
 
-  it('effectiveDiscountRate: kapı kapalı→0, açık→kademe oranı', async () => {
-    const memberships: any = {
-      myTier: () => Promise.resolve({ tier: { discountRate: 0.5 } }),
+  it('effectiveDiscountRate: bakiye kademesi (0→0, 150→.2, 250→.3, 300→.4)', async () => {
+    const settings: any = {
+      get: async () => [
+        { minLoad: 100, rate: 0.2 },
+        { minLoad: 200, rate: 0.3 },
+        { minLoad: 300, rate: 0.4 },
+      ],
     };
-    const svc = new PricingService({} as any, memberships);
-    expect(await svc.effectiveDiscountRate('u1', false)).toBe(0);
-    expect(await svc.effectiveDiscountRate('u1', true)).toBe(0.5);
+    const svc = new PricingService({} as any, {} as any, settings);
+    expect(await svc.effectiveDiscountRate(0)).toBe(0);
+    expect(await svc.effectiveDiscountRate(150)).toBe(0.2);
+    expect(await svc.effectiveDiscountRate(250)).toBe(0.3);
+    expect(await svc.effectiveDiscountRate(300)).toBe(0.4);
   });
 });

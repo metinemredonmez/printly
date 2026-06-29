@@ -16,9 +16,9 @@ const DEFAULT_FAQS: Faq[] = [
   },
   {
     q: 'Fiyatlandırma nasıl çalışır?',
-    a: 'Duvar kağıdı m² bazlı, decal ve ahşap sabit fiyatlıdır. Ekip üyeleri 1× (yarı) fiyat öder; $250 yükleyince %40 indirim açılır.',
+    a: 'Duvar kağıdı m² bazlı, decal ve ahşap sabit fiyatlıdır. Ekip üyeleri 1× (yarı) fiyat öder; bakiyene $100/$200/$300 yükleyince %20/%30/%40 indirim açılır (bakiye bitince biter).',
     qEn: 'How does pricing work?',
-    aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $250 unlocks a 40% discount.',
+    aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $100/$200/$300 unlocks 20%/30%/40% off (ends when balance is used up).',
   },
   {
     q: 'Teslimat ne kadar sürer?',

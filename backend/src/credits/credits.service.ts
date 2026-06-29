@@ -11,7 +11,6 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
-import { BULK_LOAD_FOR_DISCOUNT } from '../common/pricing.util';
 
 @Injectable()
 export class CreditsService {
@@ -52,7 +51,8 @@ export class CreditsService {
     if (!user) throw new BadRequestException('Kullanıcı bulunamadı');
 
     const next = Number((Number(user.balance) + amount).toFixed(2));
-    const grantDiscount = amount >= BULK_LOAD_FOR_DISCOUNT || user.hasDiscount40;
+    // Bakiye $100+ → indirim aktif (kademe 100/200/300 → %20/30/40; oran pricing'de mevcut bakiyeye göre)
+    const grantDiscount = next >= 100 || user.hasDiscount40;
 
     await tx.user.update({
       where: { id: userId },
@@ -63,7 +63,7 @@ export class CreditsService {
         userId,
         delta: new Prisma.Decimal(amount),
         balanceAfter: new Prisma.Decimal(next),
-        reason: `Bakiye yükleme${amount >= BULK_LOAD_FOR_DISCOUNT ? ' (+%40 indirim)' : ''}`,
+        reason: `Bakiye yükleme${next >= 100 ? ' (+indirim)' : ''}`,
       },
     });
     return { balance: next, hasDiscount40: grantDiscount };

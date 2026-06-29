@@ -85,10 +85,8 @@ export class OrdersService {
       }
     }
 
-    const discountRate = await this.pricing.effectiveDiscountRate(
-      authUser.userId,
-      user.hasDiscount40,
-    );
+    // İndirim oranı mevcut bakiye kademesine göre (100/200/300 → %20/30/40)
+    const discountRate = await this.pricing.effectiveDiscountRate(Number(user.balance));
     let quote = await this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],

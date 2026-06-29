@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { Prisma, ProductUnit } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MembershipsService } from '../memberships/memberships.module';
+import { SettingsService } from '../settings/settings.module';
 
 const SQFT_PER_SQIN = 1 / 144; // inch² → ft²
 const SQM_PER_SQFT = 0.092903; // ft² → m²
@@ -58,14 +59,21 @@ export class PricingService {
   constructor(
     private prisma: PrismaService,
     private memberships: MembershipsService,
+    private settings: SettingsService,
   ) {}
 
-  // $250 kapısı (hasDiscount40) açıksa indirim oranı = kümülatif yükleme kademesi
-  // (Standart .40 / Pro .45 / Elit .50). Kapı kapalıysa indirim yok.
-  async effectiveDiscountRate(userId: string, hasDiscount40: boolean): Promise<number> {
-    if (!hasDiscount40) return 0;
-    const { tier } = await this.memberships.myTier(userId);
-    return tier?.discountRate ?? DISCOUNT_RATE;
+  // PDF bakiye indirim kademesi: MEVCUT bakiyeye göre oran (100→%20, 200→%30, 300+→%40).
+  // Bakiye 0'a inince indirim biter (tier(0)=0). Ekip Üyesi avantajı ayrıca 1× fiyat çarpanı.
+  async effectiveDiscountRate(balanceUsd: number): Promise<number> {
+    if (!balanceUsd || balanceUsd <= 0) return 0;
+    const tiers = await this.settings.get<{ minLoad: number; rate: number }[]>(
+      'loadDiscountTiers',
+    );
+    return (
+      [...(tiers ?? [])]
+        .sort((a, b) => b.minLoad - a.minLoad)
+        .find((x) => balanceUsd >= x.minLoad)?.rate ?? 0
+    );
   }
 
   // Tek kalem fiyatı. multiplier: USER=2, TEAM_*=1.

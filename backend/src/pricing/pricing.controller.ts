@@ -55,13 +55,11 @@ export class PricingController {
   async quote(@Body() dto: QuoteDto, @CurrentUser() user: AuthUser) {
     const dbUser = await this.prisma.user.findUnique({
       where: { id: user.userId },
-      select: { priceMultiplier: true, hasDiscount40: true, role: true },
+      select: { priceMultiplier: true, balance: true, role: true },
     });
     const multiplier = dbUser?.priceMultiplier ?? multiplierForRole(user.role);
-    const discountRate = await this.pricing.effectiveDiscountRate(
-      user.userId,
-      dbUser?.hasDiscount40 ?? false,
-    );
+    // İndirim oranı mevcut bakiye kademesine göre (100/200/300 → %20/30/40)
+    const discountRate = await this.pricing.effectiveDiscountRate(Number(dbUser?.balance ?? 0));
     return this.pricing.quoteOrder(
       dto.items,
       dto.extras ?? [],

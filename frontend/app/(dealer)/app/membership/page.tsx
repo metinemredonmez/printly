@@ -600,10 +600,10 @@ function BENEFITS(tr: boolean) {
     },
     {
       icon: TrendingUp,
-      title: tr ? 'Kademeli indirim' : 'Tiered discounts',
+      title: tr ? 'Bakiye indirimi' : 'Balance discount',
       desc: tr
-        ? 'Kümülatif yüklemeyle %40 → %45 → %50 indirim kademelerine yükselin.'
-        : 'Climb 40% → 45% → 50% discount tiers as your cumulative loads grow.',
+        ? 'Bakiyene $100/$200/$300 yükle → %20/%30/%40 indirim (bakiye bitince biter).'
+        : 'Load $100/$200/$300 → 20%/30%/40% off (ends when balance is used up).',
     },
     {
       icon: Zap,

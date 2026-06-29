@@ -29,7 +29,7 @@ const DEFAULT_TIERS: Tier[] = [
 const DEFAULT_ROWS: Row[] = [
   { label: 'Fiyat çarpanı', labelEn: 'Price multiplier', user: '2×', member: '1×', leader: '1×' },
   { label: 'Aylık aidat', labelEn: 'Monthly fee', user: '—', member: '$30', leader: '—' },
-  { label: '$250 yükle → %40 indirim', labelEn: 'Load $250 → 40% off', user: true, member: true, leader: true },
+  { label: 'Bakiye yükle → %20–40 indirim', labelEn: 'Load balance → 20–40% off', user: true, member: true, leader: true },
   { label: 'Etsy mağaza bağlama', labelEn: 'Connect Etsy stores', user: true, member: true, leader: true },
   { label: 'Canlı m² fiyatlandırma', labelEn: 'Live m² pricing', user: true, member: true, leader: true },
   { label: 'Güvenli dosya yükleme (R2)', labelEn: 'Secure file upload (R2)', user: true, member: true, leader: true },
@@ -103,8 +103,8 @@ export function PlanComparison({
       </table>
       <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-3 pl-1">
         {tr
-          ? 'Tüm planlar $250 yükleme sonrası %40 indirim ve canlı fiyatlandırmadan yararlanır.'
-          : 'All plans benefit from the 40% discount after a $250 load and live pricing.'}
+          ? 'Bakiye $100/$200/$300 yükleyince %20/%30/%40 indirim (bakiye bitince biter); tüm planlar canlı fiyatlandırmadan yararlanır.'
+          : 'Load $100/$200/$300 for 20%/30%/40% off (ends when balance is used up); all plans get live pricing.'}
       </p>
     </div>
   );

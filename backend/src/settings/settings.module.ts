@@ -27,6 +27,12 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   features: { aiChatbox: false, virtualTryOn: false, kanban: true, push: false },
   membershipFee: 30,
   bulkLoadForDiscount: 250,
+  // PDF bakiye indirim kademesi — MEVCUT bakiyeye göre; bakiye bitince indirim biter
+  loadDiscountTiers: [
+    { minLoad: 100, rate: 0.2 },
+    { minLoad: 200, rate: 0.3 },
+    { minLoad: 300, rate: 0.4 },
+  ],
   discountRate: 0.4,
   demoOtpCode: '123456', // SMTP/e-posta yokken sabit demo doğrulama kodu; gerçek mail gelince admin boşaltır (kapanır)
   sampleFee: 5, // numune sipariş sabit ücreti (D2/#41)
@@ -40,7 +46,7 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   'landing.tierFeatures': [
     { label: 'Fiyat çarpanı', labelEn: 'Price multiplier', user: '2×', member: '1×', leader: '1×' },
     { label: 'Aylık aidat', labelEn: 'Monthly fee', user: '—', member: '$30', leader: '—' },
-    { label: '$250 yükle → %40 indirim', labelEn: 'Load $250 → 40% off', user: true, member: true, leader: true },
+    { label: 'Bakiye yükle → %20–40 indirim', labelEn: 'Load balance → 20–40% off', user: true, member: true, leader: true },
     { label: 'Etsy mağaza bağlama', labelEn: 'Connect Etsy stores', user: true, member: true, leader: true },
     { label: 'Canlı m² fiyatlandırma', labelEn: 'Live m² pricing', user: true, member: true, leader: true },
     { label: 'Güvenli dosya yükleme (R2)', labelEn: 'Secure file upload (R2)', user: true, member: true, leader: true },
@@ -65,7 +71,7 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   'landing.faqs': [
     { q: 'Ortak Doku nedir?', a: 'Bayilerin Etsy mağazalarında ABD pazarına duvar kağıdı, wall decal ve ahşap/CNC ürünleri sattığı bir B2B print-on-demand üretim ve operasyon altyapısıdır.', qEn: 'What is Ortak Doku?', aEn: 'A B2B print-on-demand production & operations platform where resellers sell wallpaper, wall decals and wood/CNC products to the US market via their Etsy stores.' },
     { q: 'Nasıl başlarım?', a: 'Başvuru formunu doldur, üyelik planını seç, Etsy mağazanı bağla ve ilk siparişini ver.', qEn: 'How do I start?', aEn: 'Fill the application, pick a membership plan, connect your Etsy store and place your first order.' },
-    { q: 'Fiyatlandırma nasıl çalışır?', a: 'Duvar kağıdı m² bazlı, decal ve ahşap sabit fiyatlıdır. Ekip üyeleri 1× (yarı) fiyat öder; $250 yükleyince %40 indirim açılır.', qEn: 'How does pricing work?', aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $250 unlocks a 40% discount.' },
+    { q: 'Fiyatlandırma nasıl çalışır?', a: 'Duvar kağıdı m² bazlı, decal ve ahşap sabit fiyatlıdır. Ekip üyeleri 1× (yarı) fiyat öder; bakiyene $100/$200/$300 yükleyince %20/%30/%40 indirim açılır (bakiye bitince indirim biter).', qEn: 'How does pricing work?', aEn: 'Wallpaper is priced per m², decals and wood are flat-priced. Team members pay 1× (half) price; loading $100/$200/$300 unlocks 20%/30%/40% off (ends when balance is used up).' },
     { q: 'Baskı dosyası gereksinimleri neler?', a: 'Yüklenen dosyalar ürünün gerektirdiği minimum DPI ve formatı (TIFF/PDF) karşılamalıdır; sistem otomatik doğrular.', qEn: 'What are the print file requirements?', aEn: 'Uploaded files must meet the product’s minimum DPI and format (TIFF/PDF); the system validates automatically.' },
     { q: 'Siparişi nasıl takip ederim?', a: 'Her sipariş üretim aşamalarında durum güncellemesi alır; markalı takip sayfasından kargo durumunu görebilirsin.', qEn: 'How do I track an order?', aEn: 'Every order gets status updates through production stages; you can follow shipping on a branded tracking page.' },
     { q: 'Ödemeler nasıl yapılır?', a: 'Cüzdanına bakiye yükler, siparişlerde bu bakiyeden düşersin. Toplu yükleme indirim kademelerini açar.', qEn: 'How are payments handled?', aEn: 'You load balance into your wallet and orders are deducted from it. Bulk loading unlocks discount tiers.' },
