@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import {
   Check,
@@ -43,6 +43,7 @@ export default function RegisterPage() {
   const t = useTranslations('auth');
   const tw = useTranslations('apply');
   const tc = useTranslations('common');
+  const isTr = useLocale() === 'tr';
   const router = useRouter();
 
   const [step, setStep] = useState(0); // 0..4 form, 5 = OTP
@@ -224,6 +225,11 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label>{t('email')}</Label>
                 <Input className={field} type="email" value={f.email} onChange={(e) => set('email', e.target.value)} placeholder="ornek@ortakdoku.com" />
+                {f.email && !/\S+@\S+\.\S+/.test(f.email) && (
+                  <p className="text-xs text-rose-500">
+                    {isTr ? 'Geçerli bir e-posta girin (örn. ad@site.com)' : 'Enter a valid email (e.g. name@site.com)'}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>{t('passwordHint')}</Label>
@@ -368,6 +374,11 @@ export default function RegisterPage() {
           )}
 
           {/* Navigasyon */}
+          {step < 5 && !canNext && (
+            <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6 -mb-2">
+              {isTr ? 'Devam etmek için zorunlu alanları doğru doldurun.' : 'Fill the required fields correctly to continue.'}
+            </p>
+          )}
           {step < 5 && (
             <div className="flex items-center justify-between mt-8">
               <Button variant="outline" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
