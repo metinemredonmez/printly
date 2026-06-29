@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { Search, Users, ShieldCheck, UserCheck, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -132,7 +133,7 @@ export default function AdminUsersPage() {
                 className="grid grid-cols-2 md:grid-cols-12 gap-3 px-5 py-3.5 items-center"
               >
                 <div className="md:col-span-4 min-w-0">
-                  <div className="font-semibold text-navy text-sm truncate">{u.email}</div>
+                  <Link href={`/admin/users/${u.id}`} className="block font-semibold text-navy dark:text-white text-sm truncate hover:text-primary hover:underline">{u.email}</Link>
                   <div className="text-[11px] text-slate-400">{shortDate(u.createdAt)}</div>
                 </div>
 
