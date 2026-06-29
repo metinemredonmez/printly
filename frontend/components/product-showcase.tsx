@@ -46,7 +46,7 @@ export function ProductShowcase({
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy dark:text-white">{tr ? 'Ürün Kategorileri' : 'Product Categories'}</h2>
+        <h2 className="text-2xl font-semibold text-navy dark:text-white">{tr ? 'Ürün Kategorileri' : 'Product Categories'}</h2>
         <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {tr
             ? 'Üç çekirdek üretim hattı — her biri Etsy’de satışa hazır.'

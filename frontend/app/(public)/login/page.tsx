@@ -216,7 +216,7 @@ function LoginForm() {
       </label>
       <Button
         type="submit"
-        className="w-full h-11 bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20"
+        className="w-full h-10 bg-primary hover:bg-primary-hover "
         disabled={loading}
       >
         {loading ? t('signingIn') : t('loginTitle')}
@@ -285,7 +285,7 @@ export default function LoginPage() {
           </Link>
         </div>
         <div className="relative z-10 space-y-6">
-          <h2 className="text-4xl font-semibold leading-tight">{t('brandHeadline')}</h2>
+          <h2 className="text-3xl font-semibold leading-tight">{t('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{t('brandSub')}</p>
           <ul className="space-y-3 pt-2">
             {feats.map((f) => (

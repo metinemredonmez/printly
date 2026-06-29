@@ -39,7 +39,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy dark:text-white">
+        <h2 className="text-2xl font-semibold text-navy dark:text-white">
           {tr ? 'Ne kadar kazanırsın?' : 'How much can you earn?'}
         </h2>
         <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
@@ -109,7 +109,7 @@ export function ProfitCalculator({ categories }: { categories?: LiveCat[] }) {
                 <TrendingUp className="h-4 w-4 text-brand-accent" />
                 {tr ? 'Yaklaşık yıllık kârın' : 'Approx. annual profit'}
               </div>
-              <div className="text-4xl sm:text-5xl font-semibold mt-1">{money(annual)}</div>
+              <div className="text-3xl sm:text-4xl font-semibold mt-1">{money(annual)}</div>
             </div>
           </div>
           <Link

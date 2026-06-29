@@ -129,7 +129,7 @@ export default async function Home() {
                 <Rocket className="h-3.5 w-3.5" /> {t('badge')}
               </span>
               <h1
-                className="od-fade-up text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight tracking-tight"
+                className="od-fade-up text-3xl sm:text-4xl lg:text-5xl font-semibold text-white leading-tight tracking-tight"
                 style={{ animationDelay: '0.15s' }}
               >
                 {t('heroTitle')}
@@ -188,7 +188,7 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
-                <div className="text-3xl font-semibold text-primary">{s.value}</div>
+                <div className="text-2xl font-semibold text-primary">{s.value}</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{s.label}</div>
               </div>
             ))}
@@ -198,7 +198,7 @@ export default async function Home() {
         {/* 6 KAPASİTE */}
         <section id="operations" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('capsTitle')}</h2>
+            <h2 className="text-2xl font-semibold text-navy dark:text-white">{t('capsTitle')}</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{t('capsSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -242,7 +242,7 @@ export default async function Home() {
         {/* NASIL ÇALIŞIR */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('howTitle')}</h2>
+            <h2 className="text-2xl font-semibold text-navy dark:text-white">{t('howTitle')}</h2>
             <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{t('howSubtitle')}</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -268,7 +268,7 @@ export default async function Home() {
         <section id="production" className="bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-semibold text-navy dark:text-white mb-2">{t('plansTitle')}</h2>
+              <h2 className="text-2xl font-semibold text-navy dark:text-white mb-2">{t('plansTitle')}</h2>
               <p className="text-slate-500 dark:text-slate-400">{t('plansSubtitle')}</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -314,13 +314,13 @@ export default async function Home() {
         {/* MÜŞTERİ YORUMLARI */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center space-y-3 mb-10">
-            <h2 className="text-3xl font-semibold text-navy dark:text-white">{t('testiTitle')}</h2>
+            <h2 className="text-2xl font-semibold text-navy dark:text-white">{t('testiTitle')}</h2>
             <p className="text-slate-500 dark:text-slate-400">{t('testiSubtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((tt) => (
               <figure key={tt.name} className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col">
-                <div className="text-primary text-3xl leading-none font-serif">&ldquo;</div>
+                <div className="text-primary text-2xl leading-none font-serif">&ldquo;</div>
                 <blockquote className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex-1 -mt-2">{tt.quote}</blockquote>
                 <figcaption className="mt-4 flex items-center gap-3">
                   <span className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
@@ -343,7 +343,7 @@ export default async function Home() {
         <section id="technology" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="bg-navy text-white p-10 md:p-14 rounded-3xl grid lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <h2 className="text-2xl md:text-3xl font-semibold">{t('ctaTitle')}</h2>
+              <h2 className="text-2xl md:text-2xl font-semibold">{t('ctaTitle')}</h2>
               <p className="text-slate-300 leading-relaxed">{t('ctaDesc')}</p>
             </div>
             <div className="lg:col-span-4 lg:text-right">

@@ -223,7 +223,7 @@ export default function IntegrationsPage() {
           <Button
             size="sm"
             onClick={() => setCreateOpen(true)}
-            className="h-9 rounded-xl shadow-lg shadow-blue-500/20"
+            className="h-9 rounded-xl "
           >
             <Plus className="h-4 w-4" />
             {L.newWebhook}
@@ -764,7 +764,7 @@ function CreateWebhookDialog({
               size="sm"
               onClick={submit}
               disabled={create.isPending}
-              className="h-9 rounded-xl shadow-lg shadow-blue-500/20"
+              className="h-9 rounded-xl "
             >
               {create.isPending ? (
                 <RotateCcw className="h-3.5 w-3.5 animate-spin" />
@@ -930,7 +930,7 @@ function EmptyBlock({ L, onCreate }: { L: Labels; onCreate: () => void }) {
       <p className="text-sm text-slate-400 dark:text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
         {L.emptyDesc}
       </p>
-      <Button onClick={onCreate} size="sm" className="mt-5 h-10 rounded-xl shadow-lg shadow-blue-500/20">
+      <Button onClick={onCreate} size="sm" className="mt-5 h-10 rounded-xl ">
         <Plus className="h-4 w-4" />
         {L.emptyCta}
       </Button>

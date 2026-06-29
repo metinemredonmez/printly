@@ -40,7 +40,7 @@ export function LandingFaq({ tr, faqs }: { tr: boolean; faqs?: Faq[] }) {
   return (
     <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-10">
-        <h2 className="text-3xl font-semibold text-navy dark:text-white">{tr ? 'Sıkça Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
+        <h2 className="text-2xl font-semibold text-navy dark:text-white">{tr ? 'Sıkça Sorulan Sorular' : 'Frequently Asked Questions'}</h2>
         <p className="text-slate-500 dark:text-slate-400">
           {tr ? 'Aklındaki ilk sorular — gerisi için ' : 'The first questions — for more see the '}
           <a href="/faq" className="text-primary hover:underline">{tr ? 'tüm SSS' : 'full FAQ'}</a>.

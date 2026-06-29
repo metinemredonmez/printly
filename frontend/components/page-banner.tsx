@@ -32,7 +32,7 @@ export function PageBanner({
         }}
       />
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-10">
-        <h1 className="text-3xl sm:text-4xl font-semibold text-white tracking-tight">{title}</h1>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">{title}</h1>
         {subtitle && <p className="text-slate-300 mt-2 max-w-2xl">{subtitle}</p>}
       </div>
     </div>

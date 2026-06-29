@@ -13,7 +13,7 @@ export function IntegrationsBand({ tr, integrations }: { tr: boolean; integratio
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center space-y-3 mb-8">
-        <h2 className="text-3xl font-semibold text-navy dark:text-white">{tr ? 'Entegrasyonlar' : 'Integrations'}</h2>
+        <h2 className="text-2xl font-semibold text-navy dark:text-white">{tr ? 'Entegrasyonlar' : 'Integrations'}</h2>
         <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {tr
             ? 'Ekosistemi tamamlayan servisler — bağlı olanlar ve yakında gelenler.'

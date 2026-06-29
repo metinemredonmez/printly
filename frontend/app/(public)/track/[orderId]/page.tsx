@@ -219,7 +219,7 @@ function NotFoundCard({
         <Button
           onClick={onRetry}
           disabled={retrying}
-          className="h-11 bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20"
+          className="h-10 bg-primary hover:bg-primary-hover "
         >
           <RefreshCw className={`h-4 w-4 mr-1.5 ${retrying ? 'animate-spin' : ''}`} />
           {tr ? 'Tekrar dene' : 'Try again'}

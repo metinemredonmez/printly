@@ -154,7 +154,7 @@ export default function RegisterPage() {
           <span className="font-semibold text-xl">{tc('appName')}</span>
         </Link>
         <div className="relative z-10 space-y-6">
-          <h2 className="text-4xl font-semibold leading-tight">{tw('brandHeadline')}</h2>
+          <h2 className="text-3xl font-semibold leading-tight">{tw('brandHeadline')}</h2>
           <p className="text-slate-300 text-lg">{tw('brandSub')}</p>
           <ul className="space-y-3 pt-2">
             {[tw('feat1'), tw('feat2'), tw('feat3')].map((x) => (

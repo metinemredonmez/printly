@@ -155,7 +155,7 @@ export default function MembershipPage() {
         {isUser && (
           <Button
             onClick={() => setUpgradeOpen(true)}
-            className="h-11 px-5 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20"
+            className="h-11 px-5 bg-primary hover:bg-primary-hover text-white font-medium rounded-xl "
           >
             <ArrowUpRight className="h-4 w-4" />
             {tr ? "Ekip Üyesi'ne yükselt" : 'Upgrade to Team Member'}

@@ -110,7 +110,7 @@ export default function DealerHome() {
         </div>
         <Link
           href="/app/orders/new"
-          className="inline-flex items-center gap-2 px-5 h-11 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-colors"
+          className="inline-flex items-center gap-2 px-5 h-10 bg-primary hover:bg-primary-hover text-white font-medium rounded-xl  transition-colors"
         >
           <PlusCircle className="h-4 w-4" />
           {nav('newOrder')}

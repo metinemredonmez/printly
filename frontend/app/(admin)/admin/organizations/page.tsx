@@ -396,7 +396,7 @@ function OrgDetailDialog({
             {/* Üst kimlik */}
             <div className="flex items-start gap-4 pr-8">
               <div
-                className="h-14 w-14 shrink-0 rounded-2xl flex items-center justify-center text-base font-semibold text-white shadow-lg shadow-blue-500/20"
+                className="h-14 w-14 shrink-0 rounded-2xl flex items-center justify-center text-base font-semibold text-white "
                 style={{ background: color ?? undefined }}
               >
                 {!color ? (
