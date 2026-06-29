@@ -393,6 +393,9 @@ model Order {
   deliveredAt         DateTime?
   shippingCost        Decimal   @default(0) @db.Decimal(12, 2)
 
+  // Bayi net-kâr raporu: bayinin bu siparişi Etsy'de sattığı fiyat (maliyet = total)
+  etsySalePrice Decimal? @db.Decimal(12, 2)
+
   archivedAt DateTime? // arşiv (#13) — null değilse arşivlenmiş
 
   // Üretim-öncesi onay penceresi (H2/#33) — onaylanmadan IN_PRODUCTION'a geçemez

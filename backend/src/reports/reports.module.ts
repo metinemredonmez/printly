@@ -9,6 +9,7 @@ import {
 import { OrderStatus, PaymentStatus, Role, TransactionType, TransactionStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
 @Injectable()
 export class ReportsService {
@@ -130,6 +131,62 @@ export class ReportsService {
       byStatus: Object.fromEntries(byStatus.map((s) => [s.status, s._count._all])),
     };
   }
+
+  // Bayi net-kâr raporu: Etsy satış fiyatı girilmiş siparişlerde maliyet/kâr/marj.
+  // Bayi yalnız kendi siparişlerini; ADMIN/PRODUCTION hepsini görür.
+  async profit(user: AuthUser) {
+    const staff = user.role === Role.ADMIN || user.role === Role.PRODUCTION;
+    const orders = await this.prisma.order.findMany({
+      where: {
+        etsySalePrice: { not: null },
+        ...(staff ? {} : { userId: user.userId }),
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
+      select: {
+        id: true,
+        orderNumber: true,
+        category: true,
+        status: true,
+        total: true,
+        shippingCost: true,
+        etsySalePrice: true,
+        createdAt: true,
+      },
+    });
+    let totalCost = 0;
+    let totalSale = 0;
+    const rows = orders.map((o) => {
+      const cost = Number(o.total); // bayinin bize ödediği (maliyet)
+      const sale = Number(o.etsySalePrice ?? 0);
+      const profit = Number((sale - cost).toFixed(2));
+      const margin = sale > 0 ? Number(((profit / sale) * 100).toFixed(1)) : 0;
+      totalCost += cost;
+      totalSale += sale;
+      return {
+        id: o.id,
+        orderNumber: o.orderNumber,
+        category: o.category,
+        status: o.status,
+        cost,
+        sale,
+        profit,
+        margin,
+        createdAt: o.createdAt,
+      };
+    });
+    const totalProfit = Number((totalSale - totalCost).toFixed(2));
+    return {
+      summary: {
+        count: rows.length,
+        totalCost: Number(totalCost.toFixed(2)),
+        totalSale: Number(totalSale.toFixed(2)),
+        totalProfit,
+        avgMargin: totalSale > 0 ? Number(((totalProfit / totalSale) * 100).toFixed(1)) : 0,
+      },
+      orders: rows,
+    };
+  }
 }
 
 @Controller('reports')
@@ -158,6 +215,12 @@ export class ReportsController {
   @Get('orders')
   ordersRange(@Query('from') from?: string, @Query('to') to?: string) {
     return this.reports.ordersRange(from, to);
+  }
+
+  // Net-kâr raporu — bayi kendi siparişlerini, admin hepsini görür (rol bazlı scope)
+  @Get('profit')
+  profit(@CurrentUser() user: AuthUser) {
+    return this.reports.profit(user);
   }
 }
 

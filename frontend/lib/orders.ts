@@ -45,6 +45,8 @@ export interface Order {
   estimatedDeliveryAt?: string | null;
   deliveredAt?: string | null;
   shippingCost?: number;
+  // Etsy satış fiyatı (net kâr hesabı)
+  etsySalePrice?: number | null;
   createdAt: string;
   items?: OrderItem[];
   extras?: OrderExtra[];

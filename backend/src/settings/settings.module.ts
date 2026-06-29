@@ -35,6 +35,8 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   ],
   discountRate: 0.4,
   demoOtpCode: '123456', // SMTP/e-posta yokken sabit demo doğrulama kodu; gerçek mail gelince admin boşaltır (kapanır)
+  // Google girişi (anahtar admin panelden girilir; clientId boşken/kapalıyken giriş butonu pasif)
+  googleOAuth: { enabled: false, clientId: '' },
   sampleFee: 5, // numune sipariş sabit ücreti (D2/#41)
   // Kademeli bayi planı (D1/#40): kümülatif yüklemeye göre indirim + öncelikli üretim
   membershipTiers: [

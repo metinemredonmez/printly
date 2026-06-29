@@ -24,6 +24,10 @@ class ResetPasswordDto {
   @IsString() @MinLength(8) newPassword: string;
 }
 
+class GoogleLoginDto {
+  @IsString() idToken: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
@@ -70,6 +74,21 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);
+  }
+
+  // Google girişi yapılandırması (frontend butonu clientId'yi buradan alır)
+  @Public()
+  @Get('google/config')
+  googleConfig() {
+    return this.auth.googleConfig();
+  }
+
+  // Google ID-token ile giriş/kayıt (anahtar admin panelden açılır)
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post('google')
+  google(@Body() dto: GoogleLoginDto) {
+    return this.auth.googleLogin(dto.idToken);
   }
 
   // Dev-only: hızlı giriş (prod'da 403)

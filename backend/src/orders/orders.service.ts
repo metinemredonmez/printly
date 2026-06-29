@@ -415,6 +415,24 @@ export class OrdersService {
     });
   }
 
+  // Bayi (veya staff) siparişin Etsy satış fiyatını girer → net-kâr raporu için.
+  async setSalePrice(authUser: AuthUser, id: string, etsySalePrice: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!order) throw new NotFoundException('Sipariş bulunamadı');
+    const staff = authUser.role === Role.ADMIN || authUser.role === Role.PRODUCTION;
+    if (!staff && order.userId !== authUser.userId) {
+      throw new ForbiddenException('Bu sipariş size ait değil');
+    }
+    const val = Number.isFinite(etsySalePrice) && etsySalePrice > 0 ? etsySalePrice : 0;
+    return this.prisma.order.update({
+      where: { id },
+      data: { etsySalePrice: val > 0 ? new Prisma.Decimal(val) : null },
+    });
+  }
+
   // Bayi sadece kendi siparişlerini; ADMIN/PRODUCTION hepsini görür.
   private scopeFilter(authUser: AuthUser) {
     if (authUser.role === Role.ADMIN || authUser.role === Role.PRODUCTION) return {};

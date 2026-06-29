@@ -17,7 +17,7 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { AssetStatus, AssetRole, Role, Asset } from '@prisma/client';
+import { AssetStatus, AssetRole, Role, Asset, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { R2_CLIENT } from './r2.client';
 import { AuthUser } from '../common/decorators/current-user.decorator';
@@ -193,10 +193,48 @@ export class FilesService {
   }
 
   async markReady(user: AuthUser, assetId: string) {
-    await this.getOwnedAsset(user, assetId);
+    const asset = await this.getOwnedAsset(user, assetId);
+
+    // Spec kontrolü (format/DPI) — üretim dosyası siparişe bağlıysa otomatik doğrula.
+    // Engelleyici değil: sonuç asset.checks'e yazılır, UI uyarı gösterebilir (H3 bağlandı).
+    let checks: Prisma.InputJsonValue | undefined;
+    if (asset.role === AssetRole.PRODUCTION && asset.orderId) {
+      const order = await this.prisma.order.findUnique({
+        where: { id: asset.orderId },
+        select: {
+          items: {
+            select: { product: { select: { minDpi: true, requiredFormats: true } } },
+          },
+        },
+      });
+      const ext = (asset.originalName.split('.').pop() || '').toLowerCase();
+      const issues: string[] = [];
+      for (const it of order?.items ?? []) {
+        const p = it.product;
+        if (!p) continue;
+        if (
+          p.requiredFormats?.length &&
+          ext &&
+          !p.requiredFormats.map((f) => f.toLowerCase()).includes(ext)
+        ) {
+          issues.push(
+            `Format ".${ext}" izinli değil (izinli: ${p.requiredFormats.join(', ')})`,
+          );
+        }
+        if (p.minDpi != null && asset.dpi != null && asset.dpi < p.minDpi) {
+          issues.push(`Çözünürlük ${asset.dpi} DPI yetersiz (min ${p.minDpi} DPI)`);
+        }
+      }
+      const unique = [...new Set(issues)];
+      checks = { spec: { valid: unique.length === 0, issues: unique } };
+    }
+
     return this.prisma.asset.update({
       where: { id: assetId },
-      data: { status: AssetStatus.READY },
+      data: {
+        status: AssetStatus.READY,
+        ...(checks !== undefined ? { checks } : {}),
+      },
     });
   }
 

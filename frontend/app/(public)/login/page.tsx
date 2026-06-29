@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -11,8 +11,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LangSwitcher } from '@/components/lang-switcher';
 import { Logo, LogoMark } from '@/components/logo';
-import { login } from '@/lib/api';
+import { api, login } from '@/lib/api';
 import { homeFor, type User } from '@/lib/types';
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
+
+const GIS_SRC = 'https://accounts.google.com/gsi/client';
+
+interface GoogleConfig {
+  enabled: boolean;
+  clientId: string;
+}
 
 function LoginForm() {
   const t = useTranslations('auth');
@@ -25,14 +38,121 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(false);
 
+  // --- Google girişi durumu ---
+  const [googleCfg, setGoogleCfg] = useState<GoogleConfig | null>(null);
+  const [googleReady, setGoogleReady] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const googleInited = useRef(false);
+
+  // Başarı-sonrası yönlendirme — e-posta/şifre akışıyla aynı mantık.
+  const redirectAfterAuth = useCallback(
+    (user: User) => {
+      toast.success(t('loginSuccess'));
+      router.replace(params.get('next') ?? homeFor(user.role));
+      router.refresh();
+    },
+    [router, params, t],
+  );
+
+  // Mount'ta backend Google config'ini çek (devre dışı varsayılan).
+  useEffect(() => {
+    let active = true;
+    api<GoogleConfig>('/auth/google/config')
+      .then((cfg) => {
+        if (active) setGoogleCfg(cfg);
+      })
+      .catch(() => {
+        if (active) setGoogleCfg({ enabled: false, clientId: '' });
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // GIS callback → idToken'ı backend'e gönder, cookie set edilir, {user} döner.
+  const handleGoogleCredential = useCallback(
+    async (response: { credential?: string }) => {
+      const idToken = response?.credential;
+      if (!idToken) {
+        toast.error(t('googleFailed'));
+        return;
+      }
+      setGoogleLoading(true);
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.user) {
+          throw new Error(data?.message ?? t('googleFailed'));
+        }
+        redirectAfterAuth(data.user as User);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : t('googleFailed'));
+      } finally {
+        setGoogleLoading(false);
+      }
+    },
+    [t, redirectAfterAuth],
+  );
+
+  // Config etkinse GIS script'ini bir kez yükle ve initialize et.
+  useEffect(() => {
+    if (!googleCfg?.enabled || !googleCfg.clientId) return;
+
+    function initGis() {
+      if (googleInited.current || !window.google?.accounts?.id) return;
+      window.google.accounts.id.initialize({
+        client_id: googleCfg!.clientId,
+        callback: handleGoogleCredential,
+      });
+      googleInited.current = true;
+      setGoogleReady(true);
+    }
+
+    if (window.google?.accounts?.id) {
+      initGis();
+      return;
+    }
+
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`);
+    if (existing) {
+      existing.addEventListener('load', initGis, { once: true });
+      // Script zaten yüklenmiş olabilir.
+      initGis();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = GIS_SRC;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener('load', initGis, { once: true });
+    document.head.appendChild(script);
+  }, [googleCfg, handleGoogleCredential]);
+
+  const googleEnabled = !!googleCfg?.enabled && !!googleCfg.clientId;
+
+  function onGoogleClick() {
+    if (!googleEnabled) {
+      toast.info(t('googleSoon'));
+      return;
+    }
+    if (!googleReady || !window.google?.accounts?.id) {
+      toast.info(t('googleSoon'));
+      return;
+    }
+    window.google.accounts.id.prompt();
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       const user: User = await login(email, password, need2fa ? code : undefined, remember);
-      toast.success(t('loginSuccess'));
-      router.replace(params.get('next') ?? homeFor(user.role));
-      router.refresh();
+      redirectAfterAuth(user);
     } catch (err) {
       const msg = err instanceof Error ? err.message : t('loginFailed');
       if (/2fa|iki fakt|kod gerekli|code required/i.test(msg)) {
@@ -112,8 +232,10 @@ function LoginForm() {
       </div>
       <button
         type="button"
-        onClick={() => toast.info(t('googleSoon'))}
-        className="w-full h-11 flex items-center justify-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        onClick={onGoogleClick}
+        disabled={!googleEnabled || googleLoading}
+        title={googleEnabled ? undefined : t('googleSoon')}
+        className="w-full h-11 flex items-center justify-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z" />
@@ -121,7 +243,12 @@ function LoginForm() {
           <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z" />
         </svg>
-        {t('googleLogin')}
+        {googleLoading ? t('signingIn') : t('googleLogin')}
+        {!googleEnabled && (
+          <span className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
+            {t('googleSoonBadge')}
+          </span>
+        )}
       </button>
 
       <div className="flex items-center justify-between text-sm">

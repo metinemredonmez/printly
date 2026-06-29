@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateStatusDto, ShipmentDto } from './dto';
+import { CreateOrderDto, UpdateStatusDto, ShipmentDto, SalePriceDto } from './dto';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
 
@@ -76,5 +76,16 @@ export class OrdersController {
     @Body() dto: ShipmentDto,
   ) {
     return this.orders.setShipment(user, id, dto);
+  }
+
+  // Bayi: siparişin Etsy satış fiyatını gir (net-kâr raporu). Sahip veya staff.
+  @RequirePermission('order:read')
+  @Patch(':id/sale-price')
+  setSalePrice(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: SalePriceDto,
+  ) {
+    return this.orders.setSalePrice(user, id, dto.etsySalePrice);
   }
 }

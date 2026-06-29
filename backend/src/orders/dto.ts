@@ -77,3 +77,7 @@ export class ShipmentDto {
   @IsOptional() @IsNumber() shippingCost?: number;
   @IsOptional() @IsBoolean() markShipped?: boolean; // READY ise SHIPPED'a geçir
 }
+
+export class SalePriceDto {
+  @IsNumber() etsySalePrice: number; // bayinin Etsy satış fiyatı (0 = temizle)
+}

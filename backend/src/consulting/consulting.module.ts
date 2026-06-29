@@ -10,6 +10,7 @@ import {
   Query,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   IsString,
@@ -23,6 +24,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.module';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthUser } from '../common/decorators/current-user.decorator';
+
+// Danışmanlık durum geçişleri (geçersiz/geri geçişleri engelle)
+const CONSULTING_TRANSITIONS: Record<ConsultingStatus, ConsultingStatus[]> = {
+  PENDING: [ConsultingStatus.SCHEDULED, ConsultingStatus.CANCELLED],
+  SCHEDULED: [ConsultingStatus.COMPLETED, ConsultingStatus.CANCELLED],
+  COMPLETED: [],
+  CANCELLED: [],
+};
 
 function isStaff(role: Role) {
   return role === Role.ADMIN || role === Role.PRODUCTION;
@@ -102,6 +111,16 @@ export class ConsultingService {
 
   async update(user: AuthUser, id: string, dto: UpdateConsultingDto) {
     if (!isStaff(user.role)) throw new ForbiddenException('Yalnız personel güncelleyebilir');
+    const current = await this.prisma.consultingRequest.findUnique({ where: { id } });
+    if (!current) throw new NotFoundException('Talep bulunamadı');
+    if (dto.status && dto.status !== current.status) {
+      const allowed = CONSULTING_TRANSITIONS[current.status] ?? [];
+      if (!allowed.includes(dto.status)) {
+        throw new BadRequestException(
+          `Geçersiz durum geçişi: ${current.status} → ${dto.status}`,
+        );
+      }
+    }
     const req = await this.prisma.consultingRequest.update({
       where: { id },
       data: {

@@ -62,21 +62,26 @@ export class ReturnsService {
     if (!isStaff(user.role) && order.userId !== user.userId) {
       throw new ForbiddenException('Bu sipariş size ait değil');
     }
-    const open = await this.prisma.returnRequest.findFirst({
-      where: {
-        orderId: dto.orderId,
-        status: { in: [ReturnStatus.REQUESTED, ReturnStatus.APPROVED, ReturnStatus.RECEIVED] },
-      },
-    });
-    if (open) throw new BadRequestException('Bu sipariş için açık bir iade talebi var');
-
-    const rr = await this.prisma.returnRequest.create({
-      data: {
-        orderId: dto.orderId,
-        userId: order.userId,
-        reason: dto.reason ?? ReturnReason.OTHER,
-        details: dto.details,
-      },
+    // Sipariş satırını kilitle → aynı sipariş için eşzamanlı çift açık talep serileşir
+    const rr = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Order" WHERE id = ${dto.orderId} FOR UPDATE`;
+      const open = await tx.returnRequest.findFirst({
+        where: {
+          orderId: dto.orderId,
+          status: {
+            in: [ReturnStatus.REQUESTED, ReturnStatus.APPROVED, ReturnStatus.RECEIVED],
+          },
+        },
+      });
+      if (open) throw new BadRequestException('Bu sipariş için açık bir iade talebi var');
+      return tx.returnRequest.create({
+        data: {
+          orderId: dto.orderId,
+          userId: order.userId,
+          reason: dto.reason ?? ReturnReason.OTHER,
+          details: dto.details,
+        },
+      });
     });
     await this.audit.log({
       actorUserId: user.userId,

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
-import { ArrowLeft, Check, Archive, ArchiveRestore, FileText, Printer, Package, Truck } from 'lucide-react';
+import { ArrowLeft, Check, Archive, ArchiveRestore, FileText, Printer, Package, Truck, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { money, shortDate } from '@/lib/format';
@@ -185,6 +185,8 @@ export function OrderDetail({
           )}
 
           <ShipmentCard order={o} staff={staff} id={id} />
+
+          <EtsySalePriceCard order={o} id={id} />
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 h-fit">
@@ -424,6 +426,112 @@ function ShipmentCard({
             >
               {tr ? 'Takip sayfasını aç' : 'Open tracking page'}
             </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Para: $${Number(n).toFixed(2)}
+const usd = (n: number) => `$${Number(n).toFixed(2)}`;
+
+function EtsySalePriceCard({ order, id }: { order: Order; id: string }) {
+  const tr = useLocale() === 'tr';
+  const qc = useQueryClient();
+
+  const [salePrice, setSalePrice] = useState(
+    order.etsySalePrice != null && order.etsySalePrice > 0 ? String(order.etsySalePrice) : '',
+  );
+
+  const save = useMutation({
+    mutationFn: (value: number) =>
+      api(`/orders/${id}/sale-price`, { method: 'PATCH', json: { etsySalePrice: value } }),
+    onSuccess: () => {
+      toast.success(tr ? 'Etsy satış fiyatı kaydedildi' : 'Etsy sale price saved');
+      qc.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : tr ? 'Hata' : 'Error'),
+  });
+
+  const inputCls =
+    'h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 text-sm px-2 bg-white dark:bg-slate-950 dark:text-white';
+  const labelCls = 'block text-[11px] mb-1 text-slate-500 dark:text-slate-400';
+
+  const cost = order.total;
+  const sale = order.etsySalePrice ?? 0;
+  const hasSale = sale > 0;
+  const profit = sale - cost;
+  const positive = profit >= 0;
+  const margin = sale > 0 ? (profit / sale) * 100 : 0;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <h2 className="font-semibold text-navy dark:text-white mb-3 flex items-center gap-2">
+        <TrendingUp className="h-4 w-4 text-slate-400 dark:text-slate-500" />{' '}
+        {tr ? 'Etsy Satış Fiyatı' : 'Etsy Sale Price'}
+      </h2>
+
+      <div className="flex items-end gap-2">
+        <div className="flex-1">
+          <label className={labelCls}>
+            {tr ? 'Etsy Satış Fiyatı (USD)' : 'Etsy Sale Price (USD)'}
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            className={inputCls}
+            value={salePrice}
+            onChange={(e) => setSalePrice(e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-9 rounded-xl"
+          onClick={() => save.mutate(salePrice === '' ? 0 : Number(salePrice))}
+          disabled={save.isPending}
+        >
+          {tr ? 'Kaydet' : 'Save'}
+        </Button>
+      </div>
+
+      {hasSale && (
+        <div className="mt-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              {tr ? 'Net Kâr' : 'Net Profit'}
+            </span>
+            <span
+              className={`text-base font-semibold ${
+                positive
+                  ? 'text-emerald-600 dark:text-emerald-300'
+                  : 'text-rose-600 dark:text-rose-300'
+              }`}
+            >
+              {positive ? '' : '- '}
+              {usd(Math.abs(profit))}
+            </span>
+          </div>
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-[12px] text-slate-400 dark:text-slate-500">
+              {tr ? 'Marj' : 'Margin'}
+            </span>
+            <span
+              className={`text-[12px] font-medium ${
+                positive
+                  ? 'text-emerald-600 dark:text-emerald-300'
+                  : 'text-rose-600 dark:text-rose-300'
+              }`}
+            >
+              %{margin.toFixed(1)}
+            </span>
+          </div>
+          <div className="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+            {tr ? 'Maliyet (ödediğin)' : 'Cost (you paid)'}: {usd(cost)}
           </div>
         </div>
       )}

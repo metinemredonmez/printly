@@ -292,6 +292,67 @@ export class AuthService {
     return { message: 'Şifreniz güncellendi, yeni şifrenizle giriş yapabilirsiniz' };
   }
 
+  // Google girişi yapılandırması (frontend butonu için) — anahtar admin panelden (Settings).
+  async googleConfig() {
+    const cfg = await this.settings.get<{ enabled?: boolean; clientId?: string }>(
+      'googleOAuth',
+    );
+    return { enabled: !!(cfg?.enabled && cfg?.clientId), clientId: cfg?.clientId ?? '' };
+  }
+
+  // Google ID-token ile giriş/kayıt. Doğrulama tokeninfo ile (ek bağımlılık yok).
+  // enabled=false veya clientId yoksa kapalı; anahtar gelince admin panelden açılır.
+  async googleLogin(idToken: string) {
+    const cfg = await this.settings.get<{ enabled?: boolean; clientId?: string }>(
+      'googleOAuth',
+    );
+    if (!cfg?.enabled || !cfg?.clientId) {
+      throw new BadRequestException('Google girişi şu an etkin değil');
+    }
+    if (!idToken) throw new BadRequestException('idToken gerekli');
+
+    let info: {
+      aud?: string;
+      email?: string;
+      email_verified?: string | boolean;
+      name?: string;
+    };
+    try {
+      const res = await fetch(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`,
+      );
+      if (!res.ok) throw new Error('tokeninfo ' + res.status);
+      info = await res.json();
+    } catch {
+      throw new UnauthorizedException('Google token doğrulanamadı');
+    }
+    if (info.aud !== cfg.clientId) {
+      throw new UnauthorizedException('Google istemci kimliği uyuşmuyor');
+    }
+    if (!(info.email_verified === true || info.email_verified === 'true')) {
+      throw new UnauthorizedException('Google e-postası doğrulanmamış');
+    }
+    const email = String(info.email || '').toLowerCase();
+    if (!email) throw new UnauthorizedException('Google e-postası alınamadı');
+
+    let user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      const passwordHash = await bcrypt.hash(randomBytes(24).toString('hex'), 10);
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          fullName: info.name ?? null,
+          passwordHash,
+          role: Role.USER,
+          priceMultiplier: multiplierForRole(Role.USER),
+          isEmailVerified: true,
+        },
+      });
+    }
+    if (!user.active) throw new UnauthorizedException('Hesap pasif');
+    return this.issueToken(user);
+  }
+
   private issueToken(user: User, rememberMe = false) {
     const payload: JwtPayload = {
       sub: user.id,
