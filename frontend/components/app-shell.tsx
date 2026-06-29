@@ -30,14 +30,18 @@ import {
   Headset,
   Network,
   Undo2,
+  Bell,
+  Search,
   LogOut,
   Menu,
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { logout } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { api, logout } from '@/lib/api';
 import { useMe } from '@/lib/useMe';
 import { LangSwitcher } from '@/components/lang-switcher';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { LogoMark } from '@/components/logo';
 
 type NavItem = { href: string; key: string; icon: LucideIcon };
@@ -78,6 +82,7 @@ const ADMIN_NAV: NavItem[] = [
   { href: '/admin/map', key: 'map', icon: MapIcon },
   { href: '/admin/audit', key: 'audit', icon: ScrollText },
   { href: '/admin/settings', key: 'settings', icon: Settings },
+  { href: '/admin/profile', key: 'profile', icon: UserIcon },
 ];
 
 export function AppShell({
@@ -94,6 +99,22 @@ export function AppShell({
   const tc = useTranslations('common');
   const nav = area === 'admin' ? ADMIN_NAV : DEALER_NAV;
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+
+  // Okunmamış bildirim sayısı (rozet) — 30sn'de bir tazelenir
+  const { data: unread } = useQuery({
+    queryKey: ['notif', 'unread'],
+    queryFn: () => api<{ unread: number }>('/notifications/center/unread-count'),
+    refetchInterval: 30000,
+    staleTime: 20000,
+  });
+  const unreadCount = unread?.unread ?? 0;
+
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const term = q.trim();
+    if (term) router.push(`${area === 'admin' ? '/admin' : '/app'}/search?q=${encodeURIComponent(term)}`);
+  };
 
   async function onLogout() {
     await logout();
@@ -168,21 +189,48 @@ export function AppShell({
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-slate-100 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <button className="md:hidden text-navy" onClick={() => setOpen(true)}>
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F8F9FA] dark:bg-slate-950">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between gap-3 px-4 sm:px-6 shadow-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <button className="md:hidden text-navy dark:text-white" onClick={() => setOpen(true)}>
               <Menu className="h-5 w-5" />
             </button>
-            <div className="font-semibold text-navy hidden sm:block">
+            <div className="font-semibold text-navy dark:text-white hidden sm:block whitespace-nowrap">
               {area === 'admin' ? t('opsConsole') : t('dealerPortal')}
             </div>
           </div>
-          <div className="flex items-center gap-3 sm:gap-4">
+
+          {/* Global arama */}
+          <form onSubmit={onSearch} className="hidden md:flex flex-1 max-w-sm">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={tc('searchPlaceholder')}
+                className="h-9 w-full pl-9 pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm text-navy dark:text-white placeholder:text-slate-400 outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+              />
+            </div>
+          </form>
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <ThemeToggle />
+            <Link
+              href={`${area === 'admin' ? '/admin' : '/app'}/notifications`}
+              aria-label={t('notifications')}
+              className="relative h-9 w-9 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Bell className="h-4 w-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
             <LangSwitcher />
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-semibold text-navy">{me?.email ?? '—'}</div>
-              <div className="text-[11px] text-slate-400">{me?.role ?? ''}</div>
+              <div className="text-sm font-semibold text-navy dark:text-white max-w-[160px] truncate">{me?.email ?? '—'}</div>
+              <div className="text-[11px] text-slate-400 dark:text-slate-500">{me?.role ?? ''}</div>
             </div>
             <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm shrink-0">
               {(me?.email ?? '?').slice(0, 1).toUpperCase()}

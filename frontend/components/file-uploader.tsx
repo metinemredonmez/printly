@@ -154,12 +154,12 @@ export function FileUploader({
           addFiles(e.dataTransfer.files);
         }}
         className={`rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
-          drag ? 'border-primary bg-blue-50' : 'border-slate-300 hover:border-primary hover:bg-slate-50'
+          drag ? 'border-primary bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700 hover:border-primary hover:bg-slate-50 dark:hover:bg-slate-800/40'
         }`}
       >
-        <UploadCloud className="h-10 w-10 mx-auto text-slate-400" />
-        <p className="mt-2 font-semibold text-navy">{t('uploadFiles')}</p>
-        <p className="text-xs text-slate-500 mt-1">{t('uploadHint')}</p>
+        <UploadCloud className="h-10 w-10 mx-auto text-slate-400 dark:text-slate-500" />
+        <p className="mt-2 font-semibold text-navy dark:text-white">{t('uploadFiles')}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('uploadHint')}</p>
         <input
           ref={inputRef}
           type="file"
@@ -175,13 +175,13 @@ export function FileUploader({
           {files.map((f) => (
             <div
               key={f.id}
-              className="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2.5"
             >
-              <FileIcon className="h-4 w-4 text-slate-400 shrink-0" />
+              <FileIcon className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-navy truncate">{f.file.name}</div>
+                <div className="text-sm font-medium text-navy dark:text-white truncate">{f.file.name}</div>
                 {f.status === 'uploading' && (
-                  <div className="h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                  <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1 overflow-hidden">
                     <div
                       className="h-full bg-primary transition-all"
                       style={{ width: `${f.progress}%` }}

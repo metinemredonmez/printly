@@ -30,7 +30,7 @@ const CATEGORIES = ['WALLPAPER', 'WALL_DECAL', 'WOOD'] as const;
 const UNITS = ['M2', 'FLAT'] as const;
 
 const fieldCls =
-  'w-full h-10 rounded-lg border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 outline-none';
+  'w-full h-10 rounded-lg border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 outline-none dark:bg-slate-950 dark:border-slate-700 dark:text-white';
 
 export function CatalogFormDialog({
   kind,
@@ -295,7 +295,7 @@ export function CatalogFormDialog({
 
           {/* Aktiflik (yalnızca product/material düzenlemede) */}
           {isEdit && kind !== 'extra' && (
-            <label className="flex items-center gap-2 text-sm text-navy cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-navy dark:text-white cursor-pointer">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-primary"
@@ -333,12 +333,12 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-semibold text-slate-600">
+      <Label className="text-xs font-semibold text-slate-600 dark:text-slate-300">
         {label}
         {required && <span className="text-rose-500 ml-0.5">*</span>}
       </Label>
       {children}
-      {hint && <p className="text-[11px] text-slate-400">{hint}</p>}
+      {hint && <p className="text-[11px] text-slate-400 dark:text-slate-500">{hint}</p>}
     </div>
   );
 }

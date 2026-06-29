@@ -120,23 +120,23 @@ export default function NewOrderWizard() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
+      <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
 
       {/* Progress */}
       <div className="flex items-center gap-2">
         {steps.map((s, i) => (
           <div key={s} className="flex-1">
             <div
-              className={`h-1.5 rounded-full ${i + 1 <= step ? 'bg-primary' : 'bg-slate-200'}`}
+              className={`h-1.5 rounded-full ${i + 1 <= step ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
             />
-            <div className={`text-[10px] mt-1.5 font-semibold ${i + 1 === step ? 'text-primary' : 'text-slate-400'}`}>
+            <div className={`text-[10px] mt-1.5 font-semibold ${i + 1 === step ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
               {t(s)}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 min-h-[280px]">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 min-h-[280px]">
         {/* Step 1: kategori */}
         {step === 1 && (
           <div className="grid sm:grid-cols-3 gap-4">
@@ -148,11 +148,11 @@ export default function NewOrderWizard() {
                   setProductId('');
                 }}
                 className={`rounded-2xl border-2 p-5 text-left transition-all ${
-                  category === c.key ? c.color + ' bg-slate-50' : 'border-slate-200 hover:border-slate-300'
+                  category === c.key ? c.color + ' bg-slate-50 dark:bg-slate-800/40' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                 }`}
               >
-                <div className="font-semibold text-navy">{t(c.tk)}</div>
-                <div className="text-xs text-slate-500 mt-1">{t(c.dk)}</div>
+                <div className="font-semibold text-navy dark:text-white">{t(c.tk)}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-300 mt-1">{t(c.dk)}</div>
               </button>
             ))}
           </div>
@@ -169,17 +169,17 @@ export default function NewOrderWizard() {
                     key={p.id}
                     onClick={() => setProductId(p.id)}
                     className={`rounded-xl border p-3 text-left text-sm ${
-                      productId === p.id ? 'border-primary bg-blue-50' : 'border-slate-200 hover:bg-slate-50'
+                      productId === p.id ? 'border-primary bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40'
                     }`}
                   >
-                    <div className="font-semibold text-navy">{p.name}</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="font-semibold text-navy dark:text-white">{p.name}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
                       {p.unit === 'M2' ? `${money(p.basePricePerM2)}/m²` : money(p.flatPrice)}
                     </div>
                   </button>
                 ))}
                 {catProducts.length === 0 && (
-                  <div className="text-sm text-slate-400">{t('selectFirst')}</div>
+                  <div className="text-sm text-slate-400 dark:text-slate-500">{t('selectFirst')}</div>
                 )}
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function NewOrderWizard() {
                 {(extraList.data ?? []).map((ex) => (
                   <label
                     key={ex.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-sm cursor-pointer"
+                    className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm cursor-pointer"
                   >
                     <span className="flex items-center gap-2">
                       <input
@@ -202,7 +202,7 @@ export default function NewOrderWizard() {
                       />
                       {ex.name}
                     </span>
-                    <span className="text-slate-500">{money(ex.price)}</span>
+                    <span className="text-slate-500 dark:text-slate-400">{money(ex.price)}</span>
                   </label>
                 ))}
               </div>
@@ -262,26 +262,26 @@ export default function NewOrderWizard() {
               <button
                 onClick={() => setPaymentMethod('BALANCE')}
                 className={`rounded-2xl border-2 p-5 text-left ${
-                  paymentMethod === 'BALANCE' ? 'border-primary bg-blue-50' : 'border-slate-200'
+                  paymentMethod === 'BALANCE' ? 'border-primary bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700'
                 }`}
               >
-                <div className="font-semibold text-navy">{t('balance')}</div>
-                <div className="text-xs text-slate-500 mt-1">
+                <div className="font-semibold text-navy dark:text-white">{t('balance')}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {t('balanceAvailable')}: {money(credits.data?.balance)}
                 </div>
               </button>
               <button
                 onClick={() => setPaymentMethod('CARD')}
                 className={`rounded-2xl border-2 p-5 text-left ${
-                  paymentMethod === 'CARD' ? 'border-primary bg-blue-50' : 'border-slate-200'
+                  paymentMethod === 'CARD' ? 'border-primary bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700'
                 }`}
               >
-                <div className="font-semibold text-navy">{t('card')}</div>
+                <div className="font-semibold text-navy dark:text-white">{t('card')}</div>
               </button>
             </div>
-            <div className="rounded-xl bg-slate-50 p-4 flex justify-between items-center">
-              <span className="text-sm text-slate-500">{t('livePrice')}</span>
-              <span className="text-2xl font-semibold text-navy">{money(quote.data?.total)}</span>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 flex justify-between items-center">
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('livePrice')}</span>
+              <span className="text-2xl font-semibold text-navy dark:text-white">{money(quote.data?.total)}</span>
             </div>
           </div>
         )}
@@ -319,11 +319,11 @@ export default function NewOrderWizard() {
         {/* Step 6: dosya yükleme (sipariş oluşturulduktan sonra) */}
         {step === 6 && createdId && (
           <div className="space-y-5">
-            <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-4">
-              <PartyPopper className="h-6 w-6 text-emerald-600 shrink-0" />
+            <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-4">
+              <PartyPopper className="h-6 w-6 text-emerald-600 dark:text-emerald-300 shrink-0" />
               <div>
-                <div className="font-semibold text-emerald-800">{t('orderCreatedTitle')}</div>
-                <div className="text-sm text-emerald-700">{t('orderCreatedDesc')}</div>
+                <div className="font-semibold text-emerald-800 dark:text-emerald-300">{t('orderCreatedTitle')}</div>
+                <div className="text-sm text-emerald-700 dark:text-emerald-300">{t('orderCreatedDesc')}</div>
               </div>
             </div>
             <div>

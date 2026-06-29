@@ -22,9 +22,9 @@ interface Job {
 }
 
 const JOB_COLOR: Record<string, string> = {
-  QUEUED: 'bg-slate-100 text-slate-700',
-  IN_PROGRESS: 'bg-blue-50 text-primary',
-  DONE: 'bg-emerald-50 text-emerald-700',
+  QUEUED: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+  IN_PROGRESS: 'bg-blue-50 text-primary dark:bg-blue-500/10 dark:text-blue-300',
+  DONE: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
 };
 
 export default function ProductionPage() {
@@ -60,8 +60,8 @@ export default function ProductionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-slate-500">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
       </div>
 
       {/* QR / barkod okut */}
@@ -105,23 +105,23 @@ export default function ProductionPage() {
       </div>
 
       {/* Kuyruk */}
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="px-5 py-3 border-b border-slate-100 font-semibold text-navy">{t('queue')}</div>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 font-semibold text-navy dark:text-white">{t('queue')}</div>
         {isLoading ? (
           <TableSkeleton rows={6} cols={3} />
         ) : (data ?? []).length === 0 ? (
-          <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
+          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-sm">{t('empty')}</div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {(data ?? []).map((j) => (
               <div key={j.id} className="flex items-center justify-between px-5 py-3.5">
                 <div className="flex items-center gap-3">
                   {j.priority && <Zap className="h-4 w-4 text-amber-500" />}
                   <div>
-                    <div className="font-semibold text-navy text-sm">
+                    <div className="font-semibold text-navy dark:text-white text-sm">
                       {t(j.station as 'PRINT')} · {j.orderId.slice(-6)}
                     </div>
-                    <div className="text-[11px] text-slate-400">{shortDate(j.createdAt)}</div>
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500">{shortDate(j.createdAt)}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

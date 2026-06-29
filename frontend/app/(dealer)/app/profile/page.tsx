@@ -76,17 +76,17 @@ export default function ProfilePage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Kullanıcı bilgisi (read-only) */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+          <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary dark:bg-blue-500/10 dark:text-blue-300 flex items-center justify-center">
             <User className="h-5 w-5" />
           </div>
-          <div className="font-semibold text-navy">{t('accountTitle')}</div>
+          <div className="font-semibold text-navy dark:text-white">{t('accountTitle')}</div>
         </div>
 
         {me.isLoading ? (
@@ -94,14 +94,14 @@ export default function ProfilePage() {
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                 <Mail className="h-3.5 w-3.5" />
                 {t('email')}
               </div>
-              <div className="font-semibold text-navy break-all">{me.data?.email ?? '—'}</div>
+              <div className="font-semibold text-navy dark:text-white break-all">{me.data?.email ?? '—'}</div>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {t('role')}
               </div>
@@ -120,12 +120,12 @@ export default function ProfilePage() {
 
       {/* Firma profili */}
       {hasOrg && (
-        <div className="bg-white rounded-2xl border border-slate-100 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300 flex items-center justify-center">
               <Building2 className="h-5 w-5" />
             </div>
-            <div className="font-semibold text-navy">{t('orgTitle')}</div>
+            <div className="font-semibold text-navy dark:text-white">{t('orgTitle')}</div>
           </div>
 
           {org.isLoading ? (

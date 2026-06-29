@@ -72,8 +72,8 @@ export default function CreditsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,9 +100,9 @@ export default function CreditsPage() {
         />
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-5">
-        <h2 className="text-base font-semibold text-navy">{t('topupTitle')}</h2>
-        <p className="text-xs text-slate-500 mt-1">{t('topupHint')}</p>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+        <h2 className="text-base font-semibold text-navy dark:text-white">{t('topupTitle')}</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('topupHint')}</p>
         <form onSubmit={onSubmit} className="mt-4 flex flex-col sm:flex-row sm:items-end gap-3">
           <div className="flex-1 max-w-xs">
             <Label htmlFor="amount">{t('amountLabel')}</Label>
@@ -115,7 +115,7 @@ export default function CreditsPage() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder={t('amountPlaceholder')}
-              className="mt-1.5 bg-white"
+              className="mt-1.5 bg-white dark:bg-slate-950 dark:border-slate-700 dark:text-white"
             />
           </div>
           <Button
@@ -129,11 +129,11 @@ export default function CreditsPage() {
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-base font-semibold text-navy">{t('ledgerTitle')}</h2>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-navy dark:text-white">{t('ledgerTitle')}</h2>
         </div>
-        <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 text-[11px] font-semibold uppercase text-slate-400">
+        <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold uppercase text-slate-400 dark:text-slate-500">
           <div className="col-span-5">{t('reason')}</div>
           <div className="col-span-3">{t('date')}</div>
           <div className="col-span-2 text-right">{t('delta')}</div>
@@ -142,9 +142,9 @@ export default function CreditsPage() {
         {ledgerQ.isLoading ? (
           <TableSkeleton rows={6} cols={4} />
         ) : ledger.length === 0 ? (
-          <div className="p-10 text-center text-slate-400 text-sm">{t('ledgerEmpty')}</div>
+          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-sm">{t('ledgerEmpty')}</div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {ledger.map((row) => {
               const positive = row.delta >= 0;
               return (
@@ -154,22 +154,22 @@ export default function CreditsPage() {
                 >
                   <div className="md:col-span-5 flex items-center gap-2">
                     {positive ? (
-                      <ArrowUpCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                      <ArrowUpCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     ) : (
-                      <ArrowDownCircle className="h-4 w-4 text-rose-600 shrink-0" />
+                      <ArrowDownCircle className="h-4 w-4 text-rose-600 dark:text-rose-400 shrink-0" />
                     )}
-                    <span className="text-sm font-medium text-navy truncate">{row.reason}</span>
+                    <span className="text-sm font-medium text-navy dark:text-white truncate">{row.reason}</span>
                   </div>
-                  <div className="md:col-span-3 text-sm text-slate-500">{shortDate(row.createdAt)}</div>
+                  <div className="md:col-span-3 text-sm text-slate-500 dark:text-slate-400">{shortDate(row.createdAt)}</div>
                   <div
                     className={`md:col-span-2 text-right font-semibold text-sm ${
-                      positive ? 'text-emerald-600' : 'text-rose-600'
+                      positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                     }`}
                   >
                     {positive ? '+' : '−'}
                     {money(Math.abs(row.delta))}
                   </div>
-                  <div className="md:col-span-2 text-right text-sm font-semibold text-slate-600">
+                  <div className="md:col-span-2 text-right text-sm font-semibold text-slate-600 dark:text-slate-300">
                     {money(row.balanceAfter)}
                   </div>
                 </div>

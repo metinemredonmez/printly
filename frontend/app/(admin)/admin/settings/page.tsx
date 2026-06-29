@@ -74,17 +74,17 @@ export default function AdminSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-slate-500">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
       </div>
 
       {settings.isLoading ? (
         <ListSkeleton rows={4} />
       ) : keys.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center">
-          <Settings2 className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-          <p className="text-navy font-semibold">{t('emptyTitle')}</p>
-          <p className="text-slate-400 text-sm mt-1">{t('emptyHint')}</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-10 text-center">
+          <Settings2 className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <p className="text-navy dark:text-white font-semibold">{t('emptyTitle')}</p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">{t('emptyHint')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -92,11 +92,11 @@ export default function AdminSettings() {
             const isEditing = editingKey === key;
             const value = data[key];
             return (
-              <div key={key} className="bg-white rounded-2xl border border-slate-100 p-5">
+              <div key={key} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <code className="font-semibold text-navy text-sm break-all">{key}</code>
+                      <code className="font-semibold text-navy dark:text-white text-sm break-all">{key}</code>
                       <Badge variant="secondary">{typeof value}</Badge>
                     </div>
                   </div>
@@ -114,7 +114,7 @@ export default function AdminSettings() {
 
                 {isEditing ? (
                   <div className="mt-3 space-y-2">
-                    <Label htmlFor={`val-${key}`} className="text-xs text-slate-500">
+                    <Label htmlFor={`val-${key}`} className="text-xs text-slate-500 dark:text-slate-400">
                       {t('valueJson')}
                     </Label>
                     <textarea
@@ -123,7 +123,7 @@ export default function AdminSettings() {
                       onChange={(e) => setDraft(e.target.value)}
                       rows={6}
                       spellCheck={false}
-                      className="w-full rounded-lg border border-slate-200 bg-slate-50 p-3 font-mono text-xs text-navy outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 font-mono text-xs text-navy dark:text-white outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
                     />
                     <div className="flex items-center gap-2">
                       <Button
@@ -147,7 +147,7 @@ export default function AdminSettings() {
                     </div>
                   </div>
                 ) : (
-                  <pre className="mt-3 rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-600 overflow-x-auto whitespace-pre-wrap break-all">
+                  <pre className="mt-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 p-3 font-mono text-xs text-slate-600 dark:text-slate-300 overflow-x-auto whitespace-pre-wrap break-all">
                     {pretty(value)}
                   </pre>
                 )}

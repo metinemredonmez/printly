@@ -10,7 +10,8 @@
     "cancel": "Cancel",
     "back": "Go back",
     "soon": "soon",
-    "optional": "optional"
+    "optional": "optional",
+    "searchPlaceholder": "Search orders, users, products…"
   },
   "auth": {
     "loginTitle": "System Login",
@@ -312,6 +313,8 @@
     "organizations": "Organizations",
     "billing": "Billing",
     "support": "Support",
+    "notifications": "Notifications",
+    "search": "Search",
     "returns": "Returns",
     "education": "Education",
     "consulting": "Consulting",

@@ -68,8 +68,8 @@ export default function MapPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -97,29 +97,29 @@ export default function MapPage() {
         <section className="lg:col-span-2 space-y-4">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-navy">{t('ordersHeading')}</h2>
+            <h2 className="text-lg font-semibold text-navy dark:text-white">{t('ordersHeading')}</h2>
           </div>
 
           {orders.isLoading ? (
             <ListSkeleton rows={4} />
           ) : orderList.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center">
-              <MapPin className="h-8 w-8 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm text-slate-500">{t('ordersEmpty')}</p>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-10 text-center">
+              <MapPin className="h-8 w-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('ordersEmpty')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {orderList.map((o) => (
                 <div
                   key={o.id}
-                  className="bg-white rounded-2xl border border-slate-100 p-5 hover:shadow-lg transition-shadow"
+                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="font-semibold text-navy text-sm truncate">
+                      <div className="font-semibold text-navy dark:text-white text-sm truncate">
                         {o.orderNumber}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5 truncate">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                         {o.clientName ?? t('unknownClient')}
                       </div>
                     </div>
@@ -128,8 +128,8 @@ export default function MapPage() {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-500">
-                    <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-500 dark:text-slate-400">
+                    <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                     <span className="truncate">
                       {[o.clientCity, o.clientCountry]
                         .filter(Boolean)
@@ -137,11 +137,11 @@ export default function MapPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
-                    <span className="text-sm font-semibold text-navy">
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <span className="text-sm font-semibold text-navy dark:text-white">
                       {money(o.total)}
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500">
                       {shortDate(o.createdAt)}
                     </span>
                   </div>
@@ -154,18 +154,18 @@ export default function MapPage() {
         <aside className="space-y-4">
           <div className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-emerald-600" />
-            <h2 className="text-lg font-semibold text-navy">
+            <h2 className="text-lg font-semibold text-navy dark:text-white">
               {t('activityHeading')}
             </h2>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
             {activity.isLoading ? (
               <ListSkeleton rows={4} />
             ) : eventList.length === 0 ? (
               <div className="py-6 text-center">
-                <Activity className="h-8 w-8 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm text-slate-500">{t('activityEmpty')}</p>
+                <Activity className="h-8 w-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('activityEmpty')}</p>
               </div>
             ) : (
               <ol className="space-y-4">
@@ -175,16 +175,16 @@ export default function MapPage() {
                       <CircleDot className="h-3.5 w-3.5 text-primary shrink-0" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-navy">
+                      <div className="text-sm font-semibold text-navy dark:text-white">
                         {e.action}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {e.entityType}
                         {e.actorUserId
                           ? ` · ${t('byUser', { user: e.actorUserId })}`
                           : ''}
                       </div>
-                      <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
+                      <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 mt-1">
                         <Clock className="h-3 w-3" />
                         {shortDate(e.createdAt)}
                       </div>

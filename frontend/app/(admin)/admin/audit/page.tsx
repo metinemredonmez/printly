@@ -20,11 +20,11 @@ interface AuditEntry {
 // Aksiyon ön ekine göre küçük renk (badge + nokta).
 function actionTone(action: string): { badge: string; dot: string } {
   const a = (action || '').toUpperCase();
-  if (/(CREATE|ADD|INSERT)/.test(a)) return { badge: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' };
-  if (/(UPDATE|EDIT|PATCH|CHANGE)/.test(a)) return { badge: 'bg-blue-50 text-primary', dot: 'bg-primary' };
-  if (/(DELETE|REMOVE|CANCEL)/.test(a)) return { badge: 'bg-rose-50 text-rose-600', dot: 'bg-rose-500' };
-  if (/(LOGIN|AUTH|LOGOUT)/.test(a)) return { badge: 'bg-amber-50 text-amber-600', dot: 'bg-amber-500' };
-  return { badge: 'bg-slate-100 text-navy', dot: 'bg-slate-400' };
+  if (/(CREATE|ADD|INSERT)/.test(a)) return { badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300', dot: 'bg-emerald-500' };
+  if (/(UPDATE|EDIT|PATCH|CHANGE)/.test(a)) return { badge: 'bg-blue-50 text-primary dark:bg-blue-500/10', dot: 'bg-primary' };
+  if (/(DELETE|REMOVE|CANCEL)/.test(a)) return { badge: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300', dot: 'bg-rose-500' };
+  if (/(LOGIN|AUTH|LOGOUT)/.test(a)) return { badge: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300', dot: 'bg-amber-500' };
+  return { badge: 'bg-slate-100 text-navy dark:bg-slate-800 dark:text-white', dot: 'bg-slate-400' };
 }
 
 export default function AdminAudit() {
@@ -40,14 +40,14 @@ export default function AdminAudit() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-slate-500">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <h2 className="font-semibold text-navy">{t('timeline')}</h2>
-          <span className="text-xs text-slate-400">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="font-semibold text-navy dark:text-white">{t('timeline')}</h2>
+          <span className="text-xs text-slate-400 dark:text-slate-500">
             {logs.isLoading ? '…' : t('count', { n: items.length })}
           </span>
         </div>
@@ -63,23 +63,23 @@ export default function AdminAudit() {
             description={t('emptyDesc')}
           />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {items.map((e) => {
               const tone = actionTone(e.action);
               return (
-                <li key={e.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
+                <li key={e.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                   <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${tone.dot}`} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge className={tone.badge}>{e.action}</Badge>
-                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-navy">
-                        <Hash className="h-3.5 w-3.5 text-slate-400" />
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-navy dark:text-white">
+                        <Hash className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                         {e.entityType}
-                        <span className="text-slate-400 font-normal">·</span>
-                        <span className="font-mono text-xs text-slate-500">{e.entityId}</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-normal">·</span>
+                        <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{e.entityId}</span>
                       </span>
                     </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
                       <span className="inline-flex items-center gap-1">
                         <User className="h-3 w-3" />
                         {e.actorUserId ? e.actorUserId : t('systemActor')}

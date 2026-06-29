@@ -70,10 +70,10 @@ export function OrderProofs({ orderId, staff = false }: { orderId: string; staff
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-5">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
       <div className="flex items-center gap-2 mb-3">
         <FileCheck2 className="h-4 w-4 text-primary" />
-        <h2 className="font-semibold text-navy">{t('title')}</h2>
+        <h2 className="font-semibold text-navy dark:text-white">{t('title')}</h2>
       </div>
 
       {isLoading ? (
@@ -82,24 +82,24 @@ export function OrderProofs({ orderId, staff = false }: { orderId: string; staff
           <Skeleton className="h-14 w-full rounded-xl" />
         </div>
       ) : (proofs ?? []).length === 0 ? (
-        <p className="text-sm text-slate-400 py-2">{t('empty')}</p>
+        <p className="text-sm text-slate-400 dark:text-slate-500 py-2">{t('empty')}</p>
       ) : (
         <div className="space-y-3">
           {(proofs ?? []).map((p) => (
-            <div key={p.id} className="rounded-xl border border-slate-200 p-3">
+            <div key={p.id} className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-navy text-sm truncate">{p.fileName}</span>
+                    <span className="font-medium text-navy dark:text-white text-sm truncate">{p.fileName}</span>
                     <Badge variant={STATUS_VARIANT[p.status]}>{t(`status${p.status}`)}</Badge>
                   </div>
-                  {p.note && <p className="text-xs text-slate-500 mt-1">{p.note}</p>}
+                  {p.note && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{p.note}</p>}
                   {p.responseNote && (
-                    <p className="text-xs text-rose-500 mt-1">
+                    <p className="text-xs text-rose-500 dark:text-rose-300 mt-1">
                       {t('responseNote')}: {p.responseNote}
                     </p>
                   )}
-                  <p className="text-[11px] text-slate-300 mt-1">{shortDate(p.createdAt)}</p>
+                  <p className="text-[11px] text-slate-300 dark:text-slate-600 mt-1">{shortDate(p.createdAt)}</p>
                 </div>
                 {p.r2Key && (
                   <ProofFileLink proofId={p.id} label={t('viewFile')} />
@@ -136,8 +136,8 @@ export function OrderProofs({ orderId, staff = false }: { orderId: string; staff
 
       {/* Personel: yeni prova ekle */}
       {staff && (
-        <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
-          <p className="text-xs font-semibold text-slate-500">{t('addProof')}</p>
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('addProof')}</p>
           <Input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}

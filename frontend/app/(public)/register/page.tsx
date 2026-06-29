@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import {
   Check,
   Loader2,
+  RotateCcw,
   Wallet,
   Store,
   Crown,
@@ -50,6 +51,15 @@ export default function RegisterPage() {
   const [verifying, setVerifying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState('');
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  // Geri sayım — her saniye azalt, 0'da temizle
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
   const [f, setF] = useState({
     plan: '' as Plan | '',
@@ -116,6 +126,20 @@ export default function RegisterPage() {
       toast.error(err instanceof Error ? err.message : t('verifyFailed'));
     } finally {
       setVerifying(false);
+    }
+  }
+
+  async function resend() {
+    if (resending || cooldown > 0) return;
+    setResending(true);
+    try {
+      await api('/auth/resend-otp', { method: 'POST', json: { email: f.email } });
+      toast.success(isTr ? 'Kod tekrar gönderildi' : 'Code resent');
+      setCooldown(30);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : isTr ? 'Kod gönderilemedi' : 'Could not resend code');
+    } finally {
+      setResending(false);
     }
   }
 
@@ -370,6 +394,28 @@ export default function RegisterPage() {
                 {verifying ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
                 {t('verifyRegister')}
               </Button>
+              <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+                {isTr ? 'Kod gelmedi mi?' : "Didn't get the code?"}{' '}
+                <button
+                  type="button"
+                  onClick={resend}
+                  disabled={resending || cooldown > 0}
+                  className="inline-flex items-center gap-1 font-medium text-primary hover:underline disabled:text-slate-400 dark:disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
+                >
+                  {resending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <RotateCcw className="h-3.5 w-3.5" />
+                  )}
+                  {cooldown > 0
+                    ? isTr
+                      ? `Tekrar gönder (${cooldown}sn)`
+                      : `Resend (${cooldown}s)`
+                    : isTr
+                      ? 'Kodu tekrar gönder'
+                      : 'Resend code'}
+                </button>
+              </div>
             </form>
           )}
 

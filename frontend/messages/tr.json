@@ -10,7 +10,8 @@
     "cancel": "İptal",
     "back": "Geri dön",
     "soon": "yakında",
-    "optional": "opsiyonel"
+    "optional": "opsiyonel",
+    "searchPlaceholder": "Sipariş, kullanıcı, ürün ara…"
   },
   "auth": {
     "loginTitle": "Sistem Girişi",
@@ -312,6 +313,8 @@
     "organizations": "Firmalar",
     "billing": "Fatura",
     "support": "Destek",
+    "notifications": "Bildirimler",
+    "search": "Arama",
     "returns": "İadeler",
     "education": "Eğitim",
     "consulting": "Danışmanlık",

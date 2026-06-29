@@ -56,8 +56,8 @@ export default function KanbanPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-slate-500">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
       </div>
 
       {isLoading ? (
@@ -72,11 +72,11 @@ export default function KanbanPage() {
                 if (dragId) move.mutate({ id: dragId, toStatus: col.status });
                 setDragId(null);
               }}
-              className={`bg-slate-50 rounded-2xl border-t-4 ${COL_BORDER[col.status] ?? 'border-t-slate-300'} p-2 min-h-[300px]`}
+              className={`bg-slate-50 dark:bg-slate-800/40 rounded-2xl border-t-4 ${COL_BORDER[col.status] ?? 'border-t-slate-300'} p-2 min-h-[300px]`}
             >
               <div className="flex items-center justify-between px-2 py-2">
-                <span className="text-xs font-semibold text-navy uppercase">{tos(col.status)}</span>
-                <span className="text-[11px] bg-white rounded-full px-2 py-0.5 text-slate-500 font-semibold">
+                <span className="text-xs font-semibold text-navy dark:text-white uppercase">{tos(col.status)}</span>
+                <span className="text-[11px] bg-white dark:bg-slate-900 rounded-full px-2 py-0.5 text-slate-500 dark:text-slate-400 font-semibold">
                   {col.count}
                 </span>
               </div>
@@ -86,18 +86,18 @@ export default function KanbanPage() {
                     key={c.id}
                     draggable
                     onDragStart={() => setDragId(c.id)}
-                    className="bg-white rounded-xl border border-slate-100 p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
                   >
-                    <div className="font-semibold text-navy text-sm truncate">{c.orderNumber}</div>
-                    <div className="text-[11px] text-slate-400">{c.category}</div>
+                    <div className="font-semibold text-navy dark:text-white text-sm truncate">{c.orderNumber}</div>
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500">{c.category}</div>
                     <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[11px] text-slate-500 truncate">{c.clientName ?? '—'}</span>
-                      <span className="font-semibold text-navy text-xs">{money(c.total)}</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{c.clientName ?? '—'}</span>
+                      <span className="font-semibold text-navy dark:text-white text-xs">{money(c.total)}</span>
                     </div>
                   </div>
                 ))}
                 {col.cards.length === 0 && (
-                  <div className="text-center text-[11px] text-slate-400 py-6">{t('empty')}</div>
+                  <div className="text-center text-[11px] text-slate-400 dark:text-slate-500 py-6">{t('empty')}</div>
                 )}
               </div>
             </div>

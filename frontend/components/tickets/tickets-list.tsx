@@ -22,10 +22,10 @@ interface Ticket {
 }
 
 const ST_COLOR: Record<string, string> = {
-  OPEN: 'bg-blue-50 text-primary',
-  PENDING: 'bg-amber-50 text-amber-700',
-  RESOLVED: 'bg-emerald-50 text-emerald-700',
-  CLOSED: 'bg-slate-100 text-slate-600',
+  OPEN: 'bg-blue-50 text-primary dark:bg-blue-500/10 dark:text-blue-300',
+  PENDING: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
+  RESOLVED: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
+  CLOSED: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
 };
 
 export function TicketsList({ basePath }: { basePath: string; staff?: boolean }) {
@@ -55,7 +55,7 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
   return (
     <div className="space-y-5 max-w-3xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
         <Button onClick={() => setOpen((o) => !o)}>
           <Plus className="h-4 w-4 mr-1" /> {t('new')}
         </Button>
@@ -67,7 +67,7 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
             e.preventDefault();
             create.mutate();
           }}
-          className="bg-white rounded-2xl border border-slate-100 p-5 space-y-3"
+          className="bg-white rounded-2xl border border-slate-100 p-5 space-y-3 dark:bg-slate-900 dark:border-slate-800"
         >
           <div className="space-y-1.5">
             <Label>{t('subject')}</Label>
@@ -80,7 +80,7 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
               onChange={(e) => setBody(e.target.value)}
               required
               rows={3}
-              className="w-full rounded-md border border-slate-200 p-2 text-sm"
+              className="w-full rounded-md border border-slate-200 p-2 text-sm dark:bg-slate-950 dark:border-slate-700 dark:text-white"
             />
           </div>
           <Button type="submit" disabled={create.isPending}>
@@ -89,22 +89,22 @@ export function TicketsList({ basePath }: { basePath: string; staff?: boolean })
         </form>
       )}
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         {isLoading ? (
           <TableSkeleton rows={5} cols={2} />
         ) : (data ?? []).length === 0 ? (
-          <div className="p-10 text-center text-slate-400 text-sm">{t('empty')}</div>
+          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-sm">{t('empty')}</div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {(data ?? []).map((tk) => (
               <Link
                 key={tk.id}
                 href={`${basePath}/${tk.id}`}
-                className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50"
+                className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40"
               >
                 <div>
-                  <div className="font-semibold text-navy text-sm">{tk.subject}</div>
-                  <div className="text-[11px] text-slate-400">{shortDate(tk.createdAt)}</div>
+                  <div className="font-semibold text-navy dark:text-white text-sm">{tk.subject}</div>
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500">{shortDate(tk.createdAt)}</div>
                 </div>
                 <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${ST_COLOR[tk.status] ?? 'bg-slate-100'}`}>
                   {t(tk.status as 'OPEN')}

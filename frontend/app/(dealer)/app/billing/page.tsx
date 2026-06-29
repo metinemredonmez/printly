@@ -125,8 +125,8 @@ export default function BillingPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {billing.isLoading ? (
@@ -140,12 +140,12 @@ export default function BillingPage() {
           }}
         >
           {/* Genel */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="h-9 w-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
+              <div className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-primary dark:text-blue-300 flex items-center justify-center">
                 <Globe2 className="h-5 w-5" />
               </div>
-              <div className="font-semibold text-navy">{t('general')}</div>
+              <div className="font-semibold text-navy dark:text-white">{t('general')}</div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -191,13 +191,13 @@ export default function BillingPage() {
           </div>
 
           {/* Ülkeye özel */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
             <div className="flex items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
-                <div className="h-9 w-9 rounded-xl bg-slate-100 text-navy flex items-center justify-center">
+                <div className="h-9 w-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-navy dark:text-slate-200 flex items-center justify-center">
                   <Building2 className="h-5 w-5" />
                 </div>
-                <div className="font-semibold text-navy">
+                <div className="font-semibold text-navy dark:text-white">
                   {isTR ? t('trDetails') : t('usDetails')}
                 </div>
               </div>
@@ -273,7 +273,7 @@ export default function BillingPage() {
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-slate-400 flex items-center gap-1.5">
+            <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
               <Receipt className="h-3.5 w-3.5" />
               {t('hint')}
             </p>

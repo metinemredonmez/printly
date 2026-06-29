@@ -101,8 +101,8 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <Button
           onClick={() => readAll.mutate()}
@@ -130,9 +130,9 @@ export default function NotificationsPage() {
         />
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-base font-semibold text-navy">{t('listTitle')}</h2>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-navy dark:text-white">{t('listTitle')}</h2>
         </div>
         {listQ.isLoading ? (
           <div className="p-4">
@@ -140,40 +140,40 @@ export default function NotificationsPage() {
           </div>
         ) : list.length === 0 ? (
           <div className="p-10 text-center">
-            <Bell className="h-8 w-8 text-slate-300 mx-auto" />
-            <p className="text-sm text-slate-400 mt-3">{t('listEmpty')}</p>
+            <Bell className="h-8 w-8 text-slate-300 dark:text-slate-600 mx-auto" />
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-3">{t('listEmpty')}</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {list.map((n) => {
               const isUnread = !n.readAt;
               return (
                 <div
                   key={n.id}
                   className={`flex items-start gap-4 px-5 py-4 ${
-                    isUnread ? 'bg-blue-50/40' : ''
+                    isUnread ? 'bg-blue-50/40 dark:bg-blue-500/10' : ''
                   }`}
                 >
                   <div
                     className={`mt-0.5 h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${
-                      isUnread ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-400'
+                      isUnread ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {isUnread ? <BellRing className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-navy">{n.title}</span>
+                      <span className="text-sm font-semibold text-navy dark:text-white">{n.title}</span>
                       {isUnread && (
                         <Badge className="bg-primary/10 text-primary border-transparent">
                           {t('new')}
                         </Badge>
                       )}
-                      <span className="text-[11px] text-slate-400 ml-auto shrink-0">
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 ml-auto shrink-0">
                         {shortDate(n.createdAt)}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 mt-1 break-words">{n.body}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 break-words">{n.body}</p>
                   </div>
                   {isUnread && (
                     <Button
@@ -193,22 +193,22 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-5">
-        <h2 className="text-base font-semibold text-navy">{t('prefsTitle')}</h2>
-        <p className="text-xs text-slate-500 mt-1">{t('prefsHint')}</p>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+        <h2 className="text-base font-semibold text-navy dark:text-white">{t('prefsTitle')}</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('prefsHint')}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {PREF_META.map(({ key, icon: Icon, accent }) => {
             const on = prefs ? prefs[key] : false;
             const accentClass: Record<string, string> = {
-              primary: 'bg-blue-50 text-primary',
-              navy: 'bg-slate-100 text-navy',
-              emerald: 'bg-emerald-50 text-emerald-600',
-              amber: 'bg-amber-50 text-amber-600',
+              primary: 'bg-blue-50 text-primary dark:bg-blue-500/10 dark:text-blue-300',
+              navy: 'bg-slate-100 text-navy dark:bg-slate-800 dark:text-white',
+              emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
+              amber: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300',
             };
             return (
               <div
                 key={key}
-                className="flex items-center gap-3 rounded-xl border border-slate-100 p-4"
+                className="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-4"
               >
                 <div
                   className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
@@ -218,8 +218,8 @@ export default function NotificationsPage() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-navy">{t(`pref_${key}`)}</div>
-                  <div className="text-[11px] text-slate-400">{t(`pref_${key}_desc`)}</div>
+                  <div className="text-sm font-semibold text-navy dark:text-white">{t(`pref_${key}`)}</div>
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500">{t(`pref_${key}_desc`)}</div>
                 </div>
                 <button
                   type="button"
@@ -229,7 +229,7 @@ export default function NotificationsPage() {
                   disabled={prefsQ.isLoading || updatePrefs.isPending}
                   onClick={() => updatePrefs.mutate({ [key]: !on } as Partial<Prefs>)}
                   className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
-                    on ? 'bg-primary' : 'bg-slate-200'
+                    on ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'
                   }`}
                 >
                   <span

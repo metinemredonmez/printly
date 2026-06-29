@@ -34,9 +34,9 @@ interface RevenueRow {
 type ExportKind = 'orders' | 'users' | 'transactions';
 
 const EXPORTS: { kind: ExportKind; icon: typeof ShoppingCart; accent: string }[] = [
-  { kind: 'orders', icon: ShoppingCart, accent: 'bg-blue-50 text-primary' },
-  { kind: 'users', icon: Users, accent: 'bg-amber-50 text-amber-600' },
-  { kind: 'transactions', icon: Wallet, accent: 'bg-emerald-50 text-emerald-600' },
+  { kind: 'orders', icon: ShoppingCart, accent: 'bg-blue-50 text-primary dark:bg-blue-500/10 dark:text-blue-300' },
+  { kind: 'users', icon: Users, accent: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300' },
+  { kind: 'transactions', icon: Wallet, accent: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300' },
 ];
 
 export default function ReportsPage() {
@@ -83,8 +83,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-navy">{t('title')}</h1>
-        <p className="text-slate-500">{t('subtitle')}</p>
+        <h1 className="text-2xl font-semibold text-navy dark:text-white">{t('title')}</h1>
+        <p className="text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
       </div>
 
       {/* Özet kartları */}
@@ -110,10 +110,10 @@ export default function ReportsPage() {
       </div>
 
       {/* Excel export */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
         <div className="flex items-center gap-2 mb-4">
           <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-          <h2 className="font-semibold text-navy">{t('exportTitle')}</h2>
+          <h2 className="font-semibold text-navy dark:text-white">{t('exportTitle')}</h2>
         </div>
         <div className="grid sm:grid-cols-3 gap-3">
           {EXPORTS.map(({ kind, icon: Icon, accent }) => (
@@ -121,17 +121,17 @@ export default function ReportsPage() {
               key={kind}
               onClick={() => handleExport(kind)}
               disabled={downloading !== null}
-              className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4 text-left transition-colors hover:bg-slate-50 disabled:opacity-50"
+              className="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-4 text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40 disabled:opacity-50"
             >
               <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent}`}>
                 <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-navy">{t(`export_${kind}`)}</span>
-                <span className="block text-[11px] text-slate-400">{t('exportHint')}</span>
+                <span className="block text-sm font-semibold text-navy dark:text-white">{t(`export_${kind}`)}</span>
+                <span className="block text-[11px] text-slate-400 dark:text-slate-500">{t('exportHint')}</span>
               </span>
               <Download
-                className={`h-4 w-4 shrink-0 text-slate-400 ${
+                className={`h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500 ${
                   downloading === kind ? 'animate-pulse text-primary' : ''
                 }`}
               />
@@ -142,12 +142,12 @@ export default function ReportsPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Bayi performansı */}
-        <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <Trophy className="h-4 w-4 text-amber-500" />
-            <h2 className="font-semibold text-navy">{t('dealerPerformance')}</h2>
+            <h2 className="font-semibold text-navy dark:text-white">{t('dealerPerformance')}</h2>
           </div>
-          <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 text-[11px] font-semibold uppercase text-slate-400">
+          <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 text-[11px] font-semibold uppercase text-slate-400 dark:text-slate-500">
             <div className="col-span-6">{t('dealer')}</div>
             <div className="col-span-3 text-right">{t('orders')}</div>
             <div className="col-span-3 text-right">{t('revenue')}</div>
@@ -155,24 +155,24 @@ export default function ReportsPage() {
           {dealers.isLoading ? (
             <TableSkeleton rows={6} cols={3} />
           ) : dealerRows.length === 0 ? (
-            <div className="p-10 text-center text-sm text-slate-400">{t('emptyDealers')}</div>
+            <div className="p-10 text-center text-sm text-slate-400 dark:text-slate-500">{t('emptyDealers')}</div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {dealerRows.map((d, i) => (
                 <div
                   key={d.userId}
                   className="grid grid-cols-2 md:grid-cols-12 gap-3 px-5 py-3.5 items-center"
                 >
                   <div className="md:col-span-6 flex items-center gap-3 min-w-0">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-[11px] font-semibold text-navy">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-navy dark:text-white">
                       {i + 1}
                     </span>
-                    <span className="truncate text-sm font-semibold text-navy">{d.dealer}</span>
+                    <span className="truncate text-sm font-semibold text-navy dark:text-white">{d.dealer}</span>
                   </div>
-                  <div className="md:col-span-3 text-right text-sm text-slate-600">
+                  <div className="md:col-span-3 text-right text-sm text-slate-600 dark:text-slate-300">
                     {num(d.orders)}
                   </div>
-                  <div className="md:col-span-3 text-right text-sm font-semibold text-navy">
+                  <div className="md:col-span-3 text-right text-sm font-semibold text-navy dark:text-white">
                     {money(d.revenue)}
                   </div>
                 </div>
@@ -182,29 +182,29 @@ export default function ReportsPage() {
         </div>
 
         {/* Aylık gelir */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="h-4 w-4 text-primary" />
-            <h2 className="font-semibold text-navy">{t('monthlyRevenue')}</h2>
+            <h2 className="font-semibold text-navy dark:text-white">{t('monthlyRevenue')}</h2>
           </div>
           {revenue.isLoading ? (
             <ListSkeleton rows={6} />
           ) : revRows.length === 0 ? (
-            <div className="p-10 text-center text-sm text-slate-400">{t('emptyRevenue')}</div>
+            <div className="p-10 text-center text-sm text-slate-400 dark:text-slate-500">{t('emptyRevenue')}</div>
           ) : (
             <div className="space-y-2.5">
               {revRows.slice(-12).map((r) => (
                 <div key={r.month} className="flex items-center gap-3">
-                  <span className="w-16 shrink-0 text-[11px] font-medium text-slate-500">
+                  <span className="w-16 shrink-0 text-[11px] font-medium text-slate-500 dark:text-slate-400">
                     {r.month}
                   </span>
-                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                     <div
                       className="h-full rounded-full bg-primary/80"
                       style={{ width: `${Math.max((r.total / maxRev) * 100, 3)}%` }}
                     />
                   </div>
-                  <span className="w-24 shrink-0 text-right text-xs font-semibold text-navy">
+                  <span className="w-24 shrink-0 text-right text-xs font-semibold text-navy dark:text-white">
                     {money(r.total)}
                   </span>
                 </div>

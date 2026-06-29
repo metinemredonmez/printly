@@ -20,6 +20,13 @@ import {
   CircleCheck,
   Info,
   Loader2,
+  Tag,
+  Headset,
+  MessageSquare,
+  Network,
+  GraduationCap,
+  CalendarDays,
+  type LucideIcon,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { money } from '@/lib/format';
@@ -400,6 +407,62 @@ export default function MembershipPage() {
               </div>
             )}
           </div>
+
+          {/* ── Ekip Üyesi Ayrıcalıkları ($30/ay iş modeli) ──────────── */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="flex items-center gap-2 font-semibold text-navy dark:text-white">
+                  <Crown className="h-4 w-4 text-primary" />
+                  {tr ? 'Ekip Üyesi Ayrıcalıkları' : 'Team Member Benefits'}
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  {tr
+                    ? `Aylık ${money(MEMBERSHIP_FEE)} Ekip Üyeliğinin size sağladığı tüm ayrıcalıklar.`
+                    : `Everything your ${money(MEMBERSHIP_FEE)}/mo Team Membership unlocks.`}
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-semibold text-primary dark:bg-blue-500/10">
+                <Sparkles className="h-3.5 w-3.5" />
+                {money(MEMBERSHIP_FEE)}
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  {tr ? '/ ay' : '/ mo'}
+                </span>
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {PERKS(tr).map((p) => {
+                const card = (
+                  <div className="group flex h-full flex-col rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition hover:border-primary/30 hover:bg-blue-50/40 dark:border-slate-800 dark:bg-slate-800/40 dark:hover:border-primary/40 dark:hover:bg-blue-500/5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-primary dark:bg-blue-500/10">
+                        <p.icon className="h-4 w-4" />
+                      </div>
+                      {p.href && (
+                        <ArrowUpRight className="h-4 w-4 text-slate-300 transition group-hover:text-primary dark:text-slate-600" />
+                      )}
+                    </div>
+                    <div className="mt-3 text-sm font-semibold text-navy dark:text-white">
+                      {p.title}
+                    </div>
+                    <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      {p.desc}
+                    </div>
+                  </div>
+                );
+                return p.href ? (
+                  <Link key={p.title} href={p.href} className="block h-full">
+                    {card}
+                  </Link>
+                ) : (
+                  <div key={p.title} className="h-full">
+                    {card}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </>
       )}
 
@@ -632,6 +695,46 @@ function BENEFITS(tr: boolean) {
       desc: tr
         ? 'Tek tıkla ekip üyeliğine geçin; planınızı istediğiniz zaman görün.'
         : 'Upgrade to team membership in one click and track your plan anytime.',
+    },
+  ];
+}
+
+/* ── Ekip Üyesi ayrıcalıkları ($30/ay iş modeli) ────────────────────── */
+function PERKS(tr: boolean): { icon: LucideIcon; title: string; desc: string; href?: string }[] {
+  return [
+    {
+      icon: Tag,
+      title: tr ? "%50'ye varan indirim" : 'Up to 50% off',
+      desc: tr ? 'Tüm ürünlerde avantaj' : 'Advantage across all products',
+    },
+    {
+      icon: Headset,
+      title: tr ? 'Ücretsiz Destek Ekibi' : 'Free Support Team',
+      desc: tr ? 'Öncelikli, ücretsiz destek' : 'Priority, no-cost support',
+    },
+    {
+      icon: MessageSquare,
+      title: tr ? 'Danışmanlık' : 'Consulting',
+      desc: tr ? 'Uzmanlarla birebir görüşme' : 'One-on-one with experts',
+      href: '/app/consulting',
+    },
+    {
+      icon: Network,
+      title: tr ? 'Networking' : 'Networking',
+      desc: tr ? 'Güçlü iş ağına erişim' : 'Access to a strong network',
+      href: '/app/network',
+    },
+    {
+      icon: GraduationCap,
+      title: tr ? 'Eğitim' : 'Education',
+      desc: tr ? '%50 indirimli eğitimler' : 'Trainings at 50% off',
+      href: '/app/education',
+    },
+    {
+      icon: CalendarDays,
+      title: tr ? 'Etkinlikler' : 'Events',
+      desc: tr ? '%50 indirimli etkinlikler' : 'Events at 50% off',
+      href: '/app/events',
     },
   ];
 }
