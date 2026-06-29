@@ -12,7 +12,9 @@ describe('PricingService — fiyat motoru', () => {
         findUnique: ({ where }: any) => Promise.resolve(extras[where.id] ?? null),
       },
     };
-    return new PricingService(prisma, {} as any, {} as any);
+    // settings.get → undefined (kargo defaultFlatCost yok → shipping 0)
+    const settings: any = { get: async () => undefined };
+    return new PricingService(prisma, {} as any, settings);
   };
 
   it('M2 ürün: 12×12 inç → 1 sqft → 0.0929 m² × $23 × USER(2×) ≈ $4.27', async () => {
@@ -119,6 +121,27 @@ describe('PricingService — fiyat motoru', () => {
     expect(q.total).toBeCloseTo(55, 2);
     expect(q.discountRate).toBe(0.45);
     expect(q.hasDiscount40).toBe(true);
+  });
+
+  it('quoteOrder: kargo ücreti indirim SONRASI eklenir (base 100, %45, +10 kargo → 65)', async () => {
+    const prisma: any = {
+      product: {
+        findUnique: () =>
+          Promise.resolve({ id: 'ps', active: true, unit: 'FLAT', flatPrice: 100 }),
+      },
+      extraOption: { findUnique: () => Promise.resolve(null) },
+    };
+    const settings: any = { get: async (k: string) => (k === 'shipping' ? { defaultFlatCost: 10 } : undefined) };
+    const svc = new PricingService(prisma, {} as any, settings);
+    const q = await svc.quoteOrder(
+      [{ productId: 'ps', widthInch: 1, heightInch: 1, quantity: 1 }],
+      [],
+      1,
+      0.45,
+    );
+    expect(q.discount40).toBeCloseTo(45, 2); // 100 * .45
+    expect(q.shipping).toBeCloseTo(10, 2);
+    expect(q.total).toBeCloseTo(65, 2); // 100 - 45 + 10
   });
 
   it('effectiveDiscountRate: bakiye kademesi (0→0, 150→.2, 250→.3, 300→.4)', async () => {

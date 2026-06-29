@@ -197,6 +197,9 @@ export function OrderDetail({
             {o.discount40 > 0 && (
               <Row label={t('discount')} value={`- ${money(o.discount40)}`} accent />
             )}
+            {(o.shippingCost ?? 0) > 0 && (
+              <Row label={tr ? 'Kargo' : 'Shipping'} value={money(o.shippingCost ?? 0)} />
+            )}
             <div className="border-t border-slate-100 dark:border-slate-800 pt-2 flex justify-between font-semibold text-navy dark:text-white">
               <span>{t('grandTotal')}</span>
               <span>{money(o.total)}</span>

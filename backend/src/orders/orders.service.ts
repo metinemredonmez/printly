@@ -103,6 +103,7 @@ export class OrdersService {
         subtotal: sampleFee,
         extrasTotal: 0,
         discount40: 0,
+        shipping: 0,
         total: sampleFee,
       };
     }
@@ -142,6 +143,7 @@ export class OrdersService {
           subtotal: quote.subtotal,
           extrasTotal: quote.extrasTotal,
           discount40: quote.discount40,
+          shippingCost: quote.shipping,
           total: quote.total,
           totalSqm: quote.totalSqm,
           etsyStoreId: dto.etsyStoreId,

@@ -47,6 +47,7 @@ export interface OrderQuote {
   subtotal: number;
   extrasTotal: number;
   discount40: number;
+  shipping: number;
   total: number;
   totalSqm: number;
   multiplier: number;
@@ -162,7 +163,10 @@ export class PricingService {
     const base = round(subtotal + extrasTotal, 2);
     // İndirim oranı: 0 (yok) veya kademe oranı (Standart .40 / Pro .45 / Elit .50)
     const discount40 = discountRate > 0 ? round(base * discountRate, 2) : 0;
-    const total = round(base - discount40, 2);
+    // Kargo: admin'in belirlediği sabit ücret (indirim SONRASI eklenir, indirimsiz)
+    const shipCfg = await this.settings.get<{ defaultFlatCost?: number }>('shipping');
+    const shipping = round(Number(shipCfg?.defaultFlatCost ?? 0), 2);
+    const total = round(base - discount40 + shipping, 2);
     const totalSqm = round(
       pricedItems.reduce((s, i) => s + i.sqm * i.quantity, 0),
       4,
@@ -174,6 +178,7 @@ export class PricingService {
       subtotal,
       extrasTotal,
       discount40,
+      shipping,
       total,
       totalSqm,
       multiplier,

@@ -108,6 +108,7 @@ export class InvoicesService {
     totalLine('Ara toplam', money(Number(order.subtotal)));
     if (Number(order.extrasTotal) > 0) totalLine('Ek seçenekler', money(Number(order.extrasTotal)));
     if (Number(order.discount40) > 0) totalLine('%40 indirim', `-${money(Number(order.discount40))}`);
+    if (Number(order.shippingCost) > 0) totalLine('Kargo', money(Number(order.shippingCost)));
     totalLine('TOPLAM', money(Number(order.total)), true);
 
     y -= 16;

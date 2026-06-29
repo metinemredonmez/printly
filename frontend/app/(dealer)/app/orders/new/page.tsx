@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { Check, Loader2, PartyPopper } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -31,6 +31,7 @@ interface Quote {
   extrasTotal: number;
   discount40: number;
   discountRate?: number;
+  shipping?: number;
   total: number;
   totalSqm: number;
 }
@@ -43,6 +44,7 @@ const CATEGORIES = [
 
 export default function NewOrderWizard() {
   const t = useTranslations('wizard');
+  const tr = useLocale() === 'tr';
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -246,6 +248,11 @@ export default function NewOrderWizard() {
                         ? ` (%${Math.round(quote.data.discountRate * 100)})`
                         : ''}
                       : -{money(quote.data?.discount40)}
+                    </div>
+                  )}
+                  {(quote.data?.shipping ?? 0) > 0 && (
+                    <div className="text-xs text-slate-400 mt-1">
+                      {tr ? 'Kargo' : 'Shipping'}: +{money(quote.data?.shipping)}
                     </div>
                   )}
                 </>
