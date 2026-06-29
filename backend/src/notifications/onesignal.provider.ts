@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SettingsService } from '../settings/settings.module';
 
 export interface PushSendOpts {
   title: string;
@@ -17,32 +18,46 @@ export interface PushSendResult {
   error?: string;
 }
 
+type OneSignalSettings = { enabled?: boolean; appId?: string; apiKey?: string };
+
 const CHUNK = 2000; // OneSignal include_player_ids üst sınırı
 
 @Injectable()
 export class OneSignalProvider {
   private readonly logger = new Logger(OneSignalProvider.name);
-  private appId?: string;
-  private apiKey?: string;
 
-  constructor(config: ConfigService) {
-    this.appId = config.get<string>('ONESIGNAL_APP_ID') || undefined;
-    this.apiKey = config.get<string>('ONESIGNAL_API_KEY') || undefined;
-  }
+  constructor(
+    private config: ConfigService,
+    private settings: SettingsService,
+  ) {}
 
-  get configured(): boolean {
-    return !!(this.appId && this.apiKey);
+  // Anahtarı ÖNCE admin panelinden (settings.onesignal), yoksa env'den çöz.
+  private async resolve(): Promise<{ appId?: string; apiKey?: string }> {
+    const s = await this.settings.get<OneSignalSettings>('onesignal');
+    let appId = s?.enabled ? (s.appId || '').trim() : '';
+    let apiKey = s?.enabled ? (s.apiKey || '').trim() : ''; // SettingsService secret'ı çözer
+    if (!appId || !apiKey) {
+      appId = (this.config.get<string>('ONESIGNAL_APP_ID') || '').trim();
+      apiKey = (this.config.get<string>('ONESIGNAL_API_KEY') || '').trim();
+    }
+    return { appId: appId || undefined, apiKey: apiKey || undefined };
   }
 
   async send(opts: PushSendOpts): Promise<PushSendResult> {
-    if (!this.configured) {
+    const { appId, apiKey } = await this.resolve();
+    if (!appId || !apiKey) {
       this.logger.warn('OneSignal yapılandırılmadı — bildirim gönderilmedi');
-      return { ok: false, recipients: 0, error: 'OneSignal yapılandırılmadı (ONESIGNAL_APP_ID/API_KEY)' };
+      return {
+        ok: false,
+        recipients: 0,
+        error: 'OneSignal yapılandırılmadı (admin panel → Entegrasyonlar veya env)',
+      };
     }
+    const creds = { appId, apiKey };
 
     // Broadcast (segment) → tek istek
     if (opts.segments?.length) {
-      return this.post({ included_segments: opts.segments }, opts);
+      return this.post(creds, { included_segments: opts.segments }, opts);
     }
 
     // Belirli cihazlar → 2000'lik parçalara böl
@@ -53,7 +68,7 @@ export class OneSignalProvider {
     let lastId: string | undefined;
     for (let i = 0; i < ids.length; i += CHUNK) {
       const chunk = ids.slice(i, i + CHUNK);
-      const r = await this.post({ include_player_ids: chunk }, opts);
+      const r = await this.post(creds, { include_player_ids: chunk }, opts);
       if (!r.ok) return { ...r, recipients };
       recipients += r.recipients;
       lastId = r.id;
@@ -61,9 +76,13 @@ export class OneSignalProvider {
     return { ok: true, id: lastId, recipients };
   }
 
-  private async post(target: Record<string, unknown>, opts: PushSendOpts): Promise<PushSendResult> {
+  private async post(
+    creds: { appId: string; apiKey: string },
+    target: Record<string, unknown>,
+    opts: PushSendOpts,
+  ): Promise<PushSendResult> {
     const payload: Record<string, unknown> = {
-      app_id: this.appId,
+      app_id: creds.appId,
       headings: { en: opts.title },
       contents: { en: opts.body },
       data: opts.data ?? {},
@@ -74,7 +93,10 @@ export class OneSignalProvider {
     try {
       const res = await fetch('https://onesignal.com/api/v1/notifications', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Basic ${this.apiKey}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${creds.apiKey}`,
+        },
         body: JSON.stringify(payload),
       });
       const json: any = await res.json().catch(() => ({}));

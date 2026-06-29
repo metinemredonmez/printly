@@ -49,6 +49,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProductionModule } from './production/production.module';
 import { WhitelabelModule } from './whitelabel/whitelabel.module';
 import { PublicModule } from './public/public.module';
+import { SmsModule } from './sms/sms.module';
 import { EducationModule } from './education/education.module';
 import { ConsultingModule } from './consulting/consulting.module';
 import { EventsModule } from './events/events.module';
@@ -195,6 +196,7 @@ import { HealthController } from './health.controller';
     ProductionModule,
     WhitelabelModule,
     PublicModule,
+    SmsModule,
     EducationModule,
     ConsultingModule,
     EventsModule,
