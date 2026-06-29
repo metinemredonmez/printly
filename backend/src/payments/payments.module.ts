@@ -5,10 +5,15 @@ import {
   Get,
   Post,
   Param,
+  Req,
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  type RawBodyRequest,
 } from '@nestjs/common';
+import type { Request } from 'express';
+import * as crypto from 'crypto';
+import { Public } from '../common/decorators/public.decorator';
 import {
   Prisma,
   PaymentMethod,
@@ -103,8 +108,18 @@ export class PaymentsService {
     };
   }
 
-  // Ödeme onayı (gerçek hayatta sağlayıcı webhook'u; şimdilik admin/manuel)
+  // Ödeme onayı (admin/manuel) — ortak markPaid'i çağırır.
   async confirm(actor: AuthUser, orderId: string) {
+    return this.markPaid(orderId, `manual (${actor.role})`, actor.userId, actor.role);
+  }
+
+  // Siparişi PAID işaretle (idempotent) — hem manuel confirm hem Stripe webhook kullanır.
+  private async markPaid(
+    orderId: string,
+    source: string,
+    actorUserId?: string,
+    actorRole?: Role,
+  ) {
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
     if (!order) throw new NotFoundException('Sipariş bulunamadı');
     if (order.paymentStatus === PaymentStatus.PAID) {
@@ -124,21 +139,59 @@ export class PaymentsService {
           status: TransactionStatus.SUCCESS,
           method: PaymentMethod.CARD,
           orderId: order.id,
-          note: `Kart ödemesi onaylandı (${order.paymentProvider ?? 'manual'})`,
+          note: `Kart ödemesi onaylandı (${source})`,
         },
       });
       return o;
     });
 
     await this.audit.log({
-      actorUserId: actor.userId,
-      actorRole: actor.role,
+      actorUserId,
+      actorRole,
       action: 'PAYMENT_CONFIRMED',
       entityType: 'Order',
       entityId: order.id,
-      meta: { provider: order.paymentProvider, ref: order.paymentRef },
+      meta: { source, ref: order.paymentRef },
     });
     return updated;
+  }
+
+  // Stripe webhook — imza doğrula (settings.stripe.webhookSecret) + checkout.session.completed → PAID.
+  async handleStripeWebhook(rawBody?: Buffer, signature?: string) {
+    const s = await this.settings.get<{ webhookSecret?: string }>('stripe');
+    const secret = (s?.webhookSecret || '').trim();
+    if (!secret) throw new BadRequestException('Stripe webhook secret tanımlı değil');
+    if (!signature || !rawBody) throw new BadRequestException('İmza/gövde eksik');
+
+    const parts: Record<string, string> = {};
+    for (const p of signature.split(',')) {
+      const i = p.indexOf('=');
+      if (i > 0) parts[p.slice(0, i)] = p.slice(i + 1);
+    }
+    const payload = rawBody.toString('utf8');
+    const expected = crypto
+      .createHmac('sha256', secret)
+      .update(`${parts.t}.${payload}`)
+      .digest('hex');
+    const got = parts.v1 || '';
+    if (
+      got.length !== expected.length ||
+      !crypto.timingSafeEqual(Buffer.from(got), Buffer.from(expected))
+    ) {
+      throw new BadRequestException('Stripe imzası geçersiz');
+    }
+
+    let event: any;
+    try {
+      event = JSON.parse(payload);
+    } catch {
+      throw new BadRequestException('Geçersiz webhook gövdesi');
+    }
+    if (event?.type === 'checkout.session.completed') {
+      const orderId = event.data?.object?.client_reference_id;
+      if (orderId) await this.markPaid(orderId, 'stripe-webhook');
+    }
+    return { received: true };
   }
 }
 
@@ -157,11 +210,22 @@ export class PaymentsController {
     return this.payments.createCheckout(user, orderId);
   }
 
-  // Ödeme onayı — şimdilik ADMIN (gerçek gateway webhook'u Faz 2)
+  // Ödeme onayı — ADMIN manuel (Stripe webhook gelmeden/yedek)
   @Roles(Role.ADMIN)
   @Post('confirm/:orderId')
   confirm(@CurrentUser() user: AuthUser, @Param('orderId') orderId: string) {
     return this.payments.confirm(user, orderId);
+  }
+
+  // Stripe webhook (public, imza ile doğrulanır) → ödeme otomatik onaylanır.
+  // NOT: Stripe canlı modda HTTPS endpoint ister; SSL kurulunca tam çalışır.
+  @Public()
+  @Post('stripe/webhook')
+  stripeWebhook(@Req() req: RawBodyRequest<Request>) {
+    return this.payments.handleStripeWebhook(
+      req.rawBody,
+      req.headers['stripe-signature'] as string | undefined,
+    );
   }
 }
 

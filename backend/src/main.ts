@@ -11,7 +11,8 @@ import { AppModule } from './app.module';
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: Stripe webhook imza doğrulaması için ham gövde gerekir
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get(ConfigService);
 
   // nginx/reverse-proxy arkasında gerçek istemci IP'si (rate-limit + loglar doğru çalışsın)
