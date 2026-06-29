@@ -184,6 +184,9 @@
     "approved": "Onaylandı",
     "statusChanged": "Durum güncellendi",
     "notFound": "Sipariş bulunamadı",
+    "invoicePdf": "Fatura (PDF)",
+    "labelPdf": "Kargo Etiketi",
+    "packingSlip": "Paketleme Fişi",
     "back": "Siparişlere dön"
   },
   "wizard": {

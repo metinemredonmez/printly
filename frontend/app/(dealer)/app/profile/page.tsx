@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ListSkeleton } from '@/components/skeletons';
+import { TwoFactor } from '@/components/profile/two-factor';
 
 interface Me {
   userId: string;
@@ -113,6 +114,9 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* 2FA güvenlik */}
+      <TwoFactor />
 
       {/* Firma profili */}
       {hasOrg && (

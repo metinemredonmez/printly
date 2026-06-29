@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, Check, Archive, ArchiveRestore } from 'lucide-react';
+import { ArrowLeft, Check, Archive, ArchiveRestore, FileText, Printer, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { money, shortDate } from '@/lib/format';
@@ -85,8 +85,21 @@ export function OrderDetail({
             {o.category} · {shortDate(o.createdAt)}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <OrderStatusBadge status={o.status} />
+          <Button size="sm" variant="outline" onClick={() => window.open(`/api/be/invoices/order/${id}`, '_blank')}>
+            <FileText className="h-3.5 w-3.5 mr-1.5" /> {t('invoicePdf')}
+          </Button>
+          {staff && (
+            <>
+              <Button size="sm" variant="outline" onClick={() => window.open(`/api/be/labels/order/${id}`, '_blank')}>
+                <Printer className="h-3.5 w-3.5 mr-1.5" /> {t('labelPdf')}
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => window.open(`/api/be/orders/${id}/packing-slip`, '_blank')}>
+                <Package className="h-3.5 w-3.5 mr-1.5" /> {t('packingSlip')}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

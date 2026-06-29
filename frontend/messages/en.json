@@ -184,6 +184,9 @@
     "approved": "Approved",
     "statusChanged": "Status updated",
     "notFound": "Order not found",
+    "invoicePdf": "Invoice (PDF)",
+    "labelPdf": "Shipping Label",
+    "packingSlip": "Packing Slip",
     "back": "Back to orders"
   },
   "wizard": {

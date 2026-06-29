@@ -154,6 +154,14 @@ export class AuthService {
     return { otpauthUrl, qrDataUrl, secret }; // secret: manuel giriş için
   }
 
+  async twoFactorStatus(userId: string) {
+    const u = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { twoFactorEnabled: true },
+    });
+    return { enabled: u?.twoFactorEnabled ?? false };
+  }
+
   async enableTwoFactor(userId: string, code: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user?.twoFactorSecret) {

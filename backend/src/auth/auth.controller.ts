@@ -104,4 +104,9 @@ export class AuthController {
   disable2fa(@CurrentUser() user: AuthUser, @Body() dto: TwoFactorCodeDto) {
     return this.auth.disableTwoFactor(user.userId, dto.code);
   }
+
+  @Get('2fa/status')
+  twoFactorStatus(@CurrentUser() user: AuthUser) {
+    return this.auth.twoFactorStatus(user.userId);
+  }
 }
