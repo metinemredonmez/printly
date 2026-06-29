@@ -44,8 +44,17 @@ export class MailService {
       this.logger.log(`[DEV OTP] ${email} → kod: ${code}`);
       return;
     }
-    await this.transporter.sendMail({ from: this.from, to: email, subject, text, html });
-    this.logger.log(`OTP e-postası gönderildi → ${email}`);
+    try {
+      await this.transporter.sendMail({ from: this.from, to: email, subject, text, html });
+      this.logger.log(`OTP e-postası gönderildi → ${email}`);
+    } catch (err) {
+      // SMTP başarısız (yanlış/kapalı sunucu, ör. placeholder smtp.example.com) →
+      // kaydı KIRMA; kodu log'a bas ki test/kurtarma yapılabilsin.
+      this.logger.error(
+        `OTP e-postası gönderilemedi (${email}): ${(err as Error)?.message ?? err} — kod log'a yazıldı`,
+      );
+      this.logger.log(`[DEV OTP] ${email} → kod: ${code}`);
+    }
   }
 
   // Toplu/broadcast e-posta (duyuru/bildirim). Dev'de SMTP yoksa log'a yazar.
