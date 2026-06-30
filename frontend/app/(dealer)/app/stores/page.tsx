@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { Store, Plus, Trash2, KeyRound, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -63,6 +63,9 @@ export default function StoresPage() {
         <h1 className="text-xl font-semibold text-navy dark:text-white">{t('title')}</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
+
+      {/* Etsy OAuth bağlantısı */}
+      <EtsyConnectCard />
 
       {/* Yeni mağaza formu */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
@@ -156,6 +159,114 @@ export default function StoresPage() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+/* ── Etsy OAuth bağlantı kartı ── */
+function EtsyConnectCard() {
+  const tr = useLocale() === 'tr';
+  const qc = useQueryClient();
+  const status = useQuery({
+    queryKey: ['etsy', 'status'],
+    queryFn: () => api<{ connected: boolean; shopName?: string; shopId?: string }>('/etsy/status'),
+  });
+
+  // Callback dönüşü (?etsy=connected|error) → toast
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const e = p.get('etsy');
+    if (e === 'connected') {
+      toast.success(tr ? `Etsy bağlandı${p.get('shop') ? ': ' + p.get('shop') : ''}` : 'Etsy connected');
+      qc.invalidateQueries({ queryKey: ['etsy', 'status'] });
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (e === 'error') {
+      toast.error((tr ? 'Etsy bağlanamadı: ' : 'Etsy connection failed: ') + (p.get('msg') || ''));
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [tr, qc]);
+
+  const connect = useMutation({
+    mutationFn: () => api<{ url: string }>('/etsy/connect'),
+    onSuccess: (d) => {
+      if (d?.url) window.location.href = d.url;
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : 'Etsy'),
+  });
+  const disconnect = useMutation({
+    mutationFn: () => api('/etsy/disconnect', { method: 'POST' }),
+    onSuccess: () => {
+      toast.success(tr ? 'Etsy bağlantısı kesildi' : 'Etsy disconnected');
+      qc.invalidateQueries({ queryKey: ['etsy', 'status'] });
+    },
+  });
+  const importNow = useMutation({
+    mutationFn: () => api<{ count: number; receipts: unknown[] }>('/etsy/receipts?limit=25'),
+    onSuccess: (d) =>
+      toast.success(
+        tr ? `${d?.receipts?.length ?? 0} Etsy siparişi çekildi` : `Fetched ${d?.receipts?.length ?? 0} Etsy orders`,
+      ),
+    onError: (e) => toast.error(e instanceof Error ? e.message : 'Etsy'),
+  });
+
+  const connected = status.data?.connected;
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-9 w-9 rounded-xl bg-[#F1641E]/10 text-[#F1641E] flex items-center justify-center shrink-0">
+            <Store className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold text-navy dark:text-white">
+              {tr ? 'Etsy Bağlantısı (OAuth)' : 'Etsy Connection (OAuth)'}
+            </div>
+            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              {status.isLoading
+                ? '…'
+                : connected
+                  ? (tr ? 'Bağlı' : 'Connected') + (status.data?.shopName ? ` · ${status.data.shopName}` : '')
+                  : tr
+                    ? 'Mağazanı bağla, siparişlerini çek'
+                    : 'Connect your shop to pull orders'}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {connected ? (
+            <>
+              <Button
+                size="sm"
+                onClick={() => importNow.mutate()}
+                disabled={importNow.isPending}
+                className="h-9 rounded-xl"
+              >
+                {importNow.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {tr ? 'Siparişleri Getir' : 'Fetch Orders'}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => disconnect.mutate()}
+                disabled={disconnect.isPending}
+                className="h-9 rounded-xl dark:border-slate-700 dark:text-slate-200"
+              >
+                {tr ? 'Bağlantıyı Kes' : 'Disconnect'}
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => connect.mutate()}
+              disabled={connect.isPending}
+              className="h-9 rounded-xl bg-[#F1641E] hover:bg-[#d9551550]"
+            >
+              {connect.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {tr ? "Etsy'yi Bağla" : 'Connect Etsy'}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

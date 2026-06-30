@@ -50,6 +50,7 @@ import { ProductionModule } from './production/production.module';
 import { WhitelabelModule } from './whitelabel/whitelabel.module';
 import { PublicModule } from './public/public.module';
 import { SmsModule } from './sms/sms.module';
+import { EtsyModule } from './etsy/etsy.module';
 import { EducationModule } from './education/education.module';
 import { ConsultingModule } from './consulting/consulting.module';
 import { EventsModule } from './events/events.module';
@@ -197,6 +198,7 @@ import { HealthController } from './health.controller';
     WhitelabelModule,
     PublicModule,
     SmsModule,
+    EtsyModule,
     EducationModule,
     ConsultingModule,
     EventsModule,
